@@ -34,10 +34,6 @@ class FlatteningControl extends Component {
     return this.props.parametricObj.transformationInstructions.shaping.formula;
   }
 
-  get currentProjection() {
-    this.props.parametricObj.transformationInstructions.projecting.vectors.pop();
-  }
-
   setUI_ProjectingTypes = (newState, shape) => {
     this.setState(
       this.setUI_StateCallback(newState, "projecting", {
@@ -51,7 +47,6 @@ class FlatteningControl extends Component {
     );
   };
 
-  //TODO: flattening functions can be simplified
   handleFlattening1Change = data => {
     this.handleFlatteningChange(data.pop(), "v1");
   };

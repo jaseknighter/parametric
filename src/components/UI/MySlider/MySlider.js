@@ -27,9 +27,7 @@ class MySlider extends Component {
 
   onUpdate = update => {
     this.setState({ update });
-    {
-      this.props.update(update);
-    }
+    this.props.update(update);
   };
 
   onChange = values => {
