@@ -1,0 +1,16 @@
+.Slider {
+  position: relative;
+  width: 80%;
+  /* height: 100%; */
+  margin-bottom: 1rem;
+  margin-left: .5vh;
+}
+
+.Rail {
+  position: absolute;
+  width: 100%;
+  height: 10;
+  margin-top: 35;
+  border-radius: 5;
+  background-color: #8B9CB6;
+}

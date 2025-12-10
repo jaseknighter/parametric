@@ -1,0 +1,137 @@
+.dg.ac {
+  visibility: hidden;
+  z-index: 10;
+  top: calc(100vh - 100px);
+  left: 2px;
+}
+
+.Container {
+  height: calc(100vh * 2 -2rem);
+  display: grid;
+  grid-template-areas:
+    "margin___left header header header header"
+    "interface interface three three three"
+    "footer footer footer footer footer ";
+
+  grid-template-columns: 4rem 6rem auto;
+  grid-template-rows: 6rem calc(100vh - 7rem) 15rem;
+}
+
+.Container > :not(:first-child) {
+  z-index: 2;
+}
+
+.Three {
+  grid-area: three;
+  width: calc(100vw - 11rem);
+  height: calc(100vh - 7rem);
+}
+
+.Interface_Container {
+  z-index: 4;
+  grid-area: interface;
+  align-items: left;
+}
+
+@media (min-height: 31.3rem) and (min-width: 31.3rem) {
+  .Container {
+    grid-template-areas:
+      "margin___left header header header header"
+      "margin___left three three three three"
+      "margin___left interface interface interface interface"
+      "footer footer footer footer footer ";
+
+    grid-template-columns: 4rem auto;
+    grid-template-rows: 6rem calc(100vh - 15rem - 6rem) 15rem;
+  }
+
+  .Three {
+    width: calc(100vw - 4rem);
+    height: calc(100vh - 23rem);
+  }
+
+  .Footer {
+    z-index: 4;
+    grid-area: footer;
+    color: white;
+
+    padding-right: 4rem;
+    display: grid;
+    grid-template-areas:
+      "footer___Header footer___Header footer___Header footer___Header footer___Header"
+      "footer___Content footer___Content footer___Content footer___Content footer___Content"
+      "footer___Footer footer___Footer footer___Footer footer___Footer footer___Footer";
+
+    grid-template-columns: 4rem auto;
+    grid-template-rows: 14rem calc(100vh - 21rem) 6rem;
+  }
+
+  .Footer___Title {
+    font-size: 3rem;
+    padding-right: 0.5rem;
+    margin-left: 4rem;
+    text-align: right;
+    padding-top: 9rem;
+    grid-area: footer___Header;
+  }
+  .Footer___Content___Container {
+    background-color: #777;
+    grid-area: footer___Content;
+    padding-left: 4rem;
+    padding-top: 2rem;
+    /* height:100% */
+  }
+  
+}
+
+.Header {
+  z-index: 4;
+  grid-area: header;
+  padding-left: 0.5rem;
+  padding-top: 2rem;
+  font-size: 3rem;
+  color: white;
+}
+
+.Footer {
+  z-index: 4;
+  grid-area: footer;
+  padding-left: 4rem;
+  color: white;
+  display: grid;
+  grid-template-areas:
+    "footer___Header footer___Header footer___Header footer___Header footer___Header"
+    "footer___Content footer___Content footer___Content footer___Content footer___Content"
+    "footer___Footer footer___Footer footer___Footer footer___Footer footer___Footer";
+
+  grid-template-columns: 4rem auto;
+  grid-template-rows: 14rem calc(100vh - 14rem) 6rem;
+}
+
+.Footer___Title {
+  font-size: 3rem;
+  padding-right: 0.5rem;
+  margin-right: 4rem;
+  margin-left: 4rem;
+  text-align: right;
+  padding-top: 9rem;
+  grid-area: footer___Header;
+}
+.Footer___Content___Container {
+  background-color: #777;
+  grid-area: footer___Content;
+  padding-left: 4rem;
+  padding-top: 2rem;
+  margin-top: 7rem;
+  margin-right: 6rem;
+}
+
+.Footer___Content___Container text {
+  padding: 2rem;
+  display: block;
+  height: 70%;
+  width: 70%;
+  font-size: 2rem;
+  color: #ccc;
+  background-color: #999;
+}

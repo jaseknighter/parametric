@@ -1,0 +1,63 @@
+{
+  "cutting": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "cutU": {
+      "u": {
+        "from": 0,
+        "to":  {
+          "operators": "*",
+          "operands": ["u", 0.5]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    }
+  }
+}

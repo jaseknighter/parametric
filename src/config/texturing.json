@@ -1,0 +1,134 @@
+{
+  "texturing": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "textureCircleXY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "/",
+          "operands": [
+            {
+              "operators": "cos",
+              "operands": [
+                {
+                  "operators": "*",
+                  "operands": ["u", 4]
+                }
+              ]
+            },
+            {
+              "operators": "+",
+              "operands": [
+                {
+                  "operators": "cos",
+                  "operands": ["u"]
+                },
+                4
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "/",
+          "operands": [
+            {
+              "operators": "sin",
+              "operands": [
+                {
+                  "operators": "*",
+                  "operands": ["u", 4]
+                }
+              ]
+            },
+            {
+              "operators": "+",
+              "operands": [
+                {
+                  "operators": "sin",
+                  "operands": ["u"]
+                },
+                4
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "tcircleXY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    }
+  }
+}

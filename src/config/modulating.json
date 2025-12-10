@@ -1,0 +1,342 @@
+{
+  "modulating": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "modulateX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "modulateY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2 ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "modulateZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ]
+    },
+    "modulateXY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "modulateYZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ]
+    },
+    "modulateXZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", 2]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "stingrayXY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "-",
+              "operands": ["u", "u"]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", "u"]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": ["u", "u"]
+            }
+          ]
+        }
+      ]
+    },
+    "twistY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": ["v"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "+",
+              "operands": ["v", "u", "v"]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "cos",
+          "operands": ["v"]
+        }
+      ]
+    }
+  }
+}

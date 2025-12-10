@@ -1,0 +1,481 @@
+{
+  "shaping": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "lineX2": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [1, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "lineX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [1, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "lineY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [1, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "lineZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [1, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "cosX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "cosY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "cosZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "sinX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "sinY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "sinZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["1"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "circleXY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "circleYZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ]
+    },
+    "circleXZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "cos",
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": ["u"]
+        }
+      ]
+    },
+
+    "nestedOperandsExample": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "+",
+              "operands": ["u", "v", "u", "u"]
+            }
+          ]
+        },
+        {
+          "operators": "cos",
+          "operands": [
+            {
+              "operators": "+",
+              "operands": ["v", "v", "v", "v"]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    }
+  }
+}

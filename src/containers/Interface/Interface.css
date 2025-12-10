@@ -1,0 +1,505 @@
+@keyframes openControlsAnim_1column {
+  0% {
+    /* width: 3rem; */
+  }
+  100% {
+    /* width: 10rem; */
+  }
+}
+
+@keyframes closeControlsAnim_1column {
+  0% {
+    /* width: 10rem; */
+  }
+  100% {
+    /* width: 3rem; */
+  }
+}
+
+@keyframes openControlsAnim_2column {
+  0% {
+    /* width: 3rem; */
+  }
+  100% {
+    /* width: 16rem; */
+  }
+}
+
+@keyframes closeControlsAnim_2column {
+  0% {
+    /* width: 16rem; */
+  }
+  100% {
+    /* width: 3rem; */
+  }
+}
+
+@keyframes openControlsAnim_3column {
+  0% {
+    /* height: 3rem; */
+  }
+  100% {
+    /* height: 22rem; */
+  }
+}
+
+@keyframes closeControlsAnim_3column {
+  0% {
+    /* height: 22rem; */
+  }
+  100% {
+    /* height: 3rem; */
+  }
+}
+
+.Controls___Container_1column_Open {
+  visibility: visible;
+  /* animation: openControlsAnim_1column 250ms ease-in-out; */
+  width: 11rem;
+  opacity: 1;
+}
+
+.Controls___Container_2column_Open {
+  visibility: visible;
+  /* animation: openControlsAnim_2column 250ms ease-in-out; */
+  width: 11rem;
+  opacity: 1;
+}
+
+.Controls___Container_3column_Open {
+  visibility: visible;
+  /* animation: openControlsAnim_3column 250ms ease-in-out; */
+  width: 11rem;
+  opacity: 1;
+}
+
+.Controls___Container_1column_Close {
+  /* animation: closeControlsAnim_1column 250ms ease-in-out; */
+  padding-left: 0rem;
+}
+.Controls___Container_2column_Close {
+  /* animation: closeControlsAnim_2column 250ms ease-in-out; */
+  padding-left: 0rem;
+}
+.Controls___Container_3column_Close {
+  /* animation: closeControlsAnim_3column 250ms ease-in-out; */
+  padding-left: 0rem;
+}
+
+.Controls_Show {
+  opacity: 1;
+  padding-left: 1rem;
+  transition: opacity 250ms ease-in-out;
+  /* visibility: visible; */
+}
+
+.Controls_Hide {
+  /* visibility: hidden; */
+  /* animation: hideControlsAnim 250ms */
+  opacity: 0;
+  transition: opacity 250ms ease-in-out;
+}
+
+.Interface {
+  /* width: 100vw;*/
+  width: 100%;
+  background-color: #777;
+  display: grid;
+  grid-template-columns: 10rem;
+  grid-template-rows: repeat(13, min-content);
+  
+}
+
+/* .Container > .Interface {
+  grid-template-columns: [c-1-start] 3rem [c-1-end c-2-start] 3rem [c-2-end c-3-start] 3rem[c-3-end c-4-start] 3rem[c-4-end];
+} */
+
+/* .TAreaInterface > .TAreaInterface_controlsContainer {
+  visibility: hidden;
+  width:3rem;
+} */
+
+select {
+  width: 15vw;
+  height: 3vh;
+  font-size: 1rem;
+  outline: none;
+}
+
+.TAreaInterface {
+  display: grid;
+  grid-template-areas: "label controls";
+  grid-template-columns: 11rem auto;
+  grid-template-rows: 3rem;
+
+  background-color: rgba(202, 117, 117, 0.5);
+}
+.TAreaInterface___TitleButton {
+  grid-area: label;
+  display: grid;
+  text-align: left;
+  padding-top: 1rem;
+  height: 3rem;
+  width: 11rem;
+
+  outline: none;
+  cursor: pointer;
+  border: 0;
+
+  background-color: rgba(100, 100, 100, 40%);
+}
+
+.Controls_Opened .TAreaInterface___TitleButton {
+  background-color: rgba(100, 100, 100, 20%);
+}
+
+.Controls___Container_Opened .TAreaInterface___TitleButton:active {
+  background-color: rgba(100, 100, 100, 80%);
+}
+
+.TAreaInterface___TitleButton:hover {
+  background-color: rgba(100, 100, 100, 30%);
+}
+
+.TAreaInterface___TitleButton:active {
+  background-color: rgba(100, 100, 100, 10%);
+}
+
+.TAreaInterface___TitleButton_Label {
+  color: black;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.TAreaInterface_controlsContainer.Controls_Show {
+  width: calc(100% - 1rem);
+  background-color: rgba(202, 117, 117, 0.8);
+
+  border: 1rem solid rgba(152,126,125,0.4);
+  padding-bottom: 1rem;
+}
+
+.TAreaInterface.Controls___Container_Close .TAreaInterface_controlsContainer {
+  width: 0;
+}
+
+.TAreaInterface_controlsContainer:not(.Controls_Show) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.TAreaInterface_controlsContainer {
+  grid-area: controls;
+  width: 0rem;
+  grid-row-start: 1;
+  align-self: end;
+  margin-bottom: -9rem;
+  background-color: rgba(202, 117, 117, 0.5);
+  display: grid;
+  grid-template-areas:
+    "usc-r-0 usc-r-0 usc-r-0"
+    "usc-r-1 usc-r-1 usc-r-1"
+    "usc-r-2 usc-r-2 usc-r-2"
+    "usc-r-3 usc-r-3 usc-r-3";
+  grid-template-rows: 3rem 3rem 3rem 3rem;
+}
+
+.VectorLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  grid-row-start: 1;
+  align-self: end;
+}
+
+/* //////////////////////////////////////////////////////
+// Buttons
+////////////////////////////////////////////////////// */
+
+.IconButton {
+  outline: none;
+  cursor: pointer;
+  border: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-top: 0.5rem;
+  background-repeat: no-repeat;
+  background-color: #aaa;
+}
+
+.IconButton:hover {
+  background-color: #ccc;
+}
+
+.IconButton:active {
+  background-color: #ddd;
+}
+
+.IconButton___Active {
+  background-color: #eee !important;
+  pointer-events: none;
+}
+
+.IconButton___Vector___Active {
+  background-color: #eee !important;
+}
+
+.IconButton___disabled {
+  pointer-events: none;
+  background-color: #777 !important;
+  cursor: not-allowed;
+}
+
+/* Shape buttons */
+/* TODO: fix hit area of button */
+.IconButton___line {
+  background-position: 49%;
+  background-size: 4rem;
+  grid-row-start: 1;
+  background-image: url("../../resources/icons/line_icon.png");
+}
+.IconButton___sin {
+  background-position: 49%;
+  background-size: 4rem;
+  grid-row-start: 2;
+  background-image: url("../../resources/icons/sine_icon.png");
+}
+.IconButton___cos {
+  background-position: 49%;
+  background-size: 4rem;
+  grid-row-start: 3;
+  background-image: url("../../resources/icons/cos_icon.png");
+}
+.IconButton___circle {
+  background-position: 49%;
+  background-size: 4rem;
+  grid-row-start: 4;
+  background-image: url("../../resources/icons/circle_icon.png");
+}
+
+/* XZY Buttons */
+.IconButton_leftColumn {
+  grid-column-start: 0;
+}
+
+.IconButton_rightColumn {
+  grid-column-start: 1;
+}
+
+.IconButton___x {
+  background-position-x: 75%;
+  background-position-y: 55%;
+  background-size: 4rem;
+  grid-row-start: 2;
+  background-image: url("../../resources/icons/x_icon.png");
+}
+.IconButton___y {
+  background-position-x: 45%;
+  background-position-y: 30%;
+  background-size: 4rem;
+  grid-row-start: 3;
+  background-image: url("../../resources/icons/y_icon.png");
+}
+.IconButton___z {
+  background-position-x: 32%;
+  background-position-y: 74%;
+  background-size: 4rem;
+  grid-row-start: 4;
+  background-image: url("../../resources/icons/z_icon.png");
+}
+
+/* //////////////////////////////////////////////////////
+// Sliders
+////////////////////////////////////////////////////// */
+
+.UISliderContainer {
+  display: grid;
+  grid-template-areas:
+    "sliderlabel sliderlabel sliderlabel"
+    "slider slider slider";
+  grid-template-rows: auto 3rem;
+  width: 6rem;
+  margin-top: 1rem;
+}
+
+.SliderLabel {
+  grid-area: sliderlabel;
+  grid-column-start: 1;
+  padding-left: 0.5rem;
+  padding-bottom: 0.5rem;
+  height: 1rem;
+  font-weight: 600;
+}
+
+.Slider {
+  grid-area: slider;
+  grid-column-start: 1;
+  padding-top: 1rem;
+}
+
+.UISliderContainer__1 {
+  grid-area: usc-r-0;
+  grid-column-start: 1;
+}
+
+.UISliderContainer__2 {
+  grid-area: usc-r-0;
+  grid-column-start: 2;
+}
+
+.UISliderContainer__3 {
+  grid-area: usc-r-0;
+  grid-column-start: 3;
+}
+
+@media (min-height: 31.3rem) and (min-width: 31.3rem) {
+  @keyframes openControlsAnim_1column {
+    0% {
+      width: 3rem;
+    }
+    100% {
+      width: 10rem;
+    }
+  }
+
+  @keyframes closeControlsAnim_1column {
+    0% {
+      width: 10rem;
+    }
+    100% {
+      width: 3rem;
+    }
+  }
+
+  @keyframes openControlsAnim_2column {
+    0% {
+      width: 3rem;
+    }
+    100% {
+      width: 16rem;
+    }
+  }
+
+  @keyframes closeControlsAnim_2column {
+    0% {
+      width: 16rem;
+    }
+    100% {
+      width: 3rem;
+    }
+  }
+
+  @keyframes openControlsAnim_3column {
+    0% {
+      width: 3rem;
+    }
+    100% {
+      width: 22rem;
+    }
+  }
+
+  @keyframes closeControlsAnim_3column {
+    0% {
+      width: 22rem;
+    }
+    100% {
+      width: 3rem;
+    }
+  }
+
+  .Interface {
+    height: 100%;
+    background-color: #777;
+    display: grid;
+    grid-template-rows: 13rem;
+    grid-template-columns: repeat(12, min-content);
+  }
+
+  .TAreaInterface {
+    display: grid;
+    grid-template-areas: "label controls";
+    grid-template-columns: 3rem auto;
+    grid-template-rows: 13rem;
+    background-color: rgba(202, 117, 117, 0.5);
+  }
+
+  .TAreaInterface_controlsContainer {
+    grid-area: controls;
+    width: 0rem;
+    grid-row-start: 1;
+    margin-bottom: 0rem;
+    padding-bottom: 1rem;
+    display: grid;
+    grid-template-areas:
+      "usc-r-0 usc-r-0 usc-r-0"
+      "usc-r-1 usc-r-1 usc-r-1"
+      "usc-r-2 usc-r-2 usc-r-2"
+      "usc-r-3 usc-r-3 usc-r-3";
+    grid-template-columns: repeat(auto-fit, 6rem);
+    grid-template-rows: 3rem 3rem 3rem 3rem;
+  }
+
+  .TAreaInterface___TitleButton {
+    grid-area: label;
+    display: grid;
+    text-align: left;
+    padding-top: 1rem;
+    transform: rotate(90deg) translateX(1rem) translateY(-3rem);
+    transform-origin: top left;
+    height: 3rem;
+    width: 12rem;
+    outline: none;
+    cursor: pointer;
+    border: 0;
+    background-color: rgba(100, 100, 100, 40%);
+  }
+
+  .TAreaInterface_controlsContainer.Controls_Show {
+    border:none;
+    width: calc(100% - 2rem);
+    padding-bottom: 1rem;
+  }
+
+  .Controls___Container_1column_Open {
+    visibility: visible;
+    animation: openControlsAnim_1column 250ms ease-in-out;
+    width: 11rem;
+    opacity: 1;
+  }
+
+  .Controls___Container_2column_Open {
+    visibility: visible;
+    animation: openControlsAnim_2column 250ms ease-in-out;
+    width: 17rem;
+    opacity: 1;
+  }
+
+  .Controls___Container_3column_Open {
+    visibility: visible;
+    animation: openControlsAnim_3column 250ms ease-in-out;
+    width: 23rem;
+    opacity: 1;
+  }
+
+  .Controls___Container_1column_Close {
+    animation: closeControlsAnim_1column 250ms ease-in-out;
+    padding-left: 0rem;
+  }
+  .Controls___Container_2column_Close {
+    animation: closeControlsAnim_2column 250ms ease-in-out;
+    padding-left: 0rem;
+  }
+  .Controls___Container_3column_Close {
+    animation: closeControlsAnim_3column 250ms ease-in-out;
+    padding-left: 0rem;
+  }
+
+  .Controls_Show {
+    opacity: 1;
+    transition: opacity 250ms ease-in-out;
+  }
+
+  .Controls_Hide {
+    opacity: 0;
+    transition: opacity 250ms ease-in-out;
+  }
+}

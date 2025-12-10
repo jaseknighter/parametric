@@ -1,0 +1,242 @@
+{
+  "spiraling": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "spiralX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "*",
+          "operands": ["u",1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "spiralY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "spiralZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+
+
+    "spiralXY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "spiralYZ": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "spiralXZ": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "spiralingtest": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "/",
+          "operands": [3, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["v"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    }
+  }
+}

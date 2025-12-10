@@ -1,0 +1,131 @@
+{
+  "rotating": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    },
+    "rotateZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [2, "Math.PI"]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "-",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                {
+                  "operators": "cos",
+                  "operands": [
+                    {
+                      "operators": "/",
+                      "operands": ["Math.PI", 6]
+                    }
+                  ]
+                },
+                "u"
+              ]
+            },
+            {
+              "operators": "*",
+              "operands": [
+                {
+                  "operators": "sin",
+                  "operands": [
+                    {
+                      "operators": "/",
+                      "operands": ["Math.PI", 6]
+                    }
+                  ]
+                },
+                {
+                  "operators": "sin",
+                  "operands": ["u"]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "-",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                {
+                  "operators": "sin",
+                  "operands": [
+                    {
+                      "operators": "/",
+                      "operands": ["Math.PI", 6]
+                    }
+                  ]
+                },
+                "u"
+              ]
+            },
+            {
+              "operators": "*",
+              "operands": [
+                {
+                  "operators": "cos",
+                  "operands": [
+                    {
+                      "operators": "/",
+                      "operands": ["Math.PI", 6]
+                    }
+                  ]
+                },
+                {
+                  "operators": "sin",
+                  "operands": ["u"]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [1]
+        }
+      ]
+    }
+  }
+}
