@@ -290,8 +290,8 @@ class Parametric extends Component {
         </div>
         <footer id="footer" className="Footer">
           {/* TODO: create a blurb about parametric equations */}
-          {/* <header className="Footer___Title">About Parametric Equations</header> */}
-          <header className="Footer___Title">   </header>
+          <header className="Footer___Title">About Parametric Equations</header>
+          {/* <header className="Footer___Title">   </header> */}
           <div className="Footer___Content___Container">{/* <h3></h3> */}</div>
         </footer>
       </div>
