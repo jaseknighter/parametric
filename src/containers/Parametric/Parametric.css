@@ -53,12 +53,11 @@ html {
     width: calc(100vw - 4rem);
     height: calc(100vh - 23rem);
   }
-
+  
   .Footer {
     z-index: 4;
     grid-area: footer;
     color: white;
-
     padding-right: 4rem;
     display: grid;
     grid-template-areas:
@@ -87,15 +86,6 @@ html {
   }
   
 }
-/* 
-.Header {
-  z-index: 4;
-  grid-area: header;
-  padding-left: 0.5rem;
-  padding-top: 2rem;
-  font-size: 3rem;
-  color: white;
-} */
 
 .Header {
   z-index: 4;
