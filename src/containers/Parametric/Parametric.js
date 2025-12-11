@@ -130,7 +130,7 @@ class Parametric extends Component {
     const far = 1000; // the far space in front of the camera that will be clipped
 
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, 0, 15);
+    camera.position.set(0, 0, 7);
     camera.lookAt(0, 0, 0);
 
     this.controls = new OrbitControls(camera, canvas);
