@@ -280,6 +280,9 @@ class Parametric extends Component {
       <div className="Container">
         <header id="header" className="Header">
           Parametric Equations
+          <a href="#footer" className="about-link">
+            (about)
+          </a>
         </header>
         <canvas className="Three" id="three" />
         <div id="control" className="Interface_Container">
@@ -289,9 +292,7 @@ class Parametric extends Component {
           />
         </div>
         <footer id="footer" className="Footer">
-          {/* TODO: create a blurb about parametric equations */}
           <header className="Footer___Title">About Parametric Equations</header>
-          {/* <header className="Footer___Title">   </header> */}
           <div className="Footer___Content___Container"><h3>add info about parametric equations...</h3></div>
         </footer>
       </div>
