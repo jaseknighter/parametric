@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/parametric/static/css/main.b922319d.css",
-    "main.js": "/parametric/static/js/main.9527ce10.js",
+    "main.js": "/parametric/static/js/main.ec759b98.js",
     "index.html": "/parametric/index.html",
     "main.b922319d.css.map": "/parametric/static/css/main.b922319d.css.map",
-    "main.9527ce10.js.map": "/parametric/static/js/main.9527ce10.js.map"
+    "main.ec759b98.js.map": "/parametric/static/js/main.ec759b98.js.map"
   },
   "entrypoints": [
     "static/css/main.b922319d.css",
-    "static/js/main.9527ce10.js"
+    "static/js/main.ec759b98.js"
   ]
 }
