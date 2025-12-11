@@ -57,16 +57,7 @@ class ProjectingControl extends Component {
     return this.props.parametricObj.transformationInstructions.shaping.formula;
   }
 
-  get currentProjection() {
-    this.props.parametricObj.transformationInstructions.projecting.vectors.pop();
-  }
-
   setUI_StateCallback = (newState, updateArea, newObj) => {
-    if (updateArea === "shaping") {
-      const newShape =
-        newState.parametricObj.transformationInstructions.shaping.formula;
-    }
-
     return (previousState, currentProps) => {
       return {
         ...previousState,
@@ -117,9 +108,6 @@ class ProjectingControl extends Component {
   };
 
   handleProjectingChange = data => {
-    const shape_Current = this.props.parametricObj.transformationInstructions
-      .shaping.formula;
-
     const currentProjectingFormula = this.props.parametricObj
       .transformationInstructions.projecting.formula;
 
@@ -191,7 +179,7 @@ class ProjectingControl extends Component {
       }
     });
 
-    if (projectionArea == "shaping") {
+    if (projectionArea === "shaping") {
       const updateArray = [
         {
           objectStatePath: statePath,
@@ -200,7 +188,7 @@ class ProjectingControl extends Component {
         }
       ];
       this.props.handleUpdate(updateArray);
-    } else if (projectionArea == "projecting") {
+    } else if (projectionArea === "projecting") {
       const updateArray = [
         {
           objectStatePath: statePath,

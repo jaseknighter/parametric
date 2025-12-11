@@ -1,6 +1,7 @@
 {
   "name": "parametric-equations",
   "version": "0.1.0",
+  "homepage": "https://jaseknighter.github.io/parametric",
   "private": true,
   "dependencies": {
     "immutability-helper": "^3.0.1",
@@ -10,10 +11,13 @@
     "react-dom": "^16.9.0",
     "three": "^0.181.2"
   },
-   "devDependencies": {
+  "devDependencies": {
+    "gh-pages": "^6.3.0",
     "react-scripts": "5.0.1"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

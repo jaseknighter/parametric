@@ -12,10 +12,6 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
       open: false
     };
 
-    constructor(props) {
-      super(props);
-    }
-
     componentDidMount = () => {
       this.controlsRef = React.createRef();
       this.updateControlsRef = this.updateControlsRef.bind(this);

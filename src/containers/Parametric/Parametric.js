@@ -195,38 +195,6 @@ class Parametric extends Component {
     // this.addSolidGeometry(0, 0, geometry, "pGeo");
     // this.addLineGeometry(0, 0, geometry, "pGeo");
 
-    //TODO: Turn class into a regular function
-    class AxisGridHelper {
-      constructor(node, units = 10, axisOnly) {
-        const axes = new THREE.AxesHelper();
-        axes.material.depthTest = false;
-        axes.renderOrder = 2; // after the grid
-        node.add(axes);
-
-        const grid = new THREE.GridHelper(units, units);
-        grid.material.depthTest = false;
-        grid.renderOrder = 1;
-        node.add(grid);
-
-        this.axisOnly = axisOnly;
-        this.grid = grid;
-        this.axes = axes;
-        this.visible = false;
-        this.axisOnly = axisOnly ? true : false;
-      }
-      get visible() {
-        return this._visible;
-      }
-      set visible(v) {
-        this._visible = v;
-
-        if (!this.axisOnly) {
-          this.grid.visible = v;
-        }
-        this.axes.visible = v;
-      }
-    }
-
     // create lighting
     const color = 0xffffff;
     const intensity = 2;

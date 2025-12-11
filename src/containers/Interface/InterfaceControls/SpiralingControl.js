@@ -32,10 +32,6 @@ class SprialingControl extends Component {
   get currentShape() {
     return this.props.parametricObj.transformationInstructions.shaping.formula;
   }
-
-  get currentProjection() {
-    this.props.parametricObj.transformationInstructions.projecting.vectors.pop();
-  }
   
   handleSpiraling1Change = data => {
     this.handleSpiralingChange(data.pop(), "v1");
