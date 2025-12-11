@@ -38,11 +38,11 @@ const checkFlatten = (flattenAmt, valToFlatten) => {
 const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, currentShape, currentVectors) =>
 {
   const spiralCos = vectorParams && vectorParams.spiralCos 
-    ? ((1+u*vectorParams.spiralCosAmt) * math.cos(u*vectorParams.spiralCosAmt))
+    ? ((1+ u*vectorParams.spiralCosAmt) * math.cos(u*vectorParams.spiralCosAmt) * 0.25)
     : 0;
    
   const spiralSin = vectorParams && vectorParams.spiralSin 
-    ? ((1+u*vectorParams.spiralSinAmt) * math.sin(u*vectorParams.spiralSinAmt))
+    ? ((1+ u*vectorParams.spiralSinAmt) * math.sin(u*vectorParams.spiralSinAmt) * 0.25)
     : 0;
   const modulateAmt = vectorParams && vectorParams.modulate ? vectorParams.modulateAmt: 1;
   const outerTextureAmt = vectorParams && vectorParams.texture ? vectorParams.outerTextureAmt: 1;

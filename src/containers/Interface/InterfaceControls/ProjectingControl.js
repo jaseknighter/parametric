@@ -88,7 +88,7 @@ class ProjectingControl extends Component {
       : this.props.parametricObj.transformationInstructions.projecting.vectors;
 
     const vectorToUpdate = vID === 1 ? currentVectors[0] : currentVectors[1];
-
+    
     const projectionFactor = newState
       ? newState.parametricObj.transformationInstructions.projecting.formula
       : this.props.parametricObj.transformationInstructions.projecting.formula;
