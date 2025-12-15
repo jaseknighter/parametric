@@ -1,8 +1,8 @@
 {
-  "name": "parametric-equations",
   "version": "0.1.0",
   "homepage": "https://jaseknighter.github.io/parametric",
   "private": true,
+  "display": "browser",
   "dependencies": {
     "immutability-helper": "^3.0.1",
     "mathjs": "^15.1.0",
