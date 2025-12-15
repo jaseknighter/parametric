@@ -26,10 +26,6 @@ class FlatteningControl extends Component {
     });
   };
 
-  componentDidUpdate = () => {
-    // console.log("componentDidUpdate");
-  };
-
   get currentShape() {
     return this.props.parametricObj.transformationInstructions.shaping.formula;
   }

@@ -10,7 +10,6 @@ class Select extends Component {
   //On the change event for the select box pass the selected value back to the parent
   handleChange = event => {
     let selectedValue = event.target.value;
-    console.log("id: ",event.target)
     if (selectedValue !== "select") {
       this.props.onSelectChange(selectedValue);
     }

@@ -40,10 +40,6 @@ class ProjectingControl extends Component {
     });
   };
 
-  componentDidUpdate = () => {
-    // console.log("componentDidUpdate");
-  };
-
   //TODO: refactor code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state
   componentWillReceiveProps = nextProps => {
     if (this.state.initedInterface) {
@@ -88,13 +84,12 @@ class ProjectingControl extends Component {
       : this.props.parametricObj.transformationInstructions.projecting.vectors;
 
     const vectorToUpdate = vID === 1 ? currentVectors[0] : currentVectors[1];
-    
+
     const projectionFactor = newState
       ? newState.parametricObj.transformationInstructions.projecting.formula
       : this.props.parametricObj.transformationInstructions.projecting.formula;
 
-    //TODO: address need for workaround to not activate
-    //  vector 2 button if only 1 vector is being projected
+    //TODO: find a better way set vector2 when vector 1 is updated (see additional TODO note below.)
     const project1Check = vID === 2 && projectionFactor === "project1";
 
     return (
@@ -134,8 +129,6 @@ class ProjectingControl extends Component {
         ? this.props.parametricObj.transformationInstructions.shaping.vectors
         : this.props.parametricObj.transformationInstructions.projecting
             .vectors;
-
-    // console.log("updatedVectors",updatedVectors)
 
     const statePath =
       projectionArea === "shaping"
@@ -199,14 +192,37 @@ class ProjectingControl extends Component {
           objectStatePath: statePath,
           paramToUpdate: "vectors",
           newValue: updatedVectors
+        },
+        {
+          objectStatePath: statePath,
+          paramToUpdate: "visible",
+          visible: true
         }
       ];
-      //TODO: find a better way to not do anything if only vector 2 has a value
+
+      //TODO: find a better way update vector2 when vector 1 is updated...
+      //      for now, vector 2 is removed and then added back.
       if (!updatedVectors[0] && updatedVectors[1]) {
-        // console.log("do nothing!");
+        // do nothing!
         return;
       } else {
-        this.props.handleUpdate(updateArray);
+        if (updateArray[0].newValue == "project1" && updateArray[1].newValue[1] !== null) {
+          // project vector 1, clear vector 2 temporarily",updateArray,clearUpdateArray
+          const clearUpdateArray = structuredClone(updateArray);
+          clearUpdateArray[1].newValue[1] = null;
+          clearUpdateArray[2].visible = false; // use this for visibility
+          this.props.handleUpdate(clearUpdateArray);
+          setTimeout(() => {
+            // restore vector 2 and project it
+            updateArray[0].newValue = "project2";
+            this.props.handleUpdate(updateArray);
+          }, 10);
+
+        } else {
+          this.props.handleUpdate(updateArray);
+        }
+
+
       }
     }
   };

@@ -64,7 +64,8 @@ class Parametric extends Component {
             vectorParams: { pitch: 0, roll: 0, yaw: -90 }
           }
         }
-      }
+      },
+      visible: true
     };
   }
 
@@ -79,31 +80,52 @@ class Parametric extends Component {
 
   updateParametricObjHandler = updateArray => {
     updateArray.forEach(updateItem => {
-      //Dynamically create new state obj using immutability-helper
-      var newObj = {};
-      var current = newObj;
+        // 1. Dynamically create the update object for parametricObj using immutability-helper
+        var parametricObjUpdate = {};
+        var current = parametricObjUpdate;
 
-      const pathArray = updateItem.objectStatePath.split(".");
-      for (var i = 0; i < pathArray.length; i++) {
-        if (i !== pathArray.length - 1) {
-          current[pathArray[i]] = {};
-          current = current[pathArray[i]];
-        } else {
-          current[pathArray[i]] = {
-            [updateItem.paramToUpdate]: { $set: updateItem.newValue }
-          };
-          current = current[pathArray[i]];
+        const pathArray = updateItem.objectStatePath.split(".");
+        for (var i = 0; i < pathArray.length; i++) {
+            if (i !== pathArray.length - 1) {
+                current[pathArray[i]] = {};
+                current = current[pathArray[i]];
+            } else {
+                current[pathArray[i]] = {
+                    [updateItem.paramToUpdate]: { $set: updateItem.newValue }
+                };
+                current = current[pathArray[i]];
+            }
         }
-      }
 
-      this.setState(this.setParametricObjStateCallback(newObj));
+        // 2. Create a separate update object for root-level state properties (like 'visible')
+        var rootStateUpdate = {};
+        
+        // Check if the updateItem includes the 'visible' property
+        if (updateItem.hasOwnProperty('visible')) {
+            // Add the visible property update to the rootStateUpdate object
+            // This will update 'this.state.visible'
+            rootStateUpdate.visible = { $set: updateItem.visible };
+        }
+
+        // 3. Call setState with both update objects
+        this.setState(
+            this.setParametricObjStateCallback(parametricObjUpdate, rootStateUpdate),
+        );
     });
   };
 
-  setParametricObjStateCallback = newObj => {
+  setParametricObjStateCallback = (parametricObjUpdate, rootStateUpdate) => {
     return (previousState, currentProps) => {
-      const updatedState = update(previousState, newObj);
-      return { ...previousState, ...updatedState };
+        
+        // Apply the update for parametricObj
+        const updatedParametricObjState = update(previousState, parametricObjUpdate);
+        
+        // Apply the update for root-level properties (like 'visible')
+        // The rootStateUpdate will only contain properties like 'visible' if they exist.
+        const combinedUpdatedState = update(updatedParametricObjState, rootStateUpdate);
+        
+        // Return the final combined state
+        return combinedUpdatedState;
     };
   };
 
@@ -113,8 +135,8 @@ class Parametric extends Component {
     const geometry = parameterizeGeometry(this.state.parametricObj);
     this.lastGeo = geometry.index.array;
     geometry.center();
-    this.addSolidGeometry(0, 0, geometry, "pGeo");
-
+    const visible = this.state.visible;
+    this.addGeometry(0, 0, geometry, "pGeo", visible);
   };
 
   setupThree = () => {
@@ -130,7 +152,7 @@ class Parametric extends Component {
     const far = 1000; // the far space in front of the camera that will be clipped
 
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, 0, 7);
+    camera.position.set(0, 0, 10);
     camera.lookAt(0, 0, 0);
 
     this.controls = new OrbitControls(camera, canvas);
@@ -144,15 +166,15 @@ class Parametric extends Component {
     // an array of objects whose rotation to update
     const objects = [];
 
-    this.createMaterial = () => {
+    this.createMaterial = (visible) => {
       //Passing THREE.DoubleSide front and back of shapes will be drawn
       //NOTE: this takes more time to render
-      // const wf = isWireFrame ? true : false;
+      const showWireframe = visible ? 1 : 0;
       const material = new THREE.MeshPhongMaterial({
         side: THREE.DoubleSide,
         specular: 0xffffff,
         shininess: 0,
-        opacity: 1,
+        opacity: showWireframe,
         transparent: true,
         flatShading: true,
         wireframe: true
@@ -164,15 +186,8 @@ class Parametric extends Component {
       return material;
     };
 
-    this.addSolidGeometry = (x, y, geometry, name) => {
-      const mesh = new THREE.Mesh(geometry, this.createMaterial());
-      this.addObject(x, y, mesh, name);
-    };
-
-    this.addLineGeometry = (x, y, geometry, name) => {
-      const material = new THREE.LineBasicMaterial({ color: 0x000000 });
-      // const material = new THREE.LineDashedMaterial({ color: 0x000000 });
-      const mesh = new THREE.LineSegments(geometry, material);
+    this.addGeometry = (x, y, geometry, name, visible) => {
+      const mesh = new THREE.Mesh(geometry, this.createMaterial(visible));
       this.addObject(x, y, mesh, name);
     };
 
@@ -191,9 +206,6 @@ class Parametric extends Component {
 
     //center the geometry
     geometry.center();
-
-    // this.addSolidGeometry(0, 0, geometry, "pGeo");
-    // this.addLineGeometry(0, 0, geometry, "pGeo");
 
     // create lighting
     const color = 0xffffff;
@@ -227,7 +239,7 @@ class Parametric extends Component {
     const centerObj = new THREE.Object3D();
     scene.add(centerObj);
 
-    // console.log("canvas",canvas)
+    // set state for canvas, renderer, camera...
     this.setState({
       canvas: canvas,
       renderer: renderer,
@@ -266,7 +278,6 @@ class Parametric extends Component {
       const height = (canvas.clientHeight * pixelRatio) | 0;
       const needResize = canvas.width !== width || canvas.height !== height;
       if (needResize) {
-        // console.log("height", height);
         renderer.setSize(width, height, false);
       }
       return needResize;

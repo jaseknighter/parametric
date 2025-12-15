@@ -55,10 +55,6 @@ class Interface extends Component {
     });
   };
 
-  componentDidUpdate = () => {
-    // console.log("componentDidUpdate");
-  };
-
   get currentShape() {
     return this.props.parametricObj.transformationInstructions.shaping.formula;
   }
@@ -159,7 +155,6 @@ class Interface extends Component {
       : 0;
 
     if (forceControlCollapse) {
-      // console.log("forceControlCollapse ");
       if (adjustControlY && controlOpened) {
         this.setState({
           ...this.state,

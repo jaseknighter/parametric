@@ -89,19 +89,16 @@ const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, curre
       if (vectorIndex === 0) { 
         if (vectorParams.texture){
           const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt)+math.cos(u)+ bendCos + spiralCos, pinchAmt));
-          // console.log("1",val=="Infinity")
           const returnVal = vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val;
           return returnVal;
         } else {
           const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt) + bendCos + spiralCos, pinchAmt));
-          // console.log("2",val=="Infinity")
           const returnVal = vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val//*(1/20);
           return returnVal;
         }
       } else if (vectorIndex === 1){
         if (vectorParams.texture){
           const val = checkFlatten(flatten2, math.pow(math.sin(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt) + math.sin(u*modulateAmt) + bendSin + spiralSin, pinchAmt));
-          // console.log("texture1", val);
           return vectorParams.spiralSin ? val*(1/(vectorParams.spiralSinAmt)): val;
         } else {
           const val = checkFlatten(flatten2, math.pow(math.sin(u*modulateAmt) + bendSin + spiralSin, pinchAmt));
@@ -118,13 +115,10 @@ const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, curre
       }
     case "project2":
       if (vectorIndex === 0 && vectors[0] === vectorToCheck) { 
-        // console.log("flattenx", flatten1)
         return checkFlatten(flatten1, math.sin(v));
       } else if (vectorIndex === 1 && vectors[1] === vectorToCheck){
-        // console.log("flatteny", flatten2)
         return checkFlatten(flatten2, math.sin(v));
       } else if (vectorIndex === -1){
-        // console.log("flattenz", flatten3)
         return checkFlatten(flatten3, math.cos(v));
       }
     // sutting formula
@@ -203,7 +197,7 @@ const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, curre
     
     // default
     default:
-      console.log("Formula not found!!!",formula)
+      // Formula not found!!!
       return 1;
   }
 }
@@ -211,7 +205,6 @@ const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, curre
 
 
 const rotateObj = (pitch, roll, yaw,points) => {
-  // console.log("pitch, roll, yaw,points",pitch, roll, yaw,points)
   const cosA = math.cos((yaw*DEG)*(PI));
   const sinA = math.sin((yaw*DEG)*(PI));
  
@@ -245,7 +238,6 @@ const rotateObj = (pitch, roll, yaw,points) => {
 }
 
 const reflectObj = (pitch, roll, yaw,points) => {
-  // console.log(" reflect pitch, roll, yaw,points",pitch, roll, yaw,points)
   const cosA = math.cos((yaw*DEG)*(PI));
   const sinA = math.sin((yaw*DEG)*(PI));
  

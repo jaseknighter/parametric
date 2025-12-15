@@ -25,10 +25,6 @@ class SprialingControl extends Component {
     });
   };
 
-  componentDidUpdate = () => {
-    // console.log("componentDidUpdate");
-  };
-
   handleBending1Change = data => {
     this.handleBendingChange(data.pop(), "v1");
   };

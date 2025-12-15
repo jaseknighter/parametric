@@ -12,6 +12,10 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
       open: false
     };
 
+    constructor(props) {
+      super(props);
+    }
+
     componentDidMount = () => {
       this.controlsRef = React.createRef();
       this.updateControlsRef = this.updateControlsRef.bind(this);
@@ -24,7 +28,7 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
 
     componentDidUpdate = () => {
       if (this.props.collapse && this.state.open && !this.state.transitioning) {
-        // console.log("collapse")
+        // collapse
         this.updateControlsRef();
       }
     };
@@ -64,7 +68,7 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
       controlsContainer___Interface,
       controlsContainer___Button
     ) => {
-      // console.log("openControlAnim", this.openContainerStyleName);
+      // console.log("controlsContainer", this.openContainerStyleName);
       controlsContainer.classList.remove(this.openContainerStyleName);
       controlsContainer.classList.add(this.openContainerStyleName);
       controlsContainer___Interface.classList.remove("Controls_Show");

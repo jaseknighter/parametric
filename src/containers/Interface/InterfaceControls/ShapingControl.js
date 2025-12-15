@@ -43,10 +43,6 @@ class ShapingControl extends Component {
     });
   };
 
-  componentDidUpdate = () => {
-    // console.log("componentDidUpdate");
-  };
-
   //TODO: refactor code to use memoization techniques or move it to static getDerivedStateFromProps. Learn more at: https://fb.me/react-derived-state
   componentWillReceiveProps = nextProps => {
     if (this.state.initedInterface) {
