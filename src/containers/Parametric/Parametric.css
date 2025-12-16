@@ -83,8 +83,7 @@ html {
     padding-left: 4rem;
     padding-top: 2rem;
     /* height:100% */
-  }
-  
+  }  
 }
 
 .Header {
@@ -139,18 +138,15 @@ html {
 .Footer___Content___Container {
   background-color: #777;
   grid-area: footer___Content;
-  padding-left: 4rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
   padding-top: 2rem;
   margin-top: 7rem;
-  margin-right: 6rem;
+  margin-right: 16rem;
+  font-size: 1.8rem;
 }
 
-.Footer___Content___Container text {
-  padding: 2rem;
-  display: block;
-  height: 70%;
-  width: 70%;
-  font-size: 2rem;
-  color: #ccc;
-  background-color: #999;
+a:link {
+  color: rgba(202, 117, 117); /* Red color for unvisited links */
+  text-decoration: none; /* Removes the default underline */
 }

@@ -193,12 +193,14 @@ class ShapingControl extends Component {
             <h3 className="TAreaInterface___TitleButton_Label">Shape</h3>
           </button>
           <div className="TAreaInterface_controlsContainer">
-            <button
+            {/* <button
               id="iconButton___line"
               alt="line shape"
               className={this.state.ui.shaping.lineButtonClasses}
               onClick={this.handleShapingFormulaChange}
-            ></button>
+            ></button> */}
+            <label className="VectorLabel"></label>
+
             <button
               id="iconButton___sin"
               alt="sine shape"
