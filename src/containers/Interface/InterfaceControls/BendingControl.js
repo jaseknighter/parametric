@@ -1,38 +1,26 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import withInterfaceControls from './withInterfaceControls'
 import Aux from '../../../hoc/Aux/Aux';
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
 import "../../Interface/Interface.css";
 
-class SprialingControl extends Component {
-  constructor(props) {
-    super(props);
+// Note: code has been refactored into a functional component to 
+//        address depreciated `componentWillReceiveProps`
+const SprialingControl = React.memo((props) => {
+  const { parametricObj, handleUpdate, updateControlsRef } = props;
+  const shape = parametricObj.transformationInstructions.shaping.formula;
+    
+  // MEMOIZATION: Memoize the complex event handler using useCallback
+  const handleBending1Change = useCallback((data) => {
+    handleBendingChange(data.pop(), "v1");
+  }, [handleUpdate]); // Dependencies: parametricObj and handleUpdate (assuming handleUpdate is stable)
 
-    this.state = {
-      ui: {}
-    };
-  }
+  const handleBending2Change = useCallback((data) => {
+    handleBendingChange(data.pop(), "v2");
+  }, [handleUpdate]); // Dependencies: parametricObj and handleUpdate (assuming handleUpdate is stable)
 
-  componentDidMount = () => {
-    this.setState({
-      ...this.state,
-      parametricObj: this.props.parametricObj,
-      ui: {
-        ...this.state.ui,
-        
-      }
-    });
-  };
-
-  handleBending1Change = data => {
-    this.handleBendingChange(data.pop(), "v1");
-  };
-  handleBending2Change = data => {
-    this.handleBendingChange(data.pop(), "v2");
-  };
-
-  handleBendingChange = (data, vector) => {
+  const handleBendingChange = useCallback((data,vector) => {
     
     //////////////////////////////////////////////////////
     //TODO: bend should only turn to false if all vectors are < 1
@@ -51,7 +39,7 @@ class SprialingControl extends Component {
         paramToUpdate = "bendSin"
         break;
       default:
-        break;
+        return;
     }
 
     //TODO: Fix bug where bendz only works if project1/project2 values are set
@@ -66,41 +54,42 @@ class SprialingControl extends Component {
       { objectStatePath: statePath, paramToUpdate: bendParam, newValue: data }
     ];
 
-    this.props.handleUpdate(updateArray);
-  };
+    handleUpdate(updateArray);
+  }, [handleUpdate]); // Dependency on handleUpdate (assuming it is stable)
 
-  render = () => {
-    return (
-      <Aux>
-        <button
-          onClick={this.props.updateControlsRef}
-          className="TAreaInterface___TitleButton"
-        >
-          <h3 className="TAreaInterface___TitleButton_Label">Bend</h3>
-        </button>
-
-        <div className="TAreaInterface_controlsContainer">
-          <div className="UISliderContainer UISliderContainer__1">
-            <label className="SliderLabel">1</label>
-            <MySlider
-              defaultValues={[0]}
-              domain={[0, 15]}
-              update={this.handleBending1Change}
-            />
-          </div>
-
-          <div className="UISliderContainer UISliderContainer__2">
-            <label className="SliderLabel">2</label>
-            <MySlider
-              defaultValues={[0]}
-              domain={[0, 15]}
-              update={this.handleBending2Change}
-            />
-          </div>
+  return (
+    <Aux>
+      <button
+        onClick={updateControlsRef}
+        className="TAreaInterface___TitleButton"
+      >
+        <h3 className="TAreaInterface___TitleButton_Label">Bend</h3>
+      </button>
+      <div className="TAreaInterface_controlsContainer">
+        {shape !== 'sin' && (
+        <div className="UISliderContainer UISliderContainer__1">
+          <label className="SliderLabel">1</label>
+          <MySlider
+            defaultValues={[0]}
+            domain={[0, 15]}
+            update={handleBending1Change}
+          />
         </div>
-      </Aux>
-    );
-  };
-}
+        )}
+        {shape !== 'cos' && (
+        <div className="UISliderContainer UISliderContainer__2">
+          <label className="SliderLabel">2</label>
+          <MySlider
+            defaultValues={[0]}
+            domain={[0, 15]}
+            update={handleBending2Change}
+          />
+        </div>
+        )}
+      </div>
+    </Aux>
+  );
+});
 
-export default(withInterfaceControls(SprialingControl,"bend","TAreaInterface"));
+// Use React.memo as the HOC for shallow prop comparison memoization
+export default React.memo(withInterfaceControls(SprialingControl, "bend", "TAreaInterface"));

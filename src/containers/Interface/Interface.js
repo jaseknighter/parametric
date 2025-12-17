@@ -214,6 +214,9 @@ class Interface extends Component {
   };
 
   render = () => {
+    const shape = this.state.parametricObj && this.state.parametricObj.transformationInstructions.shaping.formula;
+    // console.log("render interface", this.state)
+
     return (
       <div className="Interface" ref={this.interfaceRef}>
         <ShapingControl

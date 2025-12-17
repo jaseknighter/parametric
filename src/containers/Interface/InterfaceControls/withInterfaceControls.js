@@ -28,7 +28,7 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
 
     componentDidUpdate = () => {
       if (this.props.collapse && this.state.open && !this.state.transitioning) {
-        // collapse
+        // console.log("collapse")
         this.updateControlsRef();
       }
     };
