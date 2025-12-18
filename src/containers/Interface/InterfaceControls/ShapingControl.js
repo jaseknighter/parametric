@@ -68,7 +68,6 @@ const ShapingControl = ((props) => {
         <div className="TAreaInterface_controlsContainer">
           {/* <button
             id="iconButton___line"
-            alt="line shape"
             className={shapingUI.lineButtonClasses}
             onClick={handleShapingFormulaChange}
           ></button> */}
@@ -77,21 +76,18 @@ const ShapingControl = ((props) => {
           <button
             id="iconButton___sin"
             data-shape="sin"
-            alt="sine shape"
             className={shapingUI.sinButtonClasses}
             onClick={handleShapingFormulaChange}
           ></button>
           <button
             id="iconButton___cos"
             data-shape="cos"
-            alt="cos shape"
             className={shapingUI.cosButtonClasses}
             onClick={handleShapingFormulaChange}
           ></button>
           <button
             id="iconButton___circle"
             data-shape="circle"
-            alt="circle shape"
             className={shapingUI.circleButtonClasses}
             type="button"
             onClick={handleShapingFormulaChange}
@@ -101,7 +97,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_x_v1"
             data-vector="x"
             data-group="1"
-            alt="x shape"
             className={shapingUI.x1ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>
@@ -109,7 +104,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_y_v1"
             data-vector="y"
             data-group="1"
-            alt="y shape"
             className={shapingUI.y1ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>
@@ -117,7 +111,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_z_v1"
             data-vector="z"
             data-group="1"
-            alt="z shape"
             className={shapingUI.z1ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>
@@ -126,7 +119,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_x_v2"            
             data-vector="x"
             data-group="2"
-            alt="x shape"
             className={shapingUI.x2ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>
@@ -134,7 +126,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_y_v2"
             data-vector="y"
             data-group="2"
-            alt="y shape"
             className={shapingUI.y2ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>
@@ -142,7 +133,6 @@ const ShapingControl = ((props) => {
             id="iconButton___shaping_z_v2"          
             data-vector="z"
             data-group="2"
-            alt="z shape"
             className={shapingUI.z2ButtonClasses}
             onClick={handleShapingVectorChange}
           ></button>

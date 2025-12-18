@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import withInterfaceControls from "./withInterfaceControls";
 
 const evalProjectingButtonClasses = (vector, vID, vectors, formula) => {
@@ -89,7 +89,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_x_v1"
           data-vector="x"
           data-group="1"
-          alt="x shape"
           className={projectingUI.x1ButtonClasses}
           onClick={handleProjectingChange}
         ></button>
@@ -97,7 +96,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_y_v1"
           data-vector="y"
           data-group="1"
-          alt="y shape"
           className={projectingUI.y1ButtonClasses}
           onClick={handleProjectingChange}
         ></button>
@@ -105,7 +103,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_z_v1"
           data-vector="z"
           data-group="1"
-          alt="z shape"
           className={projectingUI.z1ButtonClasses}
           onClick={handleProjectingChange}
         ></button>
@@ -114,7 +111,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_x_v2"
           data-vector="x"
           data-group="2"
-          alt="x shape"
           className={projectingUI.x2ButtonClasses}
           onClick={handleProjectingChange}
         ></button>
@@ -122,7 +118,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_y_v2"
           data-vector="y"
           data-group="2"
-          alt="y shape"
           className={projectingUI.y2ButtonClasses}
           onClick={handleProjectingChange}
         ></button>
@@ -130,7 +125,6 @@ const ProjectingControl = ((props) => {
           id="iconButton___projecting_z_v2"
           data-vector="z"
           data-group="2"
-          alt="z shape"
           className={projectingUI.z2ButtonClasses}
           onClick={handleProjectingChange}
         ></button>

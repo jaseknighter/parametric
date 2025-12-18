@@ -98,6 +98,9 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
       }
     }, [collapse, isOpen, isTransitioning, updateControlsRef]);
 
+
+
+
     return (
       <div id={controlID} className={controlClass} ref={controlsRef}>
         <WrappedComponent

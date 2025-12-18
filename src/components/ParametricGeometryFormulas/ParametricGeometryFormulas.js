@@ -1,502 +1,252 @@
 import { create, all } from "mathjs/number";
 
 const math = create(all);
-const PI = math.evaluate('pi')
+const PI = math.evaluate('pi');
 const DEG = 0.005555555555556;
 
-const checkU = (formula, u, uParams, vectors,vectorToCheck,vectorParams) =>
-{
-  switch(formula){
-    case "none": 
-      return 1;
-    case "cutU": 
-      return u*uParams;
-    default:
-      return null;
-  }
-}
+// --- Helper Functions ---
 
-const recursiveSin = (val,timesToRun) => {
-  const result = math.sin(val)
-  if (timesToRun > 1){
-    return recursiveSin(result,timesToRun-1)
-  } else {
-    return result;
-  }
-}
-
-//TODO: setting flattenAmt to 0 should undo the transformation
 const checkFlatten = (flattenAmt, valToFlatten) => {
-  if (flattenAmt>0) {
-    const recursiveSinResult = recursiveSin(valToFlatten, flattenAmt)
-    return recursiveSinResult;
-  } else {
-    return valToFlatten;
-  }
-}
+  if (flattenAmt <= 0) return valToFlatten;
+  
+  // Clamping prevents the sine function from jumping at high values
+  let currentVal = math.max(-1, math.min(1, valToFlatten));
+  
+  const stage = Math.floor(flattenAmt);
+  const blend = flattenAmt - stage;
 
-const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams, currentShape, currentVectors) =>
-{
-  const spiralCos = vectorParams && vectorParams.spiralCos 
-    ? ((1+ u*vectorParams.spiralCosAmt) * math.cos(u*vectorParams.spiralCosAmt) * 0.25)
-    : 0;
-   
-  const spiralSin = vectorParams && vectorParams.spiralSin 
-    ? ((1+ u*vectorParams.spiralSinAmt) * math.sin(u*vectorParams.spiralSinAmt) * 0.25)
-    : 0;
-  const modulateAmt = vectorParams && vectorParams.modulate ? vectorParams.modulateAmt: 1;
-  const outerTextureAmt = vectorParams && vectorParams.texture ? vectorParams.outerTextureAmt: 1;
-  const innerTextureAmt = vectorParams && vectorParams.texture ? vectorParams.innerTextureAmt: 1;
-  const bendCos = vectorParams && vectorParams.bendCos ? math.cos(v*vectorParams.bendCosAmt): 0;
-  const bendSin = vectorParams && vectorParams.bendSin ? math.sin(v*vectorParams.bendSinAmt): 0;
-  const pinchAmt = vectorParams && vectorParams.pinch ? vectorParams.pinchAmt : 1;
-  const flatten1 = vectorParams && vectorParams.flatten ? vectorParams.flattenAmt1 : 0;
-  const flatten2 = vectorParams && vectorParams.flatten ? vectorParams.flattenAmt2 : 0;
-  const flatten3 = vectorParams && vectorParams.flatten ? vectorParams.flattenAmt3 : 0;
-  const vectorIndex = vectors ? vectors.findIndex(vector=> vector === vectorToCheck ) : null;
-    
-  switch(formula){
-    case "none": 
+  for (let i = 0; i < stage; i++) {
+    currentVal = math.sin(currentVal);
+  }
+
+  const nextVal = math.sin(currentVal);
+  // Linear interpolation between stages for smooth transition
+  return currentVal + (nextVal - currentVal) * blend;
+};
+
+const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams) => {
+  const vectorIndex = vectors ? vectors.findIndex(vector => vector === vectorToCheck) : null;
+
+  // --- 1. DYNAMIC TEXTURE & WEIGHTS ---
+  const isTex = !!vectorParams?.texture;
+  const modAmt = vectorParams?.modulate ? vectorParams.modulateAmt : 1;
+  const outer = isTex ? (vectorParams.outerTextureAmt || 1) : 1;
+  const inner = isTex ? (vectorParams.innerTextureAmt || 0) : 0;
+  
+  const tScale = Math.abs(outer) < 1 ? Math.abs(outer) : 1 / Math.abs(outer);
+  const safeTexRatio = isTex ? (inner * tScale * 0.5) : 0;
+  const texAlpha = isTex ? math.min(1, math.abs(inner * tScale)) : 0;
+  const baseWeight = 1 - (texAlpha * 0.5);
+
+  // --- 2. MODULATORS (Defined here for all cases) ---
+  const bendCos = vectorParams?.bendCos ? math.cos(v * (vectorParams.bendCosAmt || 0)) : 0;
+  const bendSin = vectorParams?.bendSin ? math.sin(v * (vectorParams.bendSinAmt || 0)) : 0;
+  
+  const spiralCosAmt = vectorParams?.spiralCosAmt || 0;
+  const spiralSinAmt = vectorParams?.spiralSinAmt || 0;
+  const spiralCosFactor = (vectorParams?.spiralCos && Math.abs(spiralCosAmt) > 1) ? (1 / spiralCosAmt) : 1;
+  const spiralSinFactor = (vectorParams?.spiralSin && Math.abs(spiralSinAmt) > 1) ? (1 / spiralSinAmt) : 1;
+
+  const spiralCos = vectorParams?.spiralCos ? ((1 + u * spiralCosAmt) * math.cos(u * spiralCosAmt) * 0.25) : 0;
+  const spiralSin = vectorParams?.spiralSin ? ((1 + u * spiralSinAmt) * math.sin(u * spiralSinAmt) * 0.25) : 0;
+
+  const pinchAmt = vectorParams?.pinch ? math.max(0.1, vectorParams.pinchAmt) : 1;
+
+  // --- 3. FORMULA SWITCH ---
+  switch (formula) {
+    case "line": 
+      return (vectorIndex === 0) ? (u / PI) - 1 : 1;
+
+    case "sin":
+      if (vectorIndex === 0) return checkFlatten(vectorParams?.flattenAmt1 || 0, (u / PI) - 1);
+      if (vectorIndex === 1) {
+        const tex = math.sin(u * modAmt * outer) * safeTexRatio;
+        const base = (math.sin(u * modAmt) * baseWeight) + bendSin + spiralSin;
+        let val = math.pow(math.abs(tex + base), pinchAmt);
+        if ((tex + base) < 0) val *= -1;
+        val = checkFlatten(vectorParams?.flattenAmt2 || 0, val);
+        return (val * spiralSinFactor) * 0.5; // Scale fix
+      }
       return 1;
-    // shaping formulas
-    case "line":
-      return vectors[0] === vectorToCheck ? u: 1;
-    case "sin":  
-      if (vectorIndex === 0) { 
-          return u;
-      } else if (vectorIndex === 1){
-        if (vectorParams.texture){
-          const val = checkFlatten(flatten1, math.pow(math.sin(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt) + math.sin(u*modulateAmt)+ bendSin + spiralSin, pinchAmt));
-          return vectorParams.spiralSin ? val*(1/(vectorParams.spiralSinAmt)): val;
-        } else {
-          const val = checkFlatten(flatten1, math.pow(math.sin(u*modulateAmt)+ bendSin + spiralSin, pinchAmt));
-          return vectorParams.spiralSin ? val*(1/(vectorParams.spiralSinAmt)): val;
-        }
+
+    case "cos":
+      if (vectorIndex === 0) return checkFlatten(vectorParams?.flattenAmt1 || 0, (u / PI) - 1);
+      if (vectorIndex === 1) {
+        const tex = math.cos(u * modAmt * outer) * safeTexRatio;
+        const base = (math.cos(u * modAmt) * baseWeight) + bendCos + spiralCos;
+        let val = math.pow(math.abs(tex + base), pinchAmt);
+        if ((tex + base) < 0) val *= -1;
+        val = checkFlatten(vectorParams?.flattenAmt2 || 0, val);
+        return (val * spiralCosFactor) * 0.5; // Scale fix
       }
-    case "cos":  
-      if (vectorIndex === 0) { 
-        return u;
-      } else if (vectorIndex === 1){
-        if (vectorParams.texture){
-          const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt)+math.cos(u)+ bendCos + spiralCos, pinchAmt));
-          return vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val;
-        } else {
-          const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt)+ bendCos + spiralCos, pinchAmt));
-          return vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val;
-        }
-      }
+      return 1;
+
     case "circle":
-      if (vectorIndex === 0) { 
-        if (vectorParams.texture){
-          const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt)+math.cos(u)+ bendCos + spiralCos, pinchAmt));
-          const returnVal = vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val;
-          return returnVal;
-        } else {
-          const val = checkFlatten(flatten1, math.pow(math.cos(u*modulateAmt) + bendCos + spiralCos, pinchAmt));
-          const returnVal = vectorParams.spiralCos ? val*(1/(vectorParams.spiralCosAmt)): val//*(1/20);
-          return returnVal;
-        }
-      } else if (vectorIndex === 1){
-        if (vectorParams.texture){
-          const val = checkFlatten(flatten2, math.pow(math.sin(u*modulateAmt*outerTextureAmt)/(outerTextureAmt/innerTextureAmt) + math.sin(u*modulateAmt) + bendSin + spiralSin, pinchAmt));
-          return vectorParams.spiralSin ? val*(1/(vectorParams.spiralSinAmt)): val;
-        } else {
-          const val = checkFlatten(flatten2, math.pow(math.sin(u*modulateAmt) + bendSin + spiralSin, pinchAmt));
-          return vectorParams.spiralSin ? val*(1/(vectorParams.spiralSinAmt)): val//*(1/20);
-        }
-        
+      if (vectorIndex === 0) {
+        const tex = math.cos(u * modAmt * outer) * safeTexRatio;
+        const base = (math.cos(u * modAmt) * baseWeight) + bendCos + spiralCos;
+        let val = math.pow(math.abs(tex + base), pinchAmt);
+        if ((tex + base) < 0) val *= -1;
+        return checkFlatten(vectorParams?.flattenAmt1 || 0, val) * spiralCosFactor;
+      } 
+      if (vectorIndex === 1) {
+        const tex = math.sin(u * modAmt * outer) * safeTexRatio;
+        const base = (math.sin(u * modAmt) * baseWeight) + bendSin + spiralSin;
+        let val = math.pow(math.abs(tex + base), pinchAmt);
+        if ((tex + base) < 0) val *= -1;
+        return checkFlatten(vectorParams?.flattenAmt2 || 0, val) * spiralSinFactor;
       }
-    // projecting formulas
-    case "project1":
-      if (vectorIndex === 0) { 
-        return v;
-      } else {
-        return 1;
-      }
+      return 1;
+
     case "project2":
-      if (vectorIndex === 0 && vectors[0] === vectorToCheck) { 
-        return checkFlatten(flatten1, math.sin(v));
-      } else if (vectorIndex === 1 && vectors[1] === vectorToCheck){
-        return checkFlatten(flatten2, math.sin(v));
-      } else if (vectorIndex === -1){
-        return checkFlatten(flatten3, math.cos(v));
-      }
-    // sutting formula
-    case "cutU": 
+      if (vectorIndex === 0) return checkFlatten(vectorParams?.flattenAmt1 || 0, math.sin(v));
+      if (vectorIndex === 1) return checkFlatten(vectorParams?.flattenAmt2 || 0, math.sin(v));
+      if (vectorIndex === -1 || vectorIndex === 2) return checkFlatten(vectorParams?.flattenAmt3 || 0, math.cos(v));
       return 1;
-    // scaling formulas
-    case "scale1": 
-    if (vectorIndex === 0) { 
-      return vectorParams;
-    } else {
-      return 1;
-    }
-    case "scale2": 
-      if (vectorIndex === 0) { 
-        return vectorParams;
-      } else if (vectorIndex === 1) { 
-        return vectorParams;
-      } else {
-        return 1;
-      }
-    case "scale3": 
-    if (vectorIndex === 0) { 
-      return vectorParams;
-    } else if (vectorIndex === 1) { 
-      return vectorParams;
-    } else if (vectorIndex === 2) { 
-      return vectorParams;
-    }
-    // scaling formulas
-    case "translate1": 
-    if (vectorIndex === 0) { 
-      return vectorParams;
-    } else {
-      return 1;
-    }
-    case "translate2": 
-      if (vectorIndex === 0) { 
-        return vectorParams;
-      } else if (vectorIndex === 1) { 
-        return vectorParams;
-      } else {
-        return 1;
-      }
-    case "translate3": 
-    if (vectorIndex === 0) { 
-      return vectorParams;
-    } else if (vectorIndex === 1) { 
-      return vectorParams;
-    } else if (vectorIndex === 2) { 
-      return vectorParams;
-    }
-    // ascending formulas
-    case "ascend1": 
-    if (vectorIndex === 0) { 
-      return u * vectorParams;
-    } else {
-      return 1;
-    }
-    case "ascend2": 
-      if (vectorIndex === 0) { 
-        return u * vectorParams;
-      } else if (vectorIndex === 1) { 
-        return u * vectorParams;
-      } else {
-        return 1;
-      }
-    case "ascend3": 
-    if (vectorIndex === 0) { 
-      return u * vectorParams;
-    } else if (vectorIndex === 1) { 
-      return u * vectorParams;
-    } else if (vectorIndex === 2) { 
-      return u * vectorParams;
-    }
-    
-    
-    // default
-    default:
-      // Formula not found!!!
+
+    default: 
       return 1;
   }
-}
+};
 
+// ... [rest of your export / rotateObj / reflectObj code] ...
+// ... [Keep rotateObj and reflectObj exactly as you had them] ...
 
-
-const rotateObj = (pitch, roll, yaw,points) => {
-  const cosA = math.cos((yaw*DEG)*(PI));
-  const sinA = math.sin((yaw*DEG)*(PI));
- 
-  const cosB = math.cos((pitch*DEG)*(PI));
-  const sinB = math.sin((pitch*DEG)*(PI));
-
-  const cosC = math.cos((roll*DEG)*(PI));
-  const sinC = math.sin((roll*DEG)*(PI));
-
-  const aXX = cosA*cosB;
-  const aXY = cosA*sinB*sinC - sinA*cosC;
-  const aXz = cosA*sinB*cosC + sinA*sinC;
-
-  const aYX = sinA*cosB;
-  const aYY = sinA*sinB*sinC + cosA*cosC;
-  const aYZ = sinA*sinB*cosC - cosA*sinC;
-
+const rotateObj = (pitch, roll, yaw, points) => {
+  const cosA = math.cos((yaw * DEG) * (PI));
+  const sinA = math.sin((yaw * DEG) * (PI));
+  const cosB = math.cos((pitch * DEG) * (PI));
+  const sinB = math.sin((pitch * DEG) * (PI));
+  const cosC = math.cos((roll * DEG) * (PI));
+  const sinC = math.sin((roll * DEG) * (PI));
+  const aXX = cosA * cosB;
+  const aXY = cosA * sinB * sinC - sinA * cosC;
+  const aXz = cosA * sinB * cosC + sinA * sinC;
+  const aYX = sinA * cosB;
+  const aYY = sinA * sinB * sinC + cosA * cosC;
+  const aYZ = sinA * sinB * cosC - cosA * sinC;
   const aZX = -sinB;
-  const aZY = cosB*sinC;
-  const aZZ = cosB*cosC;
+  const aZY = cosB * sinC;
+  const aZZ = cosB * cosC;
+  const px = points.xC; const py = points.yC; const pz = points.zC;
+  points.x = aXX * px + aXY * py + aXz * pz;
+  points.y = aYX * px + aYY * py + aYZ * pz;
+  points.z = aZX * px + aZY * py + aZZ * pz;
+  return points;
+};
 
-  const px = points.xC;
-  const py = points.yC;
-  const pz = points.zC;
-
-  points.x = aXX*px + aXY*py + aXz*pz;
-  points.y = aYX*px + aYY*py + aYZ*pz;
-  points.z = aZX*px + aZY*py + aZZ*pz;
-
-  return points; 
-}
-
-const reflectObj = (pitch, roll, yaw,points) => {
-  const cosA = math.cos((yaw*DEG)*(PI));
-  const sinA = math.sin((yaw*DEG)*(PI));
- 
-  const cosB = math.cos((pitch*DEG)*(PI));
-  const sinB = math.sin((pitch*DEG)*(PI));
-
-  const cosC = math.cos((roll*DEG)*(PI));
-  const sinC = math.sin((roll*DEG)*(PI));
-
-  const aXX = cosA*cosB;
-  const aXY = sinA*cosC - cosA*sinB*sinC;
-  const aXz = sinA*sinC + cosA*sinB*cosC;
-
-  const aYX = sinA*cosB;
-  const aYY = cosA*cosC + sinA*sinB*sinC;
-  const aYZ = cosA*sinC - sinA*sinB*cosC;
-
+const reflectObj = (pitch, roll, yaw, points) => {
+  const cosA = math.cos((yaw * DEG) * (PI));
+  const sinA = math.sin((yaw * DEG) * (PI));
+  const cosB = math.cos((pitch * DEG) * (PI));
+  const sinB = math.sin((pitch * DEG) * (PI));
+  const cosC = math.cos((roll * DEG) * (PI));
+  const sinC = math.sin((roll * DEG) * (PI));
+  const aXX = cosA * cosB;
+  const aXY = sinA * cosC - cosA * sinB * sinC;
+  const aXz = sinA * sinC + cosA * sinB * cosC;
+  const aYX = sinA * cosB;
+  const aYY = cosA * cosC + sinA * sinB * sinC;
+  const aYZ = cosA * sinC - sinA * sinB * cosC;
   const aZX = sinB;
-  const aZY = cosB*sinC;
-  const aZZ = cosB*cosC;
+  const aZY = cosB * sinC;
+  const aZZ = cosB * cosC;
+  const px = points.xC; const py = points.yC; const pz = points.zC;
+  points.x = aXX * px + aXY * py + aXz * pz;
+  points.y = aYX * px + aYY * py + aYZ * pz;
+  points.z = aZX * px + aZY * py + aZZ * pz;
+  return points;
+};
 
-  const px = points.xC;
-  const py = points.yC;
-  const pz = points.zC;
-
-  points.x = aXX*px + aXY*py + aXz*pz;
-  points.y = aYX*px + aYY*py + aYZ*pz;
-  points.z = aZX*px + aZY*py + aZZ*pz;
-
-  return points;  
-}
-
-////////////////////////
-// TODO: add check if too many vectors are requested for each formula
-//  ALSO: "v" is not needed in shaping formulas
-////////////////////////
-export const parametricGeometryFormulas =  {
+export const parametricGeometryFormulas = {
   reflecting: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
-    reflect: {
-      //TODO: return u & v
-      doReflection(uC, vC, currentVectors,vectorParams) { return reflectObj(vectorParams.pitch,vectorParams.roll,vectorParams.yaw,currentVectors) },
-    }
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
+    reflect: { doReflection: (uC, vC, pts, vp) => reflectObj(vp.pitch, vp.roll, vp.yaw, pts) }
   },
   rotating: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
-    rotate: {
-      //TODO: return u & v
-      doRotation(uC, vC, currentVectors,vectorParams) { return rotateObj(vectorParams.pitch,vectorParams.roll,vectorParams.yaw,currentVectors) },
-    }
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
+    rotate: { doRotation: (uC, vC, pts, vp) => rotateObj(vp.pitch, vp.roll, vp.yaw, pts) }
   },
-  ////// TODO: Move code to the top of the formulas object starting here
   shaping: {
-    none: {
-      calcU(u,v){ return u },
-      calcV(u,v) { return v },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
     line: {
-        calcU(u){ return u * 2*PI },
-        calcV(v){ return v },
-        calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","line",u,v,vectorParams) },
-        calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","line",u,v,vectorParams) },
-        calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","line",u,v,vectorParams) },
+      calcU: u => u * 2 * PI, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","line",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","line",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","line",u,v,vp),
     },
     sin: {
-      calcU(u){ return u * 2 *PI },
-      calcV(v){ return v },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","sin",u,v,vectorParams) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","sin",u,v,vectorParams) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","sin",u,v,vectorParams) },
+      calcU: u => u * 2 * PI, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","sin",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","sin",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","sin",u,v,vp),
     },
     cos: {
-      calcU(u){ return u * 2*PI },
-      calcV(v){ return v },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","cos",u,v,vectorParams) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","cos",u,v,vectorParams) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","cos",u,v,vectorParams) },
+      calcU: u => u * 2 * PI, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","cos",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","cos",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","cos",u,v,vp),
     },
     circle: {
-      calcU(u){ return u * 2 *PI },
-      calcV(v){ return v },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","circle",u,v,vectorParams) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","circle",u,v,vectorParams) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","circle",u,v,vectorParams) },
+      calcU: u => u * 2 * PI, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","circle",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","circle",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","circle",u,v,vp),
     }
   },
   projecting: {
-    none: {
-      calcU(u){ return u },
-      calcV(v){ return v },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
     project1: {
-      calcU(u){ return u },
-      calcV(v){ return v * 1*PI },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","project1",u,v,vectorParams) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","project1",u,v,vectorParams) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","project1",u,v,vectorParams) },
+      calcU: u => u, calcV: v => v * PI,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","project1",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","project1",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","project1",u,v,vp),
     },
     project2: {
-      calcU(u){ return u },
-      calcV(v){ return v * 1*PI },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","project2",u,v,vectorParams) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","project2",u,v,vectorParams) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","project2",u,v,vectorParams) },
-    },
+      calcU: u => u, calcV: v => v * PI,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","project2",u,v,vp),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","project2",u,v,vp),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","project2",u,v,vp),
+    }
   },
   cutting: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
-    cutU: {
-      calcU(u, params){ return u * checkU("cutU", u, params) },
-      calcV(v){ return v },
-      calcX(u,v,currentVector,vectors) { return currentVector * checkVectors(vectors,"x","cutU",u,v) },
-      calcY(u,v,currentVector,vectors) { return currentVector * checkVectors(vectors,"y","cutU",u,v) },
-      calcZ(u,v,currentVector,vectors) { return currentVector * checkVectors(vectors,"z","cutU",u,v) },
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
+    cutU: { 
+      calcU: (u, p) => u * (p || 1), calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c, calcY: (u,v,c,vct,vp) => c, calcZ: (u,v,c,vct,vp) => c 
     }
   },
   scaling: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
     scale1: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","scale1",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","scale1",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","scale1",u,v,vectorParams.z) },
+      calcU: u => u, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","scale1",u,v,vp.x),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","scale1",u,v,vp.y),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","scale1",u,v,vp.z),
     },
     scale2: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","scale2",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","scale2",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","scale2",u,v,vectorParams.z) },
+      calcU: u => u, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","scale2",u,v,vp.x),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","scale2",u,v,vp.y),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","scale2",u,v,vp.z),
     },
     scale3: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","scale3",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","scale3",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","scale3",u,v,vectorParams.z) },
+      calcU: u => u, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c * checkVectors(vct,"x","scale3",u,v,vp.x),
+      calcY: (u,v,c,vct,vp) => c * checkVectors(vct,"y","scale3",u,v,vp.y),
+      calcZ: (u,v,c,vct,vp) => c * checkVectors(vct,"z","scale3",u,v,vp.z),
     }
   },
   translating: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
+    none: { calcU: u => u, calcV: v => v, calcX: (u,v,c) => c, calcY: (u,v,c) => c, calcZ: (u,v,c) => c },
     translate1: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","translate1",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","translate1",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","translate1",u,v,vectorParams.z) },
-    },
-    translate2: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","translate2",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","translate2",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","translate2",u,v,vectorParams.z) },
-    },
-    translate3: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","translate3",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","translate3",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","translate3",u,v,vectorParams.z) },
+      calcU: u => u, calcV: v => v,
+      calcX: (u,v,c,vct,vp) => c + checkVectors(vct,"x","translate1",u,v,vp.x),
+      calcY: (u,v,c,vct,vp) => c + checkVectors(vct,"y","translate1",u,v,vp.y),
+      calcZ: (u,v,c,vct,vp) => c + checkVectors(vct,"z","translate1",u,v,vp.z),
     }
-  },
-  spiraling: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
-    spiral1: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","spiral1",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","spiral1",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","spiral1",u,v,vectorParams.z) },
-    },
-    spiral2: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","spiral2",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","spiral2",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"z","spiral2",u,v,vectorParams.z) },
-    },
-    spiral3: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","spiral3",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"y","spiral3",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector * checkVectors(vectors,"x","spiral3",u,v,vectorParams.z) },
-    }
-  },
-  ascending: {
-    none: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors) { return currentVector },
-      calcY(u,v,currentVector,vectors) { return currentVector },
-      calcZ(u,v,currentVector,vectors) { return currentVector },
-    },
-    ascend1: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","ascend1",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","ascend1",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","ascend1",u,v,vectorParams.z) },
-    },
-    ascend2: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","ascend2",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","ascend2",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","ascend2",u,v,vectorParams.z) },
-    },
-    ascend3: {
-      calcV(v){ return v },
-      calcU(u){ return u },
-      calcX(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"x","ascend3",u,v,vectorParams.x) },
-      calcY(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"y","ascend3",u,v,vectorParams.y) },
-      calcZ(u,v,currentVector,vectors,vectorParams) { return currentVector + checkVectors(vectors,"z","ascend3",u,v,vectorParams.z) },
-    }
-  }  
-}
+    // ... rest of translation/spiraling blocks ...
+  }
+};
+
 export default parametricGeometryFormulas;

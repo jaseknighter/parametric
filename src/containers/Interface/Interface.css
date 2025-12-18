@@ -1,3 +1,4 @@
+/* TODO: prevent any grid-gap from appearing when switching modes */
 
 .Controls___Container_1column_Open {
   visibility: visible;
@@ -106,7 +107,9 @@ select {
   background-color: rgba(202, 117, 117, 0.8);
 
   border: 1rem solid rgba(152,126,125,0.4);
-  padding-bottom: 1rem;
+  /* padding-bottom: 1rem; */
+  position: relative;
+  top: 1rem;
 }
 
 .TAreaInterface.Controls___Container_Close .TAreaInterface_controlsContainer {
@@ -399,12 +402,16 @@ select {
     cursor: pointer;
     border: 0;
     background-color: rgba(100, 100, 100, 40%);
+
+    
   }
 
   .TAreaInterface_controlsContainer.Controls_Show {
     border:none;
     width: calc(100% - 2rem);
     padding-bottom: 1rem;
+    position: relative;
+    top: 0rem;
   }
 
   .Controls___Container_1column_Open {
