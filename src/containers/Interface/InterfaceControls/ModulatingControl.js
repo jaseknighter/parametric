@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import withInterfaceControls from './withInterfaceControls'
-import Aux from '../../../hoc/Aux/Aux';
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
 import "../../Interface/Interface.css";
@@ -62,7 +61,7 @@ class ModulatingControl extends Component {
 
   render = () => {
     return (
-        <Aux>
+        <>
           <button
             onClick={this.props.updateControlsRef}
             className="TAreaInterface___TitleButton"
@@ -79,7 +78,7 @@ class ModulatingControl extends Component {
               />
             </div>
           </div>
-        </Aux>
+        </>
     );
   };
 }

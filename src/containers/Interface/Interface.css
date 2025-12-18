@@ -1,88 +1,29 @@
-@keyframes openControlsAnim_1column {
-  0% {
-    /* width: 3rem; */
-  }
-  100% {
-    /* width: 10rem; */
-  }
-}
-
-@keyframes closeControlsAnim_1column {
-  0% {
-    /* width: 10rem; */
-  }
-  100% {
-    /* width: 3rem; */
-  }
-}
-
-@keyframes openControlsAnim_2column {
-  0% {
-    /* width: 3rem; */
-  }
-  100% {
-    /* width: 16rem; */
-  }
-}
-
-@keyframes closeControlsAnim_2column {
-  0% {
-    /* width: 16rem; */
-  }
-  100% {
-    /* width: 3rem; */
-  }
-}
-
-@keyframes openControlsAnim_3column {
-  0% {
-    /* height: 3rem; */
-  }
-  100% {
-    /* height: 22rem; */
-  }
-}
-
-@keyframes closeControlsAnim_3column {
-  0% {
-    /* height: 22rem; */
-  }
-  100% {
-    /* height: 3rem; */
-  }
-}
 
 .Controls___Container_1column_Open {
   visibility: visible;
-  /* animation: openControlsAnim_1column 250ms ease-in-out; */
   width: 11rem;
   opacity: 1;
 }
 
 .Controls___Container_2column_Open {
   visibility: visible;
-  /* animation: openControlsAnim_2column 250ms ease-in-out; */
   width: 11rem;
   opacity: 1;
 }
 
 .Controls___Container_3column_Open {
   visibility: visible;
-  /* animation: openControlsAnim_3column 250ms ease-in-out; */
   width: 11rem;
   opacity: 1;
 }
 
 .Controls___Container_1column_Close {
-  /* animation: closeControlsAnim_1column 250ms ease-in-out; */
   padding-left: 0rem;
 }
 .Controls___Container_2column_Close {
-  /* animation: closeControlsAnim_2column 250ms ease-in-out; */
   padding-left: 0rem;
 }
 .Controls___Container_3column_Close {
-  /* animation: closeControlsAnim_3column 250ms ease-in-out; */
   padding-left: 0rem;
 }
 
@@ -95,13 +36,11 @@
 
 .Controls_Hide {
   /* visibility: hidden; */
-  /* animation: hideControlsAnim 250ms */
   opacity: 0;
   transition: opacity 250ms ease-in-out;
 }
 
 .Interface {
-  /* width: 100vw;*/
   width: 100%;
   background-color: #777;
   display: grid;
@@ -109,15 +48,6 @@
   grid-template-rows: repeat(13, min-content);
   
 }
-
-/* .Container > .Interface {
-  grid-template-columns: [c-1-start] 3rem [c-1-end c-2-start] 3rem [c-2-end c-3-start] 3rem[c-3-end c-4-start] 3rem[c-4-end];
-} */
-
-/* .TAreaInterface > .TAreaInterface_controlsContainer {
-  visibility: hidden;
-  width:3rem;
-} */
 
 select {
   width: 15vw;
@@ -330,17 +260,17 @@ select {
   font-weight: 600;
 }
 
-.Slider {
+/* .Slider { 
   grid-area: slider;
   grid-column-start: 1;
-  padding-top: 1rem;
-}
-
+  padding-top: 1rem; 
+ } */
+  
 .UISliderContainer__1 {
   grid-area: usc-r-0;
   grid-column-start: 1;
 }
-
+  
 .UISliderContainer__2 {
   grid-area: usc-r-0;
   grid-column-start: 2;
@@ -349,6 +279,24 @@ select {
 .UISliderContainer__3 {
   grid-area: usc-r-0;
   grid-column-start: 3;
+}
+
+.UISliderContainer__1_opaque {
+  grid-area: usc-r-0;
+  grid-column-start: 1;
+  opacity: 0.25;
+}
+
+.UISliderContainer__2_opaque {
+  grid-area: usc-r-0;
+  grid-column-start: 2;
+  opacity: 0.25;
+}
+
+.UISliderContainer__3_opaque {
+  grid-area: usc-r-0;
+  grid-column-start: 3;
+  opacity: 0.25;
 }
 
 @media (min-height: 31.3rem) and (min-width: 31.3rem) {

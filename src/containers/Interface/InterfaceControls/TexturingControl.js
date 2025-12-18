@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import withInterfaceControls from './withInterfaceControls'
-import Aux from '../../../hoc/Aux/Aux';
 
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
@@ -71,7 +70,7 @@ class TexturingControl extends Component {
 
   render = () => {
     return (
-      <Aux>
+      <>
         <button
           onClick={this.props.updateControlsRef}
           className="TAreaInterface___TitleButton"
@@ -101,7 +100,7 @@ class TexturingControl extends Component {
           </div> 
           */}
         </div>
-      </Aux>
+      </>
     );
   };
 }

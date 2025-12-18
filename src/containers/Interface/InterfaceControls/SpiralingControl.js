@@ -1,107 +1,82 @@
-import React, { Component } from "react";
+import React, { useCallback, useMemo } from "react";
 import withInterfaceControls from './withInterfaceControls'
-import Aux from '../../../hoc/Aux/Aux';
 
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
 import "../../Interface/Interface.css";
 
-class SprialingControl extends Component {
-  constructor(props) {
-    super(props);
+// Note: code has been refactored into a functional component to 
+//        address depreciated `componentWillReceiveProps`
+const SpiralingControl = ((props) => {
+  const { parametricObj, handleUpdate, updateControlsRef } = props;
 
-    this.state = {
-      ui: { }
-    };
-  }
-
-  componentDidMount = () => {
-    this.setState({
-      ...this.state,
-      parametricObj: this.props.parametricObj,
-      ui: {
-        ...this.state.ui,        
-      }
-    });
-  };
-
-  get currentShape() {
-    return this.props.parametricObj.transformationInstructions.shaping.formula;
-  }
+  const shaping = parametricObj?.transformationInstructions?.shaping;
   
-  handleSpiraling1Change = data => {
-    this.handleSpiralingChange(data.pop(), "v1");
-  };
-  handleSpiraling2Change = data => {
-    this.handleSpiralingChange(data.pop(), "v2");
-  };
-
-  handleSpiralingChange = (data, vector) => {
+  const spiralingUI = useMemo(() => {
+    const formula = shaping?.formula;
+    return {
+      v1SliderClass: `UISliderContainer ${formula !== "sin" ? "UISliderContainer__1" : "UISliderContainer__1_opaque"}`,
+      v2SliderClass: `UISliderContainer ${formula !== "cos" ? "UISliderContainer__2" : "UISliderContainer__2_opaque"}`
+    };
+  }, [shaping?.formula]);
+  
+  const handleSpiralingChange = useCallback((data, vector) => {
+    const spiral = data > 0;
+    const statePath = "parametricObj.transformationInstructions.shaping.vectorParams";
     
-    //TODO: spiral should only turn to false if all vectors are < 1
-    const spiral = data > 0 ? true : false;    
-    let spiralParam = "";
-    let paramToUpdate = "";
-    switch (vector) {
-      case "v1":
-        spiralParam = "spiralCosAmt";
-        paramToUpdate = "spiralCos"
-        break;
-      case "v2":
-        spiralParam = "spiralSinAmt";
-        paramToUpdate = "spiralSin"
-        break;
-      default:
-        break;
-    }
+    const vectorMap = {
+      v1: { p: "spiralCosAmt", t: "spiralCos" },
+      v2: { p: "spiralSinAmt", t: "spiralSin" }
+    };
 
-    //TODO: Fix bug where spiralz only works if project1/project2 values are set
-    const statePath = "parametricObj.transformationInstructions.shaping.vectorParams" ;
+    const { p: spiralParam, t: paramToUpdate } = vectorMap[vector];
 
-    const updateArray = [
-      {
-        objectStatePath: statePath,
-        paramToUpdate: paramToUpdate,
-        newValue: spiral
-      },
+    handleUpdate([
+      { objectStatePath: statePath, paramToUpdate, newValue: spiral },
       { objectStatePath: statePath, paramToUpdate: spiralParam, newValue: data }
-    ];
+    ]);
+  }, [handleUpdate]);
 
-    this.props.handleUpdate(updateArray);
-  };
+  // MEMOIZATION: Memoize the complex event handler using useCallback
+  const handleSpiraling1Change = useCallback((data) => {
+    const val = data[data.length - 1]; 
+    handleSpiralingChange(val, "v1");
+  }, [handleSpiralingChange]); // Dependencies: parametricObj and handleUpdate (assuming handleUpdate is stable)
 
-  render = () => {
-    return (
-      <Aux>
+  const handleSpiraling2Change = useCallback((data) => {
+    const val = data[data.length - 1]; 
+    handleSpiralingChange(val, "v2");
+  }, [handleSpiralingChange]); // Dependencies: parametricObj and handleUpdate (assuming handleUpdate is stable)
+
+  return (
+      <>
         <button
-          onClick={this.props.updateControlsRef}
+          onClick={updateControlsRef}
           className="TAreaInterface___TitleButton"
         >
           <h3 className="TAreaInterface___TitleButton_Label">Spiral</h3>
         </button>
-
         <div className="TAreaInterface_controlsContainer">
-          <div className="UISliderContainer UISliderContainer__1">
+          <div className={spiralingUI.v1SliderClass}>
             <label className="SliderLabel">1</label>
             <MySlider
               defaultValues={[0]}
               domain={[0, 10]}
-              update={this.handleSpiraling1Change}
+              update={handleSpiraling1Change}
             />
           </div>
-
-          <div className="UISliderContainer UISliderContainer__2">
+          <div className={spiralingUI.v2SliderClass}>
             <label className="SliderLabel">2</label>
             <MySlider
               defaultValues={[0]}
               domain={[0, 10]}
-              update={this.handleSpiraling2Change}
+              update={handleSpiraling2Change}
             />
           </div>
         </div>
-      </Aux>
-    );
-  };
-}
+      </>
+  );
+});
 
-export default(withInterfaceControls(SprialingControl,"spiral","TAreaInterface"));
+// Use React.memo as the HOC for shallow prop comparison memoization
+export default React.memo(withInterfaceControls(SpiralingControl, "spiral", "TAreaInterface"));

@@ -73,7 +73,7 @@ export function Handle({
           transform: 'translate(-50%, -50%)',
           zIndex: 2,
           width: "2.5vh",
-          height: "1.5vh",
+          height: "1.0vh",
           backgroundColor: disabled ? '#666' : "rgba(25,25,25,.5)",
         }}
       />

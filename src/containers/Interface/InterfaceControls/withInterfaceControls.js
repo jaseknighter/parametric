@@ -1,172 +1,113 @@
-import React, { Component } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
-  const AuxControls = React.forwardRef((props, ref) => (
-    <div id={controlID} className={controlClass} ref={ref}>
-      <WrappedComponent {...props} ref={ref} />
-    </div>
-  ));
+  return (props) => {
+    const { 
+      numberOfColumns, 
+      collapse, 
+      onOpen, 
+      onClose, 
+      adjustYAmt, 
+      showMobile, 
+      parametricObj, 
+      handleUpdate 
+    } = props;
 
-  return class extends Component {
-    state = {
-      open: false
-    };
+    const [isOpen, setIsOpen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const controlsRef = useRef(null);
 
-    constructor(props) {
-      super(props);
-    }
+    // Dynamic Class Names derived from props
+    const openClass = `Controls___Container_${numberOfColumns}column_Open`;
+    const closeClass = `Controls___Container_${numberOfColumns}column_Close`;
 
-    componentDidMount = () => {
-      this.controlsRef = React.createRef();
-      this.updateControlsRef = this.updateControlsRef.bind(this);
-
-      this.openContainerStyleName =
-        "Controls___Container_" + this.props.numberOfColumns + "column_Open";
-      this.closeContainerStyleName =
-        "Controls___Container_" + this.props.numberOfColumns + "column_Close";
-    };
-
-    componentDidUpdate = () => {
-      if (this.props.collapse && this.state.open && !this.state.transitioning) {
-        // console.log("collapse")
-        this.updateControlsRef();
-      }
-    };
-
-    updateControlsRef = () => {
-      const cRef = this.controlsRef.current;
-
-      const controlsContainer___Button = cRef.querySelector(
-        ".TAreaInterface___TitleButton"
-      );
-      const controlsContainer___Interface = cRef.querySelector(
-        ".TAreaInterface_controlsContainer"
-      );
+    // --- Animation: Open ---
+    const openControlAnim = (timeout, cRef, interfaceEl) => {
+      cRef.classList.remove(openClass);
+      cRef.classList.add(openClass);
+      interfaceEl.classList.remove("Controls_Show");
+      cRef.classList.remove(closeClass);
       
-      if (!this.state.open && !this.state.transitioning) {
-        this.props.onOpen(controlID);
-        this.openControlAnim(
-          250,
-          cRef,
-          controlsContainer___Interface,
-          controlsContainer___Button
-        );
-      } else if (!this.state.transitioning) {
-        this.props.onClose(controlID);
-        this.closeControlAnim(
-          250,
-          cRef,
-          controlsContainer___Interface,
-          controlsContainer___Button
-        );
-      }
-    };
+      setIsTransitioning(true);
 
-    openControlAnim = (
-      timeout,
-      controlsContainer,
-      controlsContainer___Interface,
-      controlsContainer___Button
-    ) => {
-      // console.log("controlsContainer", this.openContainerStyleName);
-      controlsContainer.classList.remove(this.openContainerStyleName);
-      controlsContainer.classList.add(this.openContainerStyleName);
-      controlsContainer___Interface.classList.remove("Controls_Show");
-      controlsContainer.classList.remove(this.closeContainerStyleName);
-      this.setState({
-        ...this.state,
-        transitioning: true
-      });
-
-      setTimeout(
-        function() {
-          const numberOfColumns = this.props.numberOfColumns;
-          controlsContainer___Interface.classList.remove("Controls_Hide");
-          controlsContainer.classList.remove(this.closeContainerStyleName);
-          controlsContainer___Interface.classList.add("Controls_Show");
-          controlsContainer___Interface.style.transform =
-            "translateY(" + -1 * this.props.adjustYAmt + "px)";
-          if (this.props.showMobile){
-            if (this.props.adjustYAmt < 0){
-              controlsContainer___Interface.style.borderTopStyle = "solid";
-              controlsContainer___Interface.style.borderLeft = "none";
-              controlsContainer___Interface.style.borderBottom = "none";
-            } else {
-              controlsContainer___Interface.style.borderStyle = "solid";
-              controlsContainer___Interface.style.borderLeft = "none";
-              controlsContainer___Interface.style.borderTop = "none"
-            }
+      setTimeout(() => {
+        interfaceEl.classList.remove("Controls_Hide");
+        cRef.classList.remove(closeClass);
+        interfaceEl.classList.add("Controls_Show");
+        
+        // Apply dynamic styles
+        interfaceEl.style.transform = `translateY(${-1 * adjustYAmt}px)`;
+        
+        if (showMobile) {
+          if (adjustYAmt < 0) {
+            Object.assign(interfaceEl.style, { borderTopStyle: "solid", borderLeft: "none", borderBottom: "none" });
           } else {
-              controlsContainer___Interface.style.borderRightStyle = "none";
-              controlsContainer___Interface.style.borderLeftStyle = "none";
-              controlsContainer___Interface.style.borderBottomStyle = "none";
-              controlsContainer___Interface.style.borderTopStyle = "none";
+            Object.assign(interfaceEl.style, { borderStyle: "solid", borderLeft: "none", borderTop: "none" });
           }
+        } else {
+          Object.assign(interfaceEl.style, { borderRightStyle: "none", borderLeftStyle: "none", borderBottomStyle: "none", borderTopStyle: "none" });
+        }
 
-          const controlColumnsValue = numberOfColumns === 1 ? "0" : numberOfColumns === 2 ? "5rem 5rem" : "5rem 5rem 5rem";
-          controlsContainer___Interface.style.gridTemplateColumns = controlColumnsValue;
+        const gridCols = numberOfColumns === 1 ? "0" : numberOfColumns === 2 ? "5rem 5rem" : "5rem 5rem 5rem";
+        interfaceEl.style.gridTemplateColumns = gridCols;
 
-          const newState = this.state.open ? false : true;
-          this.setState({
-            ...this.state,
-            open: newState,
-            transitioning: false
-          });
-        }.bind(this),
-        timeout
-      );
+        setIsOpen(true);
+        setIsTransitioning(false);
+      }, timeout);
     };
 
-    closeControlAnim = (
-      timeout,
-      controlsContainer,
-      controlsContainer___Interface,
-      controlsContainer___Button
-    ) => {
-      controlsContainer___Interface.classList.add("Controls_Hide");
-      this.setState({
-        ...this.state,
-        transitioning: true
-      });
-      setTimeout(
-        function() {
-          controlsContainer.classList.add(this.closeContainerStyleName);
-          controlsContainer___Interface.classList.remove("Controls_Show");
-          controlsContainer.classList.remove(this.openContainerStyleName);
+    // --- Animation: Close ---
+    const closeControlAnim = (timeout, cRef, interfaceEl) => {
+      interfaceEl.classList.add("Controls_Hide");
+      setIsTransitioning(true);
 
-          setTimeout(
-            function() {
-              controlsContainer.classList.remove(this.closeContainerStyleName);
-              const newState = this.state.open ? false : true;
-              this.setState({
-                ...this.state,
-                open: newState,
-                transitioning: false
-              });
-            }.bind(this),
-            timeout
-          );
-        }.bind(this),
-        timeout
-      );
+      setTimeout(() => {
+        cRef.classList.add(closeClass);
+        interfaceEl.classList.remove("Controls_Show");
+        cRef.classList.remove(openClass);
+
+        setTimeout(() => {
+          cRef.classList.remove(closeClass);
+          setIsOpen(false);
+          setIsTransitioning(false);
+        }, timeout);
+      }, timeout);
     };
 
-    ////////////////////////////////
-    // TODO: Look into why it necessary to explicitly pass parametricObj to props
-    ////////////////////////////////
-    render() {
-      return (
-        <AuxControls
-          controlID={controlID}
-          updateControlsRef={this.updateControlsRef}
-          parametricObj={this.props.parametricObj}
-          handleUpdate={this.props.handleUpdate}
-          onOpen={this.props.onOpenHandler}
-          onClose={this.onCloseHandler}
-          ref={this.controlsRef}
+    // --- Toggle Logic ---
+    const updateControlsRef = useCallback(() => {
+      if (isTransitioning) return;
+
+      const cRef = controlsRef.current;
+      const interfaceEl = cRef?.querySelector(".TAreaInterface_controlsContainer");
+      const buttonEl = cRef?.querySelector(".TAreaInterface___TitleButton");
+
+      if (!isOpen) {
+        onOpen?.(controlID);
+        openControlAnim(250, cRef, interfaceEl, buttonEl);
+      } else {
+        onClose?.(controlID);
+        closeControlAnim(250, cRef, interfaceEl, buttonEl);
+      }
+    }, [isOpen, isTransitioning, numberOfColumns, adjustYAmt, showMobile, onOpen, onClose]);
+
+    // --- Effect: Handle Collapse Prop ---
+    useEffect(() => {
+      if (collapse && isOpen && !isTransitioning) {
+        updateControlsRef();
+      }
+    }, [collapse, isOpen, isTransitioning, updateControlsRef]);
+
+    return (
+      <div id={controlID} className={controlClass} ref={controlsRef}>
+        <WrappedComponent
+          {...props}
+          updateControlsRef={updateControlsRef}
+          parametricObj={parametricObj}
+          handleUpdate={handleUpdate}
         />
-      );
-    }
+      </div>
+    );
   };
 };
 

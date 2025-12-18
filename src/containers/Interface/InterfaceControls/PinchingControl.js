@@ -6,7 +6,6 @@ import React, { Component } from "react";
 // import { updateObject } from "../../../shared/utility";
 
 import withInterfaceControls from './withInterfaceControls'
-import Aux from '../../../hoc/Aux/Aux';
 
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
@@ -142,7 +141,7 @@ class PinchingControl extends Component {
     return (
       
         // <div id="pinch" className="TAreaInterface">
-        <Aux>
+        <>
           <button
             // onClick={this.props.updateControlsRef}
             onClick={this.props.updateControlsRef}
@@ -160,7 +159,7 @@ class PinchingControl extends Component {
               />
             </div>
           </div>
-        </Aux>
+        </>
     );
   };
 }

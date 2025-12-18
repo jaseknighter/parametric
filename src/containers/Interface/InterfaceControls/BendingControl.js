@@ -1,16 +1,31 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import withInterfaceControls from './withInterfaceControls'
-import Aux from '../../../hoc/Aux/Aux';
 import MySlider from "../../../components/UI/MySlider/MySlider";
 
 import "../../Interface/Interface.css";
 
 // Note: code has been refactored into a functional component to 
 //        address depreciated `componentWillReceiveProps`
-const SprialingControl = React.memo((props) => {
+const BendingControl = ((props) => {
   const { parametricObj, handleUpdate, updateControlsRef } = props;
-  const shape = parametricObj.transformationInstructions.shaping.formula;
-    
+  
+  // MEMOIZATION
+  // This calculation only runs if `parametricObj` has changed, preventing re-calculation
+  // when other props (like `updateControlsRef`) change.
+  const bendingUI = useMemo(() => {
+    const shape = parametricObj.transformationInstructions.shaping.formula;
+    const sliderClasses = {
+      v1SliderClass:
+      "UISliderContainer " +
+      (shape !== "sin" ? "UISliderContainer__1" : "UISliderContainer__1_opaque"),
+      v2SliderClass:
+      "UISliderContainer " +
+      (shape !== "cos" ? "UISliderContainer__2" : "UISliderContainer__2_opaque")
+    };
+    return sliderClasses;
+
+  }, [parametricObj.transformationInstructions.shaping.formula]); // Dependency: recalculate only when shaping formula changes
+
   // MEMOIZATION: Memoize the complex event handler using useCallback
   const handleBending1Change = useCallback((data) => {
     handleBendingChange(data.pop(), "v1");
@@ -58,7 +73,7 @@ const SprialingControl = React.memo((props) => {
   }, [handleUpdate]); // Dependency on handleUpdate (assuming it is stable)
 
   return (
-    <Aux>
+    <>
       <button
         onClick={updateControlsRef}
         className="TAreaInterface___TitleButton"
@@ -66,8 +81,7 @@ const SprialingControl = React.memo((props) => {
         <h3 className="TAreaInterface___TitleButton_Label">Bend</h3>
       </button>
       <div className="TAreaInterface_controlsContainer">
-        {shape !== 'sin' && (
-        <div className="UISliderContainer UISliderContainer__1">
+        <div className={bendingUI.v1SliderClass}>
           <label className="SliderLabel">1</label>
           <MySlider
             defaultValues={[0]}
@@ -75,9 +89,7 @@ const SprialingControl = React.memo((props) => {
             update={handleBending1Change}
           />
         </div>
-        )}
-        {shape !== 'cos' && (
-        <div className="UISliderContainer UISliderContainer__2">
+        <div className={bendingUI.v2SliderClass}>
           <label className="SliderLabel">2</label>
           <MySlider
             defaultValues={[0]}
@@ -85,11 +97,10 @@ const SprialingControl = React.memo((props) => {
             update={handleBending2Change}
           />
         </div>
-        )}
       </div>
-    </Aux>
+    </>
   );
 });
 
 // Use React.memo as the HOC for shallow prop comparison memoization
-export default React.memo(withInterfaceControls(SprialingControl, "bend", "TAreaInterface"));
+export default React.memo(withInterfaceControls(BendingControl, "bend", "TAreaInterface"));
