@@ -27,18 +27,20 @@ const checkFlatten = (flattenAmt, valToFlatten) => {
 const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams) => {
   const vectorIndex = vectors ? vectors.findIndex(vector => vector === vectorToCheck) : null;
 
-  // --- 1. DYNAMIC TEXTURE & WEIGHTS ---
+  // --- 1. FIXED TEXTURE BLENDING ---
   const isTex = !!vectorParams?.texture;
   const modAmt = vectorParams?.modulate ? vectorParams.modulateAmt : 1;
   const outer = isTex ? (vectorParams.outerTextureAmt || 1) : 1;
   const inner = isTex ? (vectorParams.innerTextureAmt || 0) : 0;
   
-  const tScale = Math.abs(outer) < 1 ? Math.abs(outer) : 1 / Math.abs(outer);
-  const safeTexRatio = isTex ? (inner * tScale * 0.5) : 0;
-  const texAlpha = isTex ? math.min(1, math.abs(inner * tScale)) : 0;
-  const baseWeight = 1 - (texAlpha * 0.5);
+  // NORMALIZE: We treat 'inner' (texture intensity) as a percentage (0 to 1)
+  // We cap it so the texture can never be more than 50% of the total radius, 
+  // ensuring the base shape is always visible and the size stays constant.
+  const texIntensity = math.max(0, math.min(0.5, inner * 0.1)); 
+  const currentBaseWeight = 1.0 - texIntensity; 
+  const currentTexWeight = texIntensity;
 
-  // --- 2. MODULATORS (Defined here for all cases) ---
+  // --- 2. MODULATORS ---
   const bendCos = vectorParams?.bendCos ? math.cos(v * (vectorParams.bendCosAmt || 0)) : 0;
   const bendSin = vectorParams?.bendSin ? math.sin(v * (vectorParams.bendSinAmt || 0)) : 0;
   
@@ -58,40 +60,36 @@ const checkVectors = (vectors, vectorToCheck, formula, u, v, vectorParams) => {
       return (vectorIndex === 0) ? (u / PI) - 1 : 1;
 
     case "sin":
-      if (vectorIndex === 0) return checkFlatten(vectorParams?.flattenAmt1 || 0, (u / PI) - 1);
-      if (vectorIndex === 1) {
-        const tex = math.sin(u * modAmt * outer) * safeTexRatio;
-        const base = (math.sin(u * modAmt) * baseWeight) + bendSin + spiralSin;
-        let val = math.pow(math.abs(tex + base), pinchAmt);
-        if ((tex + base) < 0) val *= -1;
-        val = checkFlatten(vectorParams?.flattenAmt2 || 0, val);
-        return (val * spiralSinFactor) * 0.5; // Scale fix
-      }
-      return 1;
-
     case "cos":
       if (vectorIndex === 0) return checkFlatten(vectorParams?.flattenAmt1 || 0, (u / PI) - 1);
       if (vectorIndex === 1) {
-        const tex = math.cos(u * modAmt * outer) * safeTexRatio;
-        const base = (math.cos(u * modAmt) * baseWeight) + bendCos + spiralCos;
-        let val = math.pow(math.abs(tex + base), pinchAmt);
-        if ((tex + base) < 0) val *= -1;
-        val = checkFlatten(vectorParams?.flattenAmt2 || 0, val);
-        return (val * spiralCosFactor) * 0.5; // Scale fix
+        const isSin = formula === "sin";
+        const trigU = isSin ? math.sin : math.cos;
+        const fAmt = vectorParams?.flattenAmt2 || 0;
+
+        const texPart = trigU(u * modAmt * outer) * currentTexWeight;
+        const basePart = (trigU(u * modAmt) * currentBaseWeight) + (isSin ? bendSin : bendCos) + (isSin ? spiralSin : spiralCos);
+        
+        let val = math.pow(math.abs(texPart + basePart), pinchAmt);
+        if ((texPart + basePart) < 0) val *= -1;
+        val = checkFlatten(fAmt, val);
+        
+        const sFactor = isSin ? spiralSinFactor : spiralCosFactor;
+        return (val * sFactor) * 0.5;
       }
       return 1;
 
     case "circle":
       if (vectorIndex === 0) {
-        const tex = math.cos(u * modAmt * outer) * safeTexRatio;
-        const base = (math.cos(u * modAmt) * baseWeight) + bendCos + spiralCos;
+        const tex = math.cos(u * modAmt * outer) * currentTexWeight;
+        const base = (math.cos(u * modAmt) * currentBaseWeight) + bendCos + spiralCos;
         let val = math.pow(math.abs(tex + base), pinchAmt);
         if ((tex + base) < 0) val *= -1;
         return checkFlatten(vectorParams?.flattenAmt1 || 0, val) * spiralCosFactor;
       } 
       if (vectorIndex === 1) {
-        const tex = math.sin(u * modAmt * outer) * safeTexRatio;
-        const base = (math.sin(u * modAmt) * baseWeight) + bendSin + spiralSin;
+        const tex = math.sin(u * modAmt * outer) * currentTexWeight;
+        const base = (math.sin(u * modAmt) * currentBaseWeight) + bendSin + spiralSin;
         let val = math.pow(math.abs(tex + base), pinchAmt);
         if ((tex + base) < 0) val *= -1;
         return checkFlatten(vectorParams?.flattenAmt2 || 0, val) * spiralSinFactor;
