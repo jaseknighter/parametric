@@ -143,12 +143,42 @@ class Parametric extends Component {
     // CONTROL CONFIGURATION
     this.controls = new TrackballControls(camera, canvas);
     this.controls.rotateSpeed = 3.0;
-    this.controls.dynamicDampingFactor = 0.02; // Slightly higher to help the "brake"
+    this.controls.dynamicDampingFactor = 0.03; // Slightly higher to help the "brake"
+
+    // 1. Tracking variables
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+    let lastMoveTime = 0;
+    let currentVelocity = 0;
+
+    // 2. Capture movement to calculate "instantaneous" velocity
+    const onMouseMove = (e) => {
+        const now = performance.now();
+        const deltaTime = now - lastMoveTime;
+
+        if (deltaTime > 0) {
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Pixels per millisecond
+            currentVelocity = distance / deltaTime; 
+        }
+
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+        lastMoveTime = now;
+    };
+
+    canvas.addEventListener('mousemove', onMouseMove);
+
 
     // THE HARD BRAKE: Listener to kill momentum
     this.controls.addEventListener("start", () => {
+      // console.log("start");
       // Stop the movement immediately by disabling damping temporarily
       this.controls.staticMoving = true;
+      // this.controls.rotateSpeed = 3.0;
       this.controls.update();
       
       if (this.interactionTimeout) clearTimeout(this.interactionTimeout);
@@ -161,16 +191,31 @@ class Parametric extends Component {
       // }
     });
 
+    
     this.controls.addEventListener("end", () => {
-      // Re-enable damping once user moves the mouse
-      this.controls.staticMoving = false;
-      
-      // this.interactionTimeout = setTimeout(() => {
-      //   this.setState({
-      //     isInteracting: false,
-      //     parametricObj: { ...this.state.parametricObj, slices: 100, stacks: 100 }
-      //   });
-      // }, 150);
+        const timeSinceLastMove = performance.now() - lastMoveTime;
+
+        // 3. THE DETECTION LOGIC
+        // Criteria for a "Flick": 
+        // - Mouse moved recently (within 30ms)
+        // - Velocity is above a threshold (e.g., 0.5px/ms)
+        const isMoving = timeSinceLastMove < 30 && currentVelocity > 0.5;
+
+        if (!isMoving) {
+            // STATIONARY: Force a hard stop
+            this.controls.target.copy(this.controls.target);
+            this.controls.staticMoving = true; // Stay static to block momentum calculation
+            this.controls.update();
+            // this.controls.staticMoving = false; // Reset for next time
+            // console.log("Detected: Still - Hard Stop");
+        } else {
+            // MOVING: Allow the flick
+            this.controls.staticMoving = false;
+            // console.log("Detected: Flicking - Allowing Momentum");
+        }
+
+        // Reset velocity for the next interaction
+        currentVelocity = 0;
     });
 
     const scene = new THREE.Scene();
