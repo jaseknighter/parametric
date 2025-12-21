@@ -179,7 +179,8 @@ class Parametric extends Component {
     camera.lookAt(0, 0, 0);
 
     this.controls = new OrbitControls(camera, canvas);
-
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.01; // Adjust this (lower = more slide, higher = more friction)
     this.controls.target.set(0, 0, 0);
     this.controls.update();
 
@@ -283,12 +284,17 @@ class Parametric extends Component {
     });
 
     this.renderThree = () => {
-      // const canvas = renderer.domElement;
+      // 1. Required for damping to work!
+      if (this.controls) {
+        this.controls.update();
+      }
+
       if (resizeRendererToDisplaySize(renderer)) {
         const canvas = renderer.domElement;
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
       }
+      
       renderer.render(scene, camera);
       requestAnimationFrame(this.renderThree);
     };
