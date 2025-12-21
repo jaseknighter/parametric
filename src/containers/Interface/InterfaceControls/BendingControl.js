@@ -85,7 +85,7 @@ const BendingControl = ((props) => {
           <label className="SliderLabel">1</label>
           <MySlider
             defaultValues={[0]}
-            domain={[0, 15]}
+            domain={[0, 10]}
             update={handleBending1Change}
           />
         </div>
@@ -93,7 +93,7 @@ const BendingControl = ((props) => {
           <label className="SliderLabel">2</label>
           <MySlider
             defaultValues={[0]}
-            domain={[0, 15]}
+            domain={[0, 10]}
             update={handleBending2Change}
           />
         </div>

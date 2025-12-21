@@ -1,3 +1,4 @@
+//UPDATED for increased resolution
 import React, { Component } from "react";
 import update from "immutability-helper";
 import * as THREE from "three";
@@ -16,13 +17,15 @@ class Parametric extends Component {
 
     //IMPORTANT: this is where the initial state configs are set!!!
     this.state = {
+      inited: false,
+      isInteracting: false,
       audioStarted: false,
       selectedValue: "Nothing selected",
       parametricObjects: [{ obj: "obj1" }],
       parametricObj: {
         name: "pObj1",
-        slices: 30,
-        stacks: 10,
+        slices: 100,
+        stacks: 100,
         transformationInstructions: {
           shaping: {
             formula: "circle",
@@ -67,6 +70,7 @@ class Parametric extends Component {
       },
       visible: true
     };
+    this.interactionTimeout = null;
   }
 
   componentDidMount = () => {
@@ -74,44 +78,63 @@ class Parametric extends Component {
     this.setState({ initedScene: true });
   };
 
-  componentDidUpdate = () => {
-    this.updateThree();
+  componentDidUpdate = (prevProps, prevState) => {
+    // We only trigger updateThree here if the object data changed
+    // OR if the interaction state just flipped (to catch the resolution switch)
+    if (prevState.parametricObj !== this.state.parametricObj || 
+        prevState.isInteracting !== this.state.isInteracting ||
+        this.state.inited == false
+    ) {
+      this.updateThree();
+    }
+    if (this.state.inited == false) {
+      this.setState({
+        inited: true
+      });
+    }
   };
 
   updateParametricObjHandler = updateArray => {
+    // 1. UI element selected: Switch to 30
+    if (!this.state.isInteracting) {
+      // console.log("UI element selected");
+      this.setState({
+        isInteracting: true,
+        parametricObj: { ...this.state.parametricObj, slices: 40, stacks: 40 }
+      });
+    }
+
+    if (this.interactionTimeout) clearTimeout(this.interactionTimeout);
+
     updateArray.forEach(updateItem => {
-        // 1. Dynamically create the update object for parametricObj using immutability-helper
         var parametricObjUpdate = {};
         var current = parametricObjUpdate;
-
         const pathArray = updateItem.objectStatePath.split(".");
         for (var i = 0; i < pathArray.length; i++) {
             if (i !== pathArray.length - 1) {
                 current[pathArray[i]] = {};
                 current = current[pathArray[i]];
             } else {
-                current[pathArray[i]] = {
-                    [updateItem.paramToUpdate]: { $set: updateItem.newValue }
-                };
-                current = current[pathArray[i]];
+                current[pathArray[i]] = { [updateItem.paramToUpdate]: { $set: updateItem.newValue } };
             }
         }
 
-        // 2. Create a separate update object for root-level state properties (like 'visible')
         var rootStateUpdate = {};
-        
-        // Check if the updateItem includes the 'visible' property
         if (updateItem.hasOwnProperty('visible')) {
-            // Add the visible property update to the rootStateUpdate object
-            // This will update 'this.state.visible'
             rootStateUpdate.visible = { $set: updateItem.visible };
         }
 
-        // 3. Call setState with both update objects
-        this.setState(
-            this.setParametricObjStateCallback(parametricObjUpdate, rootStateUpdate),
-        );
+        this.setState(this.setParametricObjStateCallback(parametricObjUpdate, rootStateUpdate));
     });
+
+    // 2. UI element no longer being changed: Switch to 100
+    this.interactionTimeout = setTimeout(() => {
+      // console.log("UI element no longer being changed");
+      this.setState({
+        isInteracting: false,
+        parametricObj: { ...this.state.parametricObj, slices: 100, stacks: 100 }
+      });
+    }, 150);
   };
 
   setParametricObjStateCallback = (parametricObjUpdate, rootStateUpdate) => {
@@ -129,11 +152,11 @@ class Parametric extends Component {
     };
   };
 
-  lastGeo = [];
+  // lastGeo = [];
   updateThree = () => {
     this.state.scene.remove(this.state.scene.getObjectByName("pGeo"));
     const geometry = parameterizeGeometry(this.state.parametricObj);
-    this.lastGeo = geometry.index.array;
+    // this.lastGeo = geometry.index.array;
     geometry.center();
     const visible = this.state.visible;
     this.addGeometry(0, 0, geometry, "pGeo", visible);
@@ -152,7 +175,7 @@ class Parametric extends Component {
     const far = 1000; // the far space in front of the camera that will be clipped
 
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, 0, 10);
+    camera.position.set(0, 0, 5);
     camera.lookAt(0, 0, 0);
 
     this.controls = new OrbitControls(camera, canvas);
@@ -266,7 +289,6 @@ class Parametric extends Component {
         camera.aspect = canvas.clientWidth / canvas.clientHeight;
         camera.updateProjectionMatrix();
       }
-
       renderer.render(scene, camera);
       requestAnimationFrame(this.renderThree);
     };
@@ -304,7 +326,11 @@ class Parametric extends Component {
         </div>
         <footer id="footer" className="Footer">
           <header className="Footer___Title">About Parametric Equations</header>
-          <div className="Footer___Content___Container"><h3>add info about parametric equations...</h3></div>
+          <div className="Footer___Content___Container">
+            <p>Parametric equations define geometry using mathematical functions rather than fixed geometric coordinates.</p>
+            <p>This site represents an exploration of the formulas and ideas presented in the book <a href="https://www.amazon.com/Morphing-Mathematical-Transformations-Architects-Designers/dp/1780674139"><i>Morphing: A Guide to Mathematical Transformations for Architects and Designers (Laurence King Publishing, 2015)</i></a> by Joseph Choma.</p>
+            <p>Built with React.js and Three.js.</p>
+          </div>
         </footer>
       </div>
     );

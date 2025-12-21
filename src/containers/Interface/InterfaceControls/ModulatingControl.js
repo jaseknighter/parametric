@@ -73,7 +73,7 @@ class ModulatingControl extends Component {
               <label className="SliderLabel"></label>
               <MySlider
                 defaultValues={[0]}
-                domain={[0, 10]}
+                domain={[0, 5]}
                 update={this.handleModulatingChange}
               />
             </div>

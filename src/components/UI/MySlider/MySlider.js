@@ -13,12 +13,11 @@ const MySlider = ({ domain: propsDomain, defaultValues, update: propsUpdate }) =
   // Domain uses useMemo to ensure values only recalculate if the domain prop changes
   const domain = useMemo(() => propsDomain || [0, 10], [propsDomain]);
   const tickCount = domain[1] / 5;
-  const step = 0.01; //domain[1] / 10;
+  const step = 0.0001; //domain[1] / 10;
 
   const [values, setValues] = useState(() => defaultValues.slice());
 
   const onUpdate = (update) => {
-    console.log(update)
     propsUpdate(update);
   };
 
