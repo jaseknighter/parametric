@@ -63,7 +63,6 @@ class Parametric extends Component {
 
   exportParametricObjHandler = () => {
     console.log("exportParametricObjHandler")
-    const FileSaver = require('file-saver');
     const exporter = new STLExporter();
     const str = exporter.parse( this.state.scene ); // Export the scene
     const blob = new Blob( [str], { type : 'text/plain' } ); // Generate Blob from the string
@@ -254,15 +253,33 @@ class Parametric extends Component {
     requestAnimationFrame(this.renderThree);
   };
 
-  render = () => (
-    <div className="Container">
-      <header className="Header">Parametric Equations</header>
-      <canvas className="Three" id="three" />
-      <div className="Interface_Container">
-        <Interface handleExport={this.exportParametricObjHandler} handleUpdate={this.updateParametricObjHandler} parametricObj={this.state.parametricObj} />
+  render = () => {
+    return (
+      <div className="Container">
+        <header id="header" className="Header">
+          Parametric Equations
+          <a href="#footer" className="about-link">
+            (about)
+          </a>
+        </header>
+        <canvas className="Three" id="three" />
+        <div id="control" className="Interface_Container">
+          <Interface
+            handleUpdate={this.updateParametricObjHandler}
+            parametricObj={this.state.parametricObj}
+          />
+        </div>
+        <footer id="footer" className="Footer">
+          <header className="Footer___Title">About Parametric Equations</header>
+          <div className="Footer___Content___Container">
+            <p>Parametric equations define geometry using mathematical functions rather than fixed geometric coordinates.</p>
+            <p>This site represents an exploration of the formulas and ideas presented in the book <a href="https://www.amazon.com/Morphing-Mathematical-Transformations-Architects-Designers/dp/1780674139"><i>Morphing: A Guide to Mathematical Transformations for Architects and Designers (Laurence King Publishing, 2015)</i></a> by Joseph Choma.</p>
+            <p>Built with React.js and Three.js.</p>
+          </div>
+        </footer>
       </div>
-    </div>
-  );
+    );
+  };
 }
 
 export default Parametric;
