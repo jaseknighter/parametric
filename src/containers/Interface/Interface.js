@@ -6,6 +6,7 @@ import SpiralingControl from "./InterfaceControls/SpiralingControl";
 import BendingControl from "./InterfaceControls/BendingControl";
 import ModulatingControl from "./InterfaceControls/ModulatingControl";
 import TexturingControl from "./InterfaceControls/TexturingControl";
+import ExportControl from "./InterfaceControls/ExportControl";
 
 import "./Interface.css";
 
@@ -22,6 +23,7 @@ const UI_CONFIG = {
     spiral: 2,
     flatten: 3,
     modulate: 1,
+    export: 1,
   },
 };
 // Move this outside to prevent recreation on every render
@@ -33,9 +35,10 @@ const CONTROL_LIST = [
   { id: "spiral", Component: SpiralingControl },
   { id: "modulate", Component: ModulatingControl },
   { id: "flatten", Component: FlatteningControl },
+  { id: "export", Component: ExportControl },
 ];
 
-const Interface = ({ parametricObj, handleUpdate }) => {
+const Interface = ({ parametricObj, handleUpdate, handleExport }) => {
   const interfaceRef = useRef(null);
   const controlRefs = useRef({}); 
 
@@ -123,6 +126,7 @@ const Interface = ({ parametricObj, handleUpdate }) => {
             onOpen={onOpenHandler}
             onClose={onCloseHandler}
             handleUpdate={handleUpdate}
+            handleExport={handleExport}
             parametricObj={parametricObj}
           />
         </div>

@@ -5,6 +5,7 @@
   "private": true,
   "display": "browser",
   "dependencies": {
+    "file-saver": "^2.0.5",
     "immutability-helper": "^3.0.1",
     "mathjs": "^15.1.0",
     "react": "^16.9.0",

@@ -3,6 +3,9 @@ import update from "immutability-helper";
 import * as THREE from "three";
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 import { parameterizeGeometry } from "../../components/ParametricGeometryBuilder/ParametricGeometryBuilder";
+import { saveAs } from 'file-saver';
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
+
 import Interface from "../Interface/Interface";
 
 import "./Parametric.css";
@@ -57,6 +60,16 @@ class Parametric extends Component {
       if (!this.state.inited) this.setState({ inited: true });
     }
   };
+
+  exportParametricObjHandler = () => {
+    console.log("exportParametricObjHandler")
+    const FileSaver = require('file-saver');
+    const exporter = new STLExporter();
+    const str = exporter.parse( this.state.scene ); // Export the scene
+    const blob = new Blob( [str], { type : 'text/plain' } ); // Generate Blob from the string
+    saveAs(blob, "parametric.stl"); //Save the Blob to file.stl
+  }
+
 
   updateParametricObjHandler = (updateArray) => {
     if (!this.state.isInteracting) {
@@ -246,7 +259,7 @@ class Parametric extends Component {
       <header className="Header">Parametric Equations</header>
       <canvas className="Three" id="three" />
       <div className="Interface_Container">
-        <Interface handleUpdate={this.updateParametricObjHandler} parametricObj={this.state.parametricObj} />
+        <Interface handleExport={this.exportParametricObjHandler} handleUpdate={this.updateParametricObjHandler} parametricObj={this.state.parametricObj} />
       </div>
     </div>
   );

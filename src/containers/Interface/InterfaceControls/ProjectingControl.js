@@ -38,7 +38,6 @@ const calculateProjectingUpdate = (currentVectors, currentFormula, clickedVector
 
 const ProjectingControl = ((props) => {
   const { parametricObj, handleUpdate, updateControlsRef } = props;
-
   const projecting = parametricObj?.transformationInstructions?.projecting;
   const vectors = projecting?.vectors || [null, null];
   const formula = projecting?.formula;

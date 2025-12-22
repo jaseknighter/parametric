@@ -184,6 +184,12 @@ select {
 
 /* Shape buttons */
 /* TODO: fix hit area of button */
+.IconButton___export {
+  background-position: 49%;
+  background-size: 4rem;
+  grid-row-start: 2;
+  background-image: url("../../resources/icons/export_icon.png");
+}
 .IconButton___line {
   background-position: 49%;
   background-size: 4rem;

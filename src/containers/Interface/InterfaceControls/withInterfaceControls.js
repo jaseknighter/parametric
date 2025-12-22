@@ -10,7 +10,8 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
       adjustYAmt, 
       showMobile, 
       parametricObj, 
-      handleUpdate 
+      handleUpdate,
+      handleExport
     } = props;
 
     const [isOpen, setIsOpen] = useState(false);
@@ -108,6 +109,7 @@ const withInterfaceControls = (WrappedComponent, controlID, controlClass) => {
           updateControlsRef={updateControlsRef}
           parametricObj={parametricObj}
           handleUpdate={handleUpdate}
+          handleExport={handleExport}
         />
       </div>
     );
