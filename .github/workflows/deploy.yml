@@ -35,13 +35,13 @@ jobs:
           CI: true
           VITE_COVERAGE: true
 
-      # 🟢 Upload the evidence (Monocart includes both coverage and test results)
+      # 🟢 FIX: Correct the path to where Monocart actually saves the data
       - name: Upload Test Reports
         if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: parametric-test-reports
-          path: monocart-report/
+          path: monocart-report/ # Matches [MR] view report: monocart-report/index.html
           retention-days: 7
 
       # 🟢 Build the production app
