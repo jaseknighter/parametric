@@ -12,28 +12,37 @@
       "x": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ]
     },
-    "spiralX": {
+    "spiralAmtX": {
       "u": {
         "from": 0,
         "to": {
           "operators": "*",
-          "operands": [2, "Math.PI"]
+          "operands": [
+            2,
+            "Math.PI"
+          ]
         }
       },
       "v": {
@@ -43,28 +52,38 @@
       "x": [
         {
           "operators": "*",
-          "operands": ["u",1]
+          "operands": [
+            "u",
+            1
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ]
     },
-    "spiralY": {
+    "spiralAmtY": {
       "u": {
         "from": 0,
         "to": {
           "operators": "*",
-          "operands": [2, "Math.PI"]
+          "operands": [
+            2,
+            "Math.PI"
+          ]
         }
       },
       "v": {
@@ -74,28 +93,37 @@
       "x": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ]
     },
-    "spiralZ": {
+    "spiralAmtZ": {
       "u": {
         "from": 0,
         "to": {
           "operators": "*",
-          "operands": [2, "Math.PI"]
+          "operands": [
+            2,
+            "Math.PI"
+          ]
         }
       },
       "v": {
@@ -105,25 +133,29 @@
       "x": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ]
     },
-
-
-    "spiralXY": {
+    "spiralAmtXY": {
       "u": {
         "from": 0,
         "to": 1
@@ -135,23 +167,29 @@
       "x": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ]
     },
-    "spiralYZ": {
+    "spiralAmtYZ": {
       "u": {
         "from": 0,
         "to": 1
@@ -163,23 +201,29 @@
       "x": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ]
     },
-    "spiralXZ": {
+    "spiralAmtXZ": {
       "u": {
         "from": 0,
         "to": 1
@@ -191,19 +235,25 @@
       "x": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ]
     },
@@ -212,7 +262,10 @@
         "from": 0,
         "to": {
           "operators": "/",
-          "operands": [3, "Math.PI"]
+          "operands": [
+            3,
+            "Math.PI"
+          ]
         }
       },
       "v": {
@@ -222,19 +275,25 @@
       "x": [
         {
           "operators": null,
-          "operands": ["v"]
+          "operands": [
+            "v"
+          ]
         }
       ],
       "y": [
         {
           "operators": null,
-          "operands": [1]
+          "operands": [
+            1
+          ]
         }
       ],
       "z": [
         {
           "operators": null,
-          "operands": ["u"]
+          "operands": [
+            "u"
+          ]
         }
       ]
     }

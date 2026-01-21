@@ -1,89 +1,37 @@
 html {
   scroll-behavior: smooth;
-}
-
-.dg.ac {
-  visibility: hidden;
-  z-index: 10;
-  top: calc(100vh - 100px);
-  left: 2px;
+  margin: 0;
+  padding: 0;
 }
 
 .Container {
-  height: calc(100vh * 2 -2rem);
+  height: 100vh;
   display: grid;
   grid-template-areas:
     "margin___left header header header header"
     "interface interface three three three"
     "footer footer footer footer footer ";
 
-  grid-template-columns: 4rem 6rem auto;
-  grid-template-rows: 6rem calc(100vh - 7rem) 15rem;
+  grid-template-columns: 4rem repeat(4, 1fr);
+  grid-template-rows: 6rem 1fr 15rem;
 }
 
 .Container > :not(:first-child) {
   z-index: 2;
 }
 
+/* THE FIX: Remove fixed calcs, allow grid to dictate size */
 .Three {
   grid-area: three;
-  width: calc(100vw - 11rem);
-  height: calc(100vh - 7rem);
+  width: 100%;
+  height: 100%;
+  display: block; /* Prevents tiny scrollbars */
+  outline: none;
 }
 
 .Interface_Container {
-  z-index: 4;
+  z-index: 10;
   grid-area: interface;
-  align-items: left;
-}
-
-@media (min-height: 31.3rem) and (min-width: 31.3rem) {
-  .Container {
-    grid-template-areas:
-      "margin___left header header header header"
-      "margin___left three three three three"
-      "margin___left interface interface interface interface"
-      "footer footer footer footer footer ";
-
-    grid-template-columns: 4rem auto;
-    grid-template-rows: 6rem calc(100vh - 15rem - 6rem) 15rem;
-  }
-
-  .Three {
-    width: calc(100vw - 4rem);
-    height: calc(100vh - 23rem);
-  }
-  
-  .Footer {
-    z-index: 4;
-    grid-area: footer;
-    color: white;
-    padding-right: 4rem;
-    display: grid;
-    grid-template-areas:
-      "footer___Header footer___Header footer___Header footer___Header footer___Header"
-      "footer___Content footer___Content footer___Content footer___Content footer___Content"
-      "footer___Footer footer___Footer footer___Footer footer___Footer footer___Footer";
-
-    grid-template-columns: 4rem auto;
-    grid-template-rows: 14rem calc(100vh - 21rem) 6rem;
-  }
-
-  .Footer___Title {
-    font-size: 3rem;
-    padding-right: 0.5rem;
-    margin-left: 4rem;
-    text-align: right;
-    padding-top: 9rem;
-    grid-area: footer___Header;
-  }
-  .Footer___Content___Container {
-    background-color: #777;
-    grid-area: footer___Content;
-    padding-left: 4rem;
-    padding-top: 2rem;
-    /* height:100% */
-  }  
 }
 
 .Header {
@@ -91,13 +39,37 @@ html {
   grid-area: header;
   display: flex; 
   justify-content: space-between; 
-  align-items: baseline; 
-
-  padding-left: 0.5rem;
-  padding-right: 1rem; 
-  padding-top: 2rem;
+  align-items: center;
   font-size: 3rem;
   color: white;
+  pointer-events: none; /* Allows clicks to go through to Three.js */
+
+  /* ===============================
+     HEADER HEIGHT LOCK (CANONICAL)
+     =============================== */
+  padding-left: 1.5rem;
+  padding-right: 1rem; 
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  height: 6rem !important;
+  min-height: 6rem !important;
+  max-height: 6rem !important;
+
+  line-height: 1;
+  overflow: hidden;
+}
+
+.Header h1,
+.Header h2,
+.Header h3 {
+  margin: 0;
+}
+
+.Header > * {
+  pointer-events: auto;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .about-link {
@@ -105,10 +77,6 @@ html {
   text-decoration: none; 
   font-size: 1rem; 
   cursor: pointer; 
-}
-
-.about-link:hover {
-  color: #fff; 
 }
 
 .Footer {
@@ -121,9 +89,8 @@ html {
     "footer___Header footer___Header footer___Header footer___Header footer___Header"
     "footer___Content footer___Content footer___Content footer___Content footer___Content"
     "footer___Footer footer___Footer footer___Footer footer___Footer footer___Footer";
-
   grid-template-columns: 4rem auto;
-  grid-template-rows: 14rem calc(100vh - 14rem) 6rem;
+  grid-template-rows: 14rem auto 6rem;
 }
 
 .Footer___Title {
@@ -135,18 +102,256 @@ html {
   padding-top: 9rem;
   grid-area: footer___Header;
 }
+
 .Footer___Content___Container {
   background-color: #777;
   grid-area: footer___Content;
-  padding-left: 3rem;
-  padding-right: 3rem;
-  padding-top: 2rem;
+  padding: 2rem 3rem;
   margin-top: 7rem;
   margin-right: 16rem;
   font-size: 1.8rem;
 }
 
 a:link {
-  color: rgba(202, 117, 117); /* Red color for unvisited links */
-  text-decoration: none; /* Removes the default underline */
+  color: rgba(202, 117, 117);
+  text-decoration: none;
+}
+
+/* [cite: 2026-01-14] Apply consistent color scheme to main interface buttons */
+.TAreaInterface___TitleButton {
+  background-color: #8e5c5c !important; /* Darker Pink */
+  transition: background-color 0.2s ease !important;
+}
+
+.TAreaInterface___TitleButton:hover {
+  background-color: #a26969 !important; /* Intermediate Pink */
+}
+
+/* [cite: 2026-01-14] Active/Click state matches the Open state */
+.TAreaInterface___TitleButton:active {
+  background-color: #b67675 !important; /* Original Pink */
+}
+
+/* [cite: 2026-01-14] FIX: Target button when sibling container is open using :has() */
+/* This handles the case where Controls_Show is on the sibling div, not a parent */
+.TAreaInterface___TitleButton:has(+ .Controls_Show),
+.TAreaInterface___TitleButton:has(~ .Controls_Show),
+/* Keep existing selector in case of nested structure variants */
+.Controls_Show .TAreaInterface___TitleButton {
+  background-color: #b67675 !important; /* Original Pink */
+}
+
+.TAreaInterface___TitleButton:has(+ .Controls_Show):hover,
+.TAreaInterface___TitleButton:has(~ .Controls_Show):hover,
+.Controls_Show .TAreaInterface___TitleButton:hover {
+  background-color: #c27575 !important; /* Original Hover Pink */
+}
+
+/* [cite: 2026-01-14] When open, click color matches closed rollover color */
+.TAreaInterface___TitleButton:has(+ .Controls_Show):active,
+.TAreaInterface___TitleButton:has(~ .Controls_Show):active,
+.Controls_Show .TAreaInterface___TitleButton:active {
+  background-color: #a26969 !important; /* Intermediate Pink */
+}
+
+/* [cite: 2026-01-16] FIX: Ensure Diagnostics HUD is visible to Playwright */
+/* This prevents "element is not visible" errors during hover actions */
+.Worker_Status_Indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 6px 12px;
+  border-radius: 4px;
+  z-index: 9999; /* 🛡️ Ensure it sits above the 3D Canvas */
+  visibility: visible !important;
+  pointer-events: auto; /* Allow hover/click */
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: block; /* 🛡️ Ensure it has dimensions for hit-testing */
+}
+
+/* THE FIX: Remove fixed calcs, allow grid to dictate size */
+.Three {
+  grid-area: three !important;
+  width: 100%;
+  height: 100%;
+  display: block; /* Prevents tiny scrollbars */
+  outline: none;
+}
+
+.Interface_Container {
+  z-index: 10;
+  grid-area: interface !important;
+  overflow-y: auto; /* [cite: 2026-01-20] FIX: Internal scroll for mobile stability */
+  max-height: 100%;
+}
+
+/* [cite: 2026-01-20] INVARIANT: Prevent canvas from collapsing during layout shifts */
+.Three_Grid_Area {
+  grid-area: three;
+  position: relative;
+  min-height: 300px;
+  min-width: 300px; /* [cite: 2026-01-20] FIX: Spatial Guard. Prevent horizontal collapse */
+  height: 100% !important;
+}
+
+/* [cite: 2026-01-20] LAYOUT MODE: Mobile (Bottom Interface) */
+.Container.layout-mobile {
+  display: flex !important; /* [cite: 2026-01-20] FIX: Flex column prevents header margin collapse */
+  flex-direction: column;
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  /* ===============================
+     MOBILE OVERFLOW INVARIANT
+     =============================== */
+  overflow: visible !important;
+}
+
+.Container.layout-mobile .Three_Grid_Area {
+  position: absolute;
+  left: 11rem; /* [cite: 2026-01-20] VIEWPORT AUTHORITY: Start after label stripe */
+  width: calc(100vw - 11rem);
+  height: calc(100vh - 10rem); /* Stable area between header and footer */
+  z-index: 1;
+}
+
+.Container.layout-mobile .Interface_Container {
+  position: absolute;
+  top: 6rem;
+  left: 0;
+  width: fit-content !important; /* [cite: 2026-01-20] FIX: Shrink to content width */
+  height: calc(100vh - 6rem); /* [cite: 2026-01-20] FIX: Extend to bottom of window */
+  max-height: none; /* Remove previous constraint */
+  z-index: 100;    /* Float ABOVE the canvas */
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* [cite: 2026-01-20] MOBILE STRIPE INVARIANT: Grey stripe behind labels only */
+.Container.layout-mobile .Interface_Container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11rem;     /* Width of control labels */
+  height: 100%;
+  /* background-color: #777; */
+  background-color: rgba(119, 119, 119, 0.5);
+  z-index: -1;
+  pointer-events: auto; /* The stripe blocks clicks */
+}
+
+/* ===============================
+   MOBILE POINTER EVENTS MODEL
+   =============================== */
+.Container.layout-mobile .Interface {
+  pointer-events: none;
+  overflow: visible !important;
+}
+
+.Container.layout-mobile .TAreaInterface {
+  width: fit-content;
+  pointer-events: auto;
+  position: relative; /* anchor for popouts */
+}
+
+.Container.layout-mobile .TAreaInterface_controlsContainer {
+  pointer-events: auto !important;
+}
+
+/* ===============================
+   MOBILE SAFE POPOUT (NO TRANSFORMS)
+   =============================== */
+.Container.layout-mobile
+.TAreaInterface_controlsContainer.Controls_Show {
+  position: absolute;
+
+  left: -1rem; /* DO NOT CHANGE THIS VALUE!!!! width of label stripe */
+  top: 0;      /* align with label top */
+
+  transform: none !important;
+
+  margin: 0;
+  /* [cite: 2026-01-20] FIX: Content-Aware Widths based on column count */
+  width: fit-content !important;
+  min-width: unset !important;
+  display: grid;
+  padding-right: 1.5rem;
+
+  z-index: 1000;
+}
+
+/* 0.5 Column (Export) */
+.Container.layout-mobile .Controls___Container_0_5column_Open .TAreaInterface_controlsContainer.Controls_Show {
+  width: 5rem !important;
+}
+
+/* 1 Column (Single sliders) */
+.Container.layout-mobile .Controls___Container_1column_Open .TAreaInterface_controlsContainer.Controls_Show {
+  width: 6rem !important;
+}
+
+/* 2 Columns (Shape, Texture) */
+.Container.layout-mobile .Controls___Container_2column_Open .TAreaInterface_controlsContainer.Controls_Show {
+  width: 10rem !important;
+}
+
+/* 3 Columns (Project, Bend, Pinch, etc.) */
+.Container.layout-mobile .Controls___Container_3column_Open .TAreaInterface_controlsContainer.Controls_Show {
+  width: 14rem !important;
+}
+
+/* [cite: 2026-01-20] FIX: Bottom Group aligns bottom-to-bottom to stay on screen */
+.Container.layout-mobile .Bottom_Group .TAreaInterface_controlsContainer.Controls_Show {
+  top: auto;
+  bottom: 0;
+  transform: none !important;
+}
+
+/* [cite: 2026-01-20] LAYOUT MODE: Desktop (Bottom Interface) */
+.Container.layout-desktop {
+  height: 100vh !important; /* [cite: 2026-01-20] ELIMINATE 200vh DRIFT */
+  display: grid;
+  grid-template-areas:
+    "margin___left header header header header"
+    "margin___left three  three  three  three"
+    "margin___left interface interface interface interface"
+    "footer footer footer footer footer ";
+
+  grid-template-columns: 4rem repeat(4, 1fr);
+  grid-template-rows: 6rem 1fr 15rem;
+  overflow: hidden;
+}
+
+/* [cite: 2026-01-20] FIX: Reset canvas positioning when returning to desktop */
+.Container.layout-desktop .Three_Grid_Area {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* [cite: 2026-01-20] FIX: Reset Interface positioning/sizing when returning to desktop */
+.Container.layout-desktop .Interface_Container {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.Container.layout-desktop .Interface {
+  width: 100% !important;
 }

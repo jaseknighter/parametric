@@ -1,0 +1,112 @@
+/**
+ * @fileoverview generate-coverage-table.js
+ * AUTOMATION: Updates README.md with latest test metrics.
+ * Reads Jest coverage, Playwright coverage, and Playwright test results.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Paths
+const JEST_COVERAGE_PATH = path.resolve(__dirname, '../coverage/coverage-final.json');
+const PW_COVERAGE_PATH = path.resolve(__dirname, '../monocart-report/coverage/coverage-final.json');
+const PW_RESULTS_PATH = path.resolve(__dirname, '../playwright-report.json');
+const README_PATH = path.resolve(__dirname, '../README.md');
+
+// Helper to calculate coverage percentage
+function calculateCoverage(coverageMap, filePath, type) {
+    if (!coverageMap) return null;
+    // Find key ending with filePath
+    const key = Object.keys(coverageMap).find(k => k.endsWith(filePath));
+    if (!key) return null;
+    
+    const fileCov = coverageMap[key];
+    const metrics = fileCov[type]; // 's' for statements, 'b' for branches
+    
+    let total = 0;
+    let covered = 0;
+    
+    if (type === 's') {
+        total = Object.keys(metrics).length;
+        covered = Object.values(metrics).filter(v => v > 0).length;
+    } else if (type === 'b') {
+        Object.values(metrics).forEach(branchCounts => {
+            branchCounts.forEach(count => {
+                total++;
+                if (count > 0) covered++;
+            });
+        });
+    }
+    
+    return total === 0 ? 100 : Math.round((covered / total) * 100);
+}
+
+// Helper to get pass rate
+function getPassRate(results, projectNames) {
+    if (!results) return null;
+    
+    let passed = 0;
+    let total = 0;
+    
+    function traverse(suite) {
+        if (suite.specs) {
+            suite.specs.forEach(spec => {
+                spec.tests.forEach(test => {
+                    if (!projectNames || projectNames.includes(test.projectName)) {
+                        total++;
+                        if (test.status === 'expected' || test.status === 'passed') passed++;
+                    }
+                });
+            });
+        }
+        if (suite.suites) {
+            suite.suites.forEach(child => traverse(child));
+        }
+    }
+    
+    traverse(results);
+    
+    return total === 0 ? null : Math.round((passed / total) * 100);
+}
+
+function formatResult(val) {
+    if (val === null || val === undefined) return 'N/A';
+    return `✅ ${val}%`;
+}
+
+async function main() {
+    const jestCoverage = fs.existsSync(JEST_COVERAGE_PATH) ? JSON.parse(fs.readFileSync(JEST_COVERAGE_PATH, 'utf8')) : null;
+    const pwCoverage = fs.existsSync(PW_COVERAGE_PATH) ? JSON.parse(fs.readFileSync(PW_COVERAGE_PATH, 'utf8')) : null;
+    const pwResults = fs.existsSync(PW_RESULTS_PATH) ? JSON.parse(fs.readFileSync(PW_RESULTS_PATH, 'utf8')) : null;
+
+    const logicCov = calculateCoverage(jestCoverage, 'ParametricLogic.js', 's');
+    const workerCov = calculateCoverage(jestCoverage, 'Parametric.worker.js', 'b');
+    const displayCov = calculateCoverage(pwCoverage, 'ParametricScene.js', 's');
+    
+    // Heuristic for project names based on common configs
+    const chromiumRate = getPassRate(pwResults, ['chromium', 'Desktop Chrome', 'google-chrome']) ?? getPassRate(pwResults, null); // Fallback to all
+    const firefoxRate = getPassRate(pwResults, ['firefox', 'Desktop Firefox', 'firefox-smoke']);
+    const webkitRate = getPassRate(pwResults, ['webkit', 'Desktop Safari', 'webkit-smoke']);
+
+    const newTable = `| Category | Metric | Result | Environment |
+| :--- | :--- | :--- | :--- |
+| **Logic Layer** | Statement Coverage | ${formatResult(logicCov)} | Jest / Node v20 |
+| **Web Worker** | Branch Coverage | ${formatResult(workerCov)} | Jest / Node v20 |
+| **Display Layer** | Statement Coverage | ${formatResult(displayCov)} | Playwright |
+| **Smoke Suite** | Pass Rate | ${formatResult(chromiumRate)} | Playwright (Chromium) |
+| **Smoke Suite** | Pass Rate | ${formatResult(firefoxRate)} | Playwright (Firefox) |
+| **Smoke Suite** | Pass Rate | ${formatResult(webkitRate)} | Playwright (WebKit) |`;
+
+    if (fs.existsSync(README_PATH)) {
+        let content = fs.readFileSync(README_PATH, 'utf8');
+        const tableRegex = /\| Category \| Metric \| Result \| Environment \|[\s\S]*?\| Playwright \(WebKit\) \|/;
+        if (tableRegex.test(content)) {
+            fs.writeFileSync(README_PATH, content.replace(tableRegex, newTable));
+            console.log('✅ README.md coverage table updated.');
+        } else {
+            console.warn('⚠️ Could not find table in README.md to update.');
+        }
+    }
+}
+
+main();
