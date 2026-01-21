@@ -25,6 +25,39 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # 🟢 FIX 1: Install Playwright Browsers & OS Dependencies
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      # 🟢 FIX 2: Run the baseline suite
+      - name: Run Smoke Suite
+        run: npm run test:full-baseline
+        env:
+          CI: true
+          VITE_COVERAGE: true
+
+      # 🟢 FIX 3: Capture the evidence even on failure
+      - name: Upload Test Reports
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: parametric-test-reports
+          path: |
+            monocart-report/
+            playwright-report/
+          retention-days: 7
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Build
         run: npm run build
 
