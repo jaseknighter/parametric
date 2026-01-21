@@ -30,7 +30,7 @@ jobs:
 
       # 🟢 Run tests and update snapshots for the Linux environment
       - name: Run Smoke Suite
-        run: npm run test:full-baseline -- --update-snapshots
+        run: npm run test:full-baseline:ci
         env:
           CI: true
           VITE_COVERAGE: true
