@@ -19,3 +19,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+canvas {
+  touch-action: none; /* 🟢 Prevents browser-level scrolling/zooming on the canvas */
+}

@@ -48,7 +48,11 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    hmr: { overlay: false }
+    hmr: { overlay: false },
+    watch: {
+      // 🟢 Add these patterns to the ignored list
+      ignored: ['**/coverage/**', '**/monocart-report/**']
+    }
   },
 
   build: {

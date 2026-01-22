@@ -1,10 +1,24 @@
 .DS_Store
 node_modules/
+dist/
 build/
 
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+# Playwright Outputs
+test-results/
+playwright-report/
+playwright/.cache/
+playwright/.auth/
+blob-report/
+
+# Test Coverage & Monocart
+coverage/
+monocart-report/
+
+# Playwright Snapshots (Actual/Diff)
+# We keep *-reference.png but ignore failure artifacts
+*-actual.png
+*-diff.png
+
+# Environment / Logs
+.env
+*.log

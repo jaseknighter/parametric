@@ -19,6 +19,8 @@ export const SLIDER_THROTTLE_MS = 16;
 export const SLIDER_STEP = 0.01;
 export const MAX_VERTICES = 70000;
 export const HUD_TYPING_DEBOUNCE = 300;
+export const ZOOM_SENSITIVITY = 1.2; // [cite: 2026-01-21] UX: Tweakable zoom speed
+export const MAX_ZOOM_DISTANCE = 100; // [cite: 2026-01-21] UX: Prevent object from disappearing
 export const SCALE_FACTOR = 5.0;
 
 // [cite: 2026-01-19] MOBILE LAYOUT CONSTANTS

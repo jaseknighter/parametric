@@ -8,7 +8,7 @@
 import * as THREE from "three";
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 import { Debug } from "../../utilities/debug";
-import { LAYOUT_THRESHOLDS } from "../../shared/ParametricConstants";
+import { LAYOUT_THRESHOLDS, ZOOM_SENSITIVITY, MAX_ZOOM_DISTANCE } from "../../shared/ParametricConstants";
 
 export const createSceneManager = (canvas, options = {}) => {
   const parent = canvas.parentElement || document.body;
@@ -38,6 +38,11 @@ export const createSceneManager = (canvas, options = {}) => {
   const controls = new TrackballControls(camera, canvas);
   controls.rotateSpeed = 1.5;
   controls.dynamicDampingFactor = 0.1;
+  controls.zoomSpeed = ZOOM_SENSITIVITY; // [cite: 2026-01-21] UX: Apply sensitivity cap
+  controls.noRotate = true; // [cite: 2026-01-21] FIX: Disable built-in rotation to prevent conflict with custom spin
+  controls.staticMoving = true; // [cite: 2026-01-21] UX: Makes zoom feel more responsive on mobile
+  controls.maxDistance = MAX_ZOOM_DISTANCE; // [cite: 2026-01-21] UX: Prevent zooming out too far
+
   controls.target.set(0, 0, 0);
   controls.addEventListener("change", () => { needsRender = true; });
 
@@ -240,7 +245,9 @@ export const createSceneManager = (canvas, options = {}) => {
   };
 
   const onPointerMove = (e) => {
-    if (!isDragging) return;
+    // [cite: 2026-01-21] FIX: If multiple pointers are active (pinching), don't apply custom rotation
+    if (!isDragging || !e.isPrimary) return;
+
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
     dragDistance += Math.sqrt(dx * dx + dy * dy);
@@ -314,6 +321,8 @@ export const createSceneManager = (canvas, options = {}) => {
     ready: readyPromise,
     scene: scene, 
     stopMotion,
+    // [cite: 2026-01-21] TEST HOOK: Expose velocity for conflict prevention tests
+    getVelocity: () => Math.max(Math.abs(velocityX), Math.abs(velocityY)),
     getMesh: () => mesh,
     // [cite: 2026-01-20] FIX: Inject layout mode to gate resize logic
     setLayoutMode: (mode) => {

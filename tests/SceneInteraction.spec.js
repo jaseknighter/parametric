@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('ParametricScene Interactions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?e2e=true');
-    await page.waitForFunction(() => window.scene && window.intentService);
+    await page.waitForFunction(() => window.scene && window.intentService && window.scene.getVelocity);
   });
 
   test('Double click toggles spin', async ({ page }) => {
@@ -37,5 +37,25 @@ test.describe('ParametricScene Interactions', () => {
   test('Resize triggers handler', async ({ page }) => {
     await page.setViewportSize({ width: 800, height: 600 });
     await page.waitForTimeout(200); // Wait for debounce
+  });
+
+  test('Input Decoupling: Multi-touch gestures should not trigger custom rotation', async ({ page }) => {
+    // 1. Simulate a pointer move with 'isPrimary: false' 
+    // (Simulating the second finger of a pinch)
+    await page.evaluate(() => {
+      const canvas = document.querySelector('canvas');
+      // Dispatch a move event that should be ignored by the custom handler
+      const event = new PointerEvent('pointermove', {
+        clientX: 500,
+        clientY: 500,
+        isPrimary: false, // [cite: 2026-01-21] TEST: This flag should block rotation logic
+        bubbles: true
+      });
+      canvas.dispatchEvent(event);
+    });
+  
+    // 2. Verify rotation velocity remains zero (or near zero)
+    const velocity = await page.evaluate(() => window.scene.getVelocity());
+    expect(velocity).toBe(0);
   });
 });
