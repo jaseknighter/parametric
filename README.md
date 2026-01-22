@@ -123,6 +123,8 @@ The v0.5 release represents a core transplant to enable modern performance and m
 #### Guidelines for Working with LLMs <!-- omit in toc -->
 * Triangulating for Truthiness: Effective Engagement with LLMs for Software Engineering (**Draft:** under review)
 
+---
+
 #### DRAFT Technical Documentation (LLM Generated)
 
 The following sections are under active development and subject to change.
@@ -176,6 +178,8 @@ To set up the environment and the new Worker-based architecture locally:
 3. **Start the development server:**
 
     `npm run dev`
+
+---
 
 ### Credits
 * **Mathematical Foundation**: Inspired by the formulas and ideas in the book <a href="https://www.amazon.com/Morphing-Mathematical-Transformations-Architects-Designers/dp/1780674139">Morphing: A Guide to Mathematical Transformations for Architects and Designers (Laurence King Publishing, 2015)</a> by Joseph Choma.
