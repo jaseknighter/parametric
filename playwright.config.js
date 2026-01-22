@@ -1,4 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// 🟢 Standard ES Module replacement for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Check if we are in coverage mode
 const isCoverage = process.env.VITE_COVERAGE === 'true';
@@ -14,7 +20,7 @@ export default defineConfig({
     ['list'],
     ['monocart-reporter', {  
         name: "Parametric 2026 Unified Report",
-        outputDir: './monocart-report',
+        outputDir: path.resolve(__dirname, 'monocart-report'),
         coverage: {
             // Use Istanbul provider when VITE_COVERAGE is true
             provider: isCoverage ? 'istanbul' : 'v8', 

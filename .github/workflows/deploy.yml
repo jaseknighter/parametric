@@ -41,9 +41,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: parametric-test-reports
-          path: monocart-report/ # Matches [MR] view report: monocart-report/index.html
+          path: '**/monocart-report/' # 🟢 Wildcard helps find it in the workspace
           retention-days: 7
-
+          
       # 🟢 Build the production app
       - name: Build
         run: npm run build
@@ -59,3 +59,17 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      # 🟢 New Diagnostic Step: See where the files actually are
+      - name: List Files for Debugging
+        if: always()
+        run: ls -R
+
+      - name: Upload Test Reports
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: parametric-test-reports
+          # 🟢 Use a relative path that searches the workspace
+          path: '**/monocart-report/'
+          retention-days: 7
