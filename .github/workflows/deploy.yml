@@ -47,9 +47,8 @@ jobs:
         if: always() 
         uses: actions/upload-artifact@v4
         with:
-          name: parametric-test-reports
-          # Using the absolute-ish path we set in playwright.config.js
-          path: monocart-report/ 
+          name: parametric-test-results # Changing the name to be sure it's fresh
+          path: test-results/ # 🟢 THIS IS THE KEY
           retention-days: 7
           
       - name: Build
