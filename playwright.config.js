@@ -42,8 +42,9 @@ export default defineConfig({
 
 webServer: {
     command: isCoverage ? 'VITE_COVERAGE=true npm run start' : 'npm run start',
-    url: 'http://localhost:3000/parametric/', // 🟢 ALIGN: Match the actual app path
-    reuseExistingServer: !process.env.CI,
+    url: 'http://localhost:3000/parametric/',
+    // 🟢 THE FIX: In CI, we reuse the server started by start-server-and-test
+    reuseExistingServer: true, 
     timeout: 120 * 1000,
     stderr: 'pipe',
     stdout: 'pipe',
