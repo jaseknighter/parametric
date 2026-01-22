@@ -49,7 +49,7 @@
     "test:smoke": "playwright test smoke.spec.js",
     "test:smoke:watch": "playwright test smoke.spec.js --watch",
     "test:run-all-suites": "npm run test -- --coverage && VITE_COVERAGE=true npx playwright test && node scripts/merge-coverage.cjs",
-    "test:run-all-suites:ci": "npm run test -- --coverage && VITE_COVERAGE=true npx playwright test --update-snapshots && node scripts/merge-coverage.cjs",
+    "test:run-all-suites:ci": "npm run test -- --coverage && VITE_COVERAGE=true npx playwright test tests/*.spec.js --update-snapshots && node scripts/merge-coverage.cjs",
     "test:full-baseline": "start-server-and-test 'npm run start' http://localhost:3000/parametric/ 'npm run test:run-all-suites'",
     "test:full-baseline:ci": "start-server-and-test 'npm run start' http://localhost:3000/parametric/ 'npm run test:run-all-suites:ci'"
   },

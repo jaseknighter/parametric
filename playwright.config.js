@@ -40,10 +40,9 @@ export default defineConfig({
     onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
   },
 
-  webServer: {
-    // 🚀 DYNAMIC COMMAND: Pass the coverage flag into the server startup
+webServer: {
     command: isCoverage ? 'VITE_COVERAGE=true npm run start' : 'npm run start',
-    url: 'http://localhost:3000',
+    url: 'http://localhost:3000/parametric/', // 🟢 ALIGN: Match the actual app path
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     stderr: 'pipe',
