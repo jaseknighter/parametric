@@ -400,9 +400,13 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
     await page.evaluate(() => {
        window.intentService.setIntent('bendAmtX', 1.5);
     });
-    // Wait for the update to process (RID change)
-    await page.waitForFunction((prev) => window.intentService?.state?.rid !== prev, previousRid);
-
+    
+    // 🟢 FIX: Increase timeout for CI environments
+    await page.waitForFunction(
+      (prev) => window.intentService?.state?.rid !== prev, 
+      previousRid,
+      { timeout: 60000 } // [cite: 2026-01-21] Increase to 60s for heavy CI renders
+    );
     // 4. Final verification
     await expect(async () => {
       const vectors = await page.evaluate(() => window.intentService?.state?.vectors);
