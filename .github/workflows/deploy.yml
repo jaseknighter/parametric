@@ -28,23 +28,30 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # 🟢 Run tests and update snapshots for the Linux environment
       - name: Run Smoke Suite
         run: npm run test:full-baseline:ci
         env:
           CI: true
           VITE_COVERAGE: true
 
-      # 🟢 FIX: Correct the path to where Monocart actually saves the data
+      # 🔍 DIAGNOSTIC: Run this IMMEDIATELY after tests if they fail
+      - name: List Files for Debugging
+        if: always()
+        run: |
+          echo "Checking root directory:"
+          ls -F
+          echo "Searching for monocart-report directory:"
+          find . -name "monocart-report" -type d
+
       - name: Upload Test Reports
         if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: parametric-test-reports
-          path: '**/monocart-report/' # 🟢 Wildcard helps find it in the workspace
+          # Using the absolute-ish path we set in playwright.config.js
+          path: monocart-report/ 
           retention-days: 7
           
-      # 🟢 Build the production app
       - name: Build
         run: npm run build
 
@@ -59,17 +66,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      # 🟢 New Diagnostic Step: See where the files actually are
-      - name: List Files for Debugging
-        if: always()
-        run: ls -R
-
-      - name: Upload Test Reports
-        if: always() 
-        uses: actions/upload-artifact@v4
-        with:
-          name: parametric-test-reports
-          # 🟢 Use a relative path that searches the workspace
-          path: '**/monocart-report/'
-          retention-days: 7
