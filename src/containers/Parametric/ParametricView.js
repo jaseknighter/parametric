@@ -125,19 +125,6 @@ const ParametricView = forwardRef((props, ref) => {
     }
   }, [currentRequestId, status, avgLat, error]);
 
-  useEffect(() => {
-    console.log("[VIEW] ParametricView Props Update", { 
-        rid: parametricObj.rid,
-        radius: parametricObj.transformationInstructions?.shaping?.radius
-    });
-  }, [parametricObj]);
-  
-  // [cite: 2026-01-20] DIAGNOSTIC: Log mount/unmount to detect component destruction during resize.
-  useEffect(() => {
-    console.log("[VIEW] Mount");
-    return () => console.log("[VIEW] Unmount");
-  }, []);
-
   /**
    * Memory Utilization Calculation
    */

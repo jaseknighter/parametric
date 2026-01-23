@@ -141,7 +141,7 @@ const Parametric = () => {
           if (prev === 'mobile' && w > LAYOUT_THRESHOLDS.MOBILE_TO_DESKTOP) nextMode = 'desktop';
           if (nextMode !== prev) {
             Debug.log("DISPLAY", `[LayoutMode] Transition: ${prev} -> ${nextMode} (Width: ${w}px)`);
-            console.log(`[AUTH] Dispatching LayoutMode: ${nextMode}`);
+            Debug.log("AUTH", `Dispatching LayoutMode: ${nextMode}`);
           } else if (Debug.isEnabled("DISPLAY")) {
             Debug.log("DISPLAY", `[LayoutMode] Stable: ${prev} (Width: ${w}px)`);
           }
