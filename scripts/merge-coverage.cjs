@@ -14,69 +14,48 @@
 
 const fs = require('fs');
 const path = require('path');
-const istanbulCoverage = require('istanbul-lib-coverage');
-// const istanbulReports = require('istanbul-reports');
-// const istanbulLibReport = require('istanbul-lib-report');
 const MCR = require('monocart-coverage-reports');
 
-(async function mergeReports() {
-  const map = istanbulCoverage.createCoverageMap();
+function ts() {
+  return new Date().toISOString();
+}
 
+console.log('\n🔍 --- STARTING COVERAGE MERGE VERIFICATION ---');
+
+(async function mergeReports() {
   // 1. PATH DEFINITIONS
   const JEST_PATH = path.resolve(__dirname, '../coverage/coverage-final.json');
-  // 🎯 Update this to match Monocart's actual output location
-  const PW_PATH = path.resolve(__dirname, '../monocart-report/coverage/coverage-final.json');
-  const OUTPUT_DIR = path.resolve(__dirname, '../coverage/unified-report');
-  let mergedCount = 0;
+  // 🟢 ALIGNMENT: Match the path established in playwright.config.js
+  const PW_COVERAGE_DIR = path.resolve(__dirname, '../raw-shards');
+  
+  // 2. THE SETTLE GUARD (Wait for OS to release file handles)
+  console.log("🕒 Waiting 1s for OS to flush JSON shards to disk...");
+  await new Promise(res => setTimeout(res, 1000));
 
-  // 2. MERGE JEST DATA (UNIT LOGIC)
-  if (fs.existsSync(JEST_PATH)) {
-    console.log("📍 Merging Jest Unit Coverage...");
-    try {
-      map.merge(JSON.parse(fs.readFileSync(JEST_PATH, 'utf8')));
-      mergedCount++;
-    } catch (e) {
-      console.error("❌ Error parsing Jest coverage:", e.message);
-    }
-  } else {
-    console.warn("⚠️ Jest coverage not found at /coverage/coverage-final.json");
+  // 3. VERIFY INPUTS
+  const hasJest = fs.existsSync(JEST_PATH);
+  const shards = fs.existsSync(PW_COVERAGE_DIR) 
+    ? fs.readdirSync(PW_COVERAGE_DIR).filter(f => f.endsWith('.json') && !f.includes('summary'))
+    : [];
+
+  console.log(`📡 Jest Coverage: ${hasJest ? '✅ FOUND' : '❌ MISSING'}`);
+  console.log(`📡 Playwright Shards: ${shards.length > 0 ? `✅ ${shards.length} FOUND` : '❌ NONE'}`);
+
+  if (!hasJest && shards.length === 0) {
+      console.error("\n❌ [ABORTED] No valid coverage files found.");
+      return;
   }
 
-  // 3. MERGE PLAYWRIGHT DATA (AUTHORITY/UI)
-  if (fs.existsSync(PW_PATH)) {
-    console.log("📍 Merging Playwright E2E Coverage...");
-    try {
-      map.merge(JSON.parse(fs.readFileSync(PW_PATH, 'utf8')));
-      mergedCount++;
-    } catch (e) {
-      console.error("❌ Error parsing Playwright coverage:", e.message);
-    }
-  } else {
-    console.warn("⚠️ Playwright coverage not found at /docs/test-results/coverage/coverage-final.json");
-  }
-
-  // 🧪 FAIL-SAFE LATCH: Check if we have files before summarizing
-  const files = map.files();
-  if (mergedCount === 0 || files.length === 0) {
-    console.error("\n❌ [ABORTED] No valid coverage files were merged.");
-    console.error("Ensure your tests ran successfully and generated JSON artifacts.\n");
-    return;
-  }
-
-  console.log(`✨ Total files tracked in coverage map: ${files.length}`);
-
-  // 4. GENERATE MONOCART UNIFIED HTML DASHBOARD
-  async function generateMonocartUnified() {
-    const mcr = MCR({
+  // 3. GENERATE MONOCART UNIFIED HTML DASHBOARD
+  console.log('\n💾 Generating Monocart Unified Report...');
+  const mcr = MCR({
       name: "Parametric 2026 Unified Report",
       outputDir: path.join(process.cwd(), 'monocart-report'),
-      outputFile: 'index.html', 
       
-      // 🎯 THE CRITICAL FIX: Normalize paths so Jest and PW match
+      // 🟢 PATH FUSION: Ensures /Users/x/src matches src/ in the final report
       sourcePath: (filePath) => {
-          // Remove absolute paths and keep only from 'src' onwards
-          if (filePath.includes('src')) {
-              return filePath.substring(filePath.indexOf('src'));
+          if (filePath.includes('src/')) {
+              return filePath.substring(filePath.indexOf('src/'));
           }
           return filePath;
       },
@@ -84,51 +63,42 @@ const MCR = require('monocart-coverage-reports');
       reports: [
         ['html', { outputFile: 'index.html' }],
         ['console-summary'],
-        ['istanbul', { subdir: 'coverage-details' }]
+        ['json-summary', { file: 'coverage-summary.json' }]
       ],
-      sourceFilter: (sourcePath) => sourcePath.includes('src'),
-    });
+      sourceFilter: (sourcePath) => sourcePath.includes('src/'),
+  });
 
-    // Load the data directly as objects to allow MCR to handle the heavy lifting
-    if (fs.existsSync(JEST_PATH)) {
-        const jestData = JSON.parse(fs.readFileSync(JEST_PATH, 'utf8'));
-        await mcr.add(jestData);
-    }
-    
-    if (fs.existsSync(PW_PATH)) {
-        const pwData = JSON.parse(fs.readFileSync(PW_PATH, 'utf8'));
-        await mcr.add(pwData);
-    }
-
-    await mcr.generate();
-  }  
+  // Add Jest Data
+  if (hasJest) {
+      const jestData = JSON.parse(fs.readFileSync(JEST_PATH, 'utf8'));
+      await mcr.add(jestData);
+      console.log('   ➕ Added Jest data.');
+  }
   
-  await generateMonocartUnified();
-    
-  console.log(`✨ Total files tracked: ${files.length}`);
+  // Add Playwright Data
+  for (const file of shards) {
+      const fullPath = path.join(PW_COVERAGE_DIR, file);
+      try {
+        const pwData = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+        
+        // 🟢 KEY FIX: Normalize shard keys to absolute paths so they "snap" to the Jest data
+        const normalizedData = {};
+        Object.keys(pwData).forEach(key => {
+            let absoluteKey = key;
+            if (key.includes('src/')) {
+                const relativePath = key.substring(key.indexOf('src/'));
+                absoluteKey = path.resolve(process.cwd(), relativePath);
+            }
+            normalizedData[absoluteKey] = pwData[key];
+        });
 
-  // 5. CLEANUP
-  const NYC_OUTPUT = path.resolve(__dirname, '../.nyc_output');
-  if (fs.existsSync(NYC_OUTPUT)) {
-      fs.rmSync(NYC_OUTPUT, { recursive: true, force: true });
-      console.log("🧹 Cleaned up .nyc_output");
+        await mcr.add(normalizedData);
+        console.log(`   ➕ Added Shard: ${file}`);
+      } catch (e) {
+        console.error(`   ❌ Error adding shard ${file}:`, e.message);
+      }
   }
 
-  // 4. GENERATE ISTANBUL UNIFIED HTML DASHBOARD
-  // try {
-  //   const context = istanbulLibReport.createContext({
-  //     dir: OUTPUT_DIR,
-  //     // Change 'nested' to 'pkg' for better stability with mixed sources
-  //     defaultSummarizer: 'pkg', 
-  //     coverageMap: map // 🛡️ Explicitly pass the map into the context
-  //   });
-
-  //   const report = istanbulReports.create('html');
-  //   // 🛡️ Pass the map directly to the execute call
-  //   report.execute(context); 
-
-  //   console.log(`\n✅ [SUCCESS] Unified Report generated at: ${OUTPUT_DIR}/index.html`);
-  // } catch (err) {
-  //   console.error("❌ Failed to generate HTML report:", err);
-  // }
+  await mcr.generate();
+  console.log('\n🚀 --- MERGE COMPLETE --- \n');
 })();

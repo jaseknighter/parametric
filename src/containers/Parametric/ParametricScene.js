@@ -317,7 +317,7 @@ export const createSceneManager = (canvas, options = {}) => {
   resizeObs.observe(parent);
 
   canvas.__threeScene = scene;
-  return {
+  const manager = {
     ready: readyPromise,
     scene: scene, 
     stopMotion,
@@ -357,4 +357,10 @@ export const createSceneManager = (canvas, options = {}) => {
       material.dispose();
     }
   };
+
+  // [cite: 2026-01-23] TEST HOOK: Expose manager for coverage testing (Disposal/Layout)
+  if (typeof window !== 'undefined') {
+      canvas.__sceneManager = manager;
+  }
+  return manager;
 };

@@ -30,7 +30,8 @@
   > `console.warn('[VariableBridge] Received null/undefined vectorParams. Falling back to identity (0).');`
 - [ ] **Code reorganization:** Move non-container code out of `/containers` and into more logical locations (e.g. `/logic`, `/workers`, etc.).
 
-### 2. Advanced Testing (The "Quality of Quality")
+### 2. Testing
+- [ ] **Test Performance Optomization**: improve how tests are run so they aren't slowed down unecessarily (e.g. for overly long timeouts).
 - [ ] **Numerical Accuracy:** Update tests to move beyond existence checks (e.g., replace `not.toBe(0)` with actual expected slider values).
 - [ ] **Architectural Guards:** Implement compliance tests:
   - `test('Security Guard: getFormulaExecutionScope must filter unknown keys')`
@@ -40,7 +41,8 @@
 - [x] **Cross-Browser Smoke Suite:** Configured WebKit & Firefox runners for critical path (HUD/Canvas).
 - [ ] **Mobile Validation:** Add automated UI tests specifically for mobile breakpoints and interactions.
 
-### 3. Performance & Observability
+### 3. Antifragility, Performance & Observability
+- [ ] **Remove things that hide fragility:** for example, adding a ternary test for `null` when setting a variable rather than allowing things to fail to surface underlying problems
 - [ ] **Final Performance Benchmarking:** Establish the "Vertex Ceiling" for desktop vs. mobile.
 - [ ] **Live Telemetry:** Implement the Grafana/Loki observability bridge.
 - [ ] **HUD Refinement:** Add a "Minimize" feature to the Diagnostic HUD to prevent UI clutter.

@@ -23,7 +23,9 @@ test.describe('HUD Stability & Authority Contract', () => {
     
     // Wait for initial worker stability (Green Dot)
     // [cite: 2026-01-16] FIX: Use state: 'attached' to avoid visibility flakes in headless mode
-    await page.waitForSelector('.status-dot.stable, .status-dot.idle', { state: 'attached', timeout: 10000 });
+    // [cite: 2026-01-22] FIX: WebKit Resilience - Wait for element existence first, then state
+    await page.locator('.status-dot').first().waitFor({ state: 'attached' });
+    await expect(page.locator('.status-dot').first()).toHaveClass(/stable|idle/, { timeout: 15000 });
 
     // [cite: 2026-01-16] Enable Debug channel for Time Warp verification
     await page.evaluate(() => {

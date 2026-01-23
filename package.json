@@ -26,6 +26,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "babel-jest": "^30.2.0",
     "babel-plugin-transform-import-meta": "^2.3.3",
+    "cross-env": "^10.1.0",
     "gh-pages": "^6.3.0",
     "identity-obj-proxy": "^3.0.0",
     "istanbul-lib-coverage": "^3.2.2",
@@ -35,23 +36,28 @@
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^30.2.0",
     "monocart-reporter": "^2.9.23",
+    "rimraf": "^6.1.2",
     "start-server-and-test": "^2.1.3",
     "vite": "^7.3.1",
     "vite-plugin-istanbul": "^7.2.1",
-    "wait-on": "^9.0.3"
+    "wait-on": "^9.0.3",
+    "husky": "^8.0.0"
   },
   "scripts": {
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "jest",
+    "clean:artifacts": "rimraf raw-shards monocart-report playwright-report test-results coverage",
+    "test": "jest --coverage --reporters=default --coverageReporters=json --coverageReporters=text",
     "test:watch": "jest --watch",
-    "test:smoke": "playwright test smoke.spec.js",
-    "test:smoke:watch": "playwright test smoke.spec.js --watch",
-    "test:run-all-suites": "npm run test -- --coverage && VITE_COVERAGE=true npx playwright test && node scripts/merge-coverage.cjs",
-    "test:run-all-suites:ci": "npm run test -- --coverage && VITE_COVERAGE=true npx playwright test tests/ --update-snapshots && node scripts/merge-coverage.cjs",
-    "test:full-baseline": "start-server-and-test 'npm run start' http://localhost:3000/parametric/ 'npm run test:run-all-suites'",
-    "test:full-baseline:ci": "start-server-and-test 'npm run start' http://localhost:3000/parametric/ 'npm run test:run-all-suites:ci'"
+    "test:smoke": "cross-env npx playwright test smoke.spec.js",
+    "test:smoke:watch": "cross-env npx playwright test smoke.spec.js --watch",
+    "test:full-baseline": "cross-env VITE_COVERAGE=true start-server-and-test 'npm run start -- --force' http://localhost:3000/parametric/ 'cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json npx playwright test --project=chromium --project=firefox --project=webkit'",
+    "test:full-baseline:ci": "cross-env start-server-and-test 'VITE_COVERAGE=true npm run start' http://localhost:3000/parametric/ 'cross-env VITE_COVERAGE=true npx playwright test tests/ --project=chromium --project=firefox --project=webkit --update-snapshots'",
+    "test:run-all-suites": "npm run clean:artifacts && cross-env VITE_COVERAGE=true npm run test -- --coverage && cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json VITE_COVERAGE=true npx playwright test --project=chromium --project=firefox --project=webkit && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
+    "test:run-all-suites:ci": "cross-env VITE_COVERAGE=true npm run test -- --coverage && cross-env VITE_COVERAGE=true npx playwright test tests/ --project=chromium --project=firefox --project=webkit --update-snapshots && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
+    "coverage-table": "node scripts/generate-coverage-table.cjs",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": "react-app"

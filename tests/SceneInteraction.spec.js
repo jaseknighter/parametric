@@ -1,9 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { addCoverageReport } from 'monocart-reporter';
 
 test.describe('ParametricScene Interactions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?e2e=true');
     await page.waitForFunction(() => window.scene && window.intentService && window.scene.getVelocity);
+  });
+
+  test.afterEach(async ({ page }, testInfo) => {
+    const coverage = await page.evaluate(() => window.__coverage__);
+    if (coverage) {
+      await addCoverageReport(coverage, testInfo);
+    }
   });
 
   test('Double click toggles spin', async ({ page }) => {

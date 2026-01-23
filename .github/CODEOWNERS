@@ -1,0 +1,6 @@
+# Require your manual approval for any changes to logic
+/src/ @jaseknighter
+/package.json @jaseknighter
+
+# Allow the CI to be the "owner" of snapshots (optional)
+/tests/**/*.spec.js-snapshots/*.png @jaseknighter

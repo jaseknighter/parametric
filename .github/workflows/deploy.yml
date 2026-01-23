@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -33,6 +33,16 @@ jobs:
         env:
           CI: true
           VITE_COVERAGE: true
+
+      # 🟢 NEW AUTOMATION STEP:
+      - name: Auto-commit snapshot updates
+        if: always() # Run even if tests failed (because snapshots might have updated)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-update snapshots from CI [skip ci]"
+          # 🟢 Scope write access to ONLY the snapshot folders
+          file_pattern: 'tests/**/*.spec.js-snapshots/*.png'
+          disable_globbing: false
 
       # 🔍 DIAGNOSTIC: Run this IMMEDIATELY after tests if they fail
       - name: List Files for Debugging

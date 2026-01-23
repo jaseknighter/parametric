@@ -183,3 +183,14 @@ export const INTENT_CONFIG = { // Also serves as PERFORMANCE_CONFIG
   // Epsilon used by IntentService and Playwright to verify state mirroring.
   SYNC_EPSILON: 0.0001,
 };
+
+export const QUALITY_THRESHOLDS = {
+  COVERAGE: {
+    GREEN: 80,  // ✅ 80% and above
+    YELLOW: 60  // ⚠️ 60% to 79%
+  },
+  PASS_RATE: {
+    GREEN: 100, // ✅ Only perfect is green
+    YELLOW: 98  // ⚠️ Minor flakes allowed
+  }
+};

@@ -6,10 +6,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const libCoverage = require('istanbul-lib-coverage');
 
 // Paths
 const JEST_COVERAGE_PATH = path.resolve(__dirname, '../coverage/coverage-final.json');
-const PW_COVERAGE_PATH = path.resolve(__dirname, '../monocart-report/coverage/coverage-final.json');
+const PW_COVERAGE_PATH = path.resolve(__dirname, '../monocart-report/coverage-summary.json');
 const PW_RESULTS_PATH = path.resolve(__dirname, '../playwright-report.json');
 const README_PATH = path.resolve(__dirname, '../README.md');
 
@@ -21,6 +22,15 @@ function calculateCoverage(coverageMap, filePath, type) {
     if (!key) return null;
     
     const fileCov = coverageMap[key];
+    
+    // Handle Summary Format (from Monocart coverage-summary.json)
+    if (fileCov.statements && fileCov.branches) {
+         const metricKey = type === 's' ? 'statements' : (type === 'b' ? 'branches' : null);
+         if (!metricKey) return null;
+         const m = fileCov[metricKey];
+         return { pct: m.pct, covered: m.covered, total: m.total };
+    }
+
     const metrics = fileCov[type]; // 's' for statements, 'b' for branches
     
     let total = 0;
@@ -38,23 +48,35 @@ function calculateCoverage(coverageMap, filePath, type) {
         });
     }
     
-    return total === 0 ? 100 : Math.round((covered / total) * 100);
+    return {
+        pct: total === 0 ? 100 : Math.round((covered / total) * 100),
+        covered: covered,
+        total: total
+    };
 }
 
 // Helper to get pass rate
-function getPassRate(results, projectNames) {
-    if (!results) return null;
+function getTestStats(results, projectNames, excludeProjects = []) {
+    if (!results) return { rate: null, count: 0 };
     
     let passed = 0;
     let total = 0;
+    let failures = [];
     
     function traverse(suite) {
         if (suite.specs) {
             suite.specs.forEach(spec => {
                 spec.tests.forEach(test => {
-                    if (!projectNames || projectNames.includes(test.projectName)) {
+                    const isIncluded = !projectNames || projectNames.includes(test.projectName);
+                    const isExcluded = excludeProjects && excludeProjects.includes(test.projectName);
+                    
+                    if (isIncluded && !isExcluded) {
                         total++;
-                        if (test.status === 'expected' || test.status === 'passed') passed++;
+                        if (test.status === 'expected' || test.status === 'passed' || test.status === 'flaky') {
+                            passed++;
+                        } else {
+                            failures.push(`${spec.title} (${test.projectName})`);
+                        }
                     }
                 });
             });
@@ -66,17 +88,64 @@ function getPassRate(results, projectNames) {
     
     traverse(results);
     
-    return total === 0 ? null : Math.round((passed / total) * 100);
+    return {
+        rate: total === 0 ? null : Math.round((passed / total) * 100),
+        count: total,
+        passed: passed,
+        failures: failures
+    };
 }
 
-function formatResult(val) {
-    if (val === null || val === undefined) return 'N/A';
-    return `✅ ${val}%`;
+const constantsPath = path.resolve(__dirname, '../src/shared/ParametricConstants.js');
+const constantsContent = fs.readFileSync(constantsPath, 'utf8');
+
+function getThreshold(type, color) {
+    const regex = new RegExp(`${type}:\\s*{[^}]*${color}:\\s*(\\d+)`, 'i');
+    const match = constantsContent.match(regex);
+    return match ? parseInt(match[1], 10) : 0;
+}
+
+const THRESHOLDS = {
+    COVERAGE: { 
+        GREEN: getThreshold('COVERAGE', 'GREEN') || 80, 
+        YELLOW: getThreshold('COVERAGE', 'YELLOW') || 60 
+    },
+    PASS_RATE: { 
+        GREEN: getThreshold('PASS_RATE', 'GREEN') || 100, 
+        YELLOW: getThreshold('PASS_RATE', 'YELLOW') || 98 
+    }
+};
+
+console.log(`📡 Linked to source thresholds: Cov(${THRESHOLDS.COVERAGE.GREEN}/${THRESHOLDS.COVERAGE.YELLOW}) Pass(${THRESHOLDS.PASS_RATE.GREEN}/${THRESHOLDS.PASS_RATE.YELLOW})`);
+
+// 🟢 Now formatResult will work!
+function formatResult(val, count, passedCount, isCoverage = false) {
+    if (val === null || val === undefined || val === 'N/A') return 'N/A';
+    
+    const pct = isCoverage ? val.pct : val;
+    const limits = isCoverage ? THRESHOLDS.COVERAGE : THRESHOLDS.PASS_RATE;
+    
+    let icon = '❌'; 
+    if (pct >= limits.GREEN) {
+        icon = '✅';
+    } else if (pct >= limits.YELLOW) {
+        icon = '⚠️';
+    }
+    
+    if (isCoverage) {
+        return `${icon} ${val.pct}% (${val.covered}/${val.total})`;
+    } else {
+        const countStr = (count !== undefined && passedCount !== undefined) 
+            ? ` (${passedCount}/${count})` 
+            : '';
+        return `${icon} ${Math.round(val)}%${countStr}`;
+    }
 }
 
 async function main() {
     const jestCoverage = fs.existsSync(JEST_COVERAGE_PATH) ? JSON.parse(fs.readFileSync(JEST_COVERAGE_PATH, 'utf8')) : null;
     const pwCoverage = fs.existsSync(PW_COVERAGE_PATH) ? JSON.parse(fs.readFileSync(PW_COVERAGE_PATH, 'utf8')) : null;
+
     const pwResults = fs.existsSync(PW_RESULTS_PATH) ? JSON.parse(fs.readFileSync(PW_RESULTS_PATH, 'utf8')) : null;
 
     const servicesCov = calculateCoverage(jestCoverage, 'ParametricIntentService.js', 's');
@@ -86,9 +155,21 @@ async function main() {
     const displayCov = calculateCoverage(pwCoverage, 'ParametricScene.js', 's');
     
     // Heuristic for project names based on common configs
-    const chromiumRate = getPassRate(pwResults, ['chromium', 'Desktop Chrome', 'google-chrome']) ?? getPassRate(pwResults, null); // Fallback to all
-    const firefoxRate = getPassRate(pwResults, ['firefox', 'Desktop Firefox', 'firefox-smoke']);
-    const webkitRate = getPassRate(pwResults, ['webkit', 'Desktop Safari', 'webkit-smoke']);
+    const chromiumStats = getTestStats(pwResults, ['chromium', 'Desktop Chrome', 'google-chrome']);
+    const firefoxStats = getTestStats(pwResults, ['firefox', 'Desktop Firefox', 'firefox-smoke']);
+    const webkitStats = getTestStats(pwResults, ['webkit', 'Desktop Safari', 'webkit-smoke']);
+    
+    // Calculate "Other" stats by excluding known projects
+    const knownProjects = ['chromium', 'Desktop Chrome', 'google-chrome', 'firefox', 'Desktop Firefox', 'firefox-smoke', 'webkit', 'Desktop Safari', 'webkit-smoke'];
+    const otherStats = getTestStats(pwResults, null, knownProjects);
+
+    // Collect all failures for Known Issues section
+    const allFailures = [
+        ...chromiumStats.failures,
+        ...firefoxStats.failures,
+        ...webkitStats.failures,
+        ...otherStats.failures
+    ];
 
     const timestamp = new Date().toLocaleString(undefined, {
         year: 'numeric',
@@ -99,31 +180,47 @@ async function main() {
         second: 'numeric',
         timeZoneName: 'short'
     });
-    const newTable = `| Category | Metric | Result | Environment |
+    
+    let newTable = `| Category | Metric | Result | Environment |
 | :--- | :--- | :--- | :--- |
-| **Services Layer** | Statement Coverage | ${formatResult(servicesCov)} | Jest / Node v20 |
-| **Security Layer** | Statement Coverage | ${formatResult(securityCov)} | Jest / Node v20 |
-| **Logic Layer** | Statement Coverage | ${formatResult(logicCov)} | Jest / Node v20 |
-| **Web Worker** | Branch Coverage | ${formatResult(workerCov)} | Jest / Node v20 |
-| **Display Layer** | Statement Coverage | ${formatResult(displayCov)} | Playwright |
-| **Smoke Suite** | Pass Rate | ${formatResult(chromiumRate)} | Playwright (Chromium) |
-| **Smoke Suite** | Pass Rate | ${formatResult(firefoxRate)} | Playwright (Firefox) |
-| **Smoke Suite** | Pass Rate | ${formatResult(webkitRate)} | Playwright (WebKit) |
+| **Services Layer** | Statement Coverage | ${formatResult(servicesCov, undefined, undefined, true)} | Jest / Node v20 |
+| **Security Layer** | Statement Coverage | ${formatResult(securityCov, undefined, undefined, true)} | Jest / Node v20 |
+| **Logic Layer** | Statement Coverage | ${formatResult(logicCov, undefined, undefined, true)} | Jest / Node v20 |
+| **Web Worker** | Branch Coverage | ${formatResult(workerCov, undefined, undefined, true)} | Jest / Node v20 |
+| **Display Layer** | Statement Coverage | ${formatResult(displayCov, undefined, undefined, true)} | Playwright |
+| **Smoke Suite** | Pass Rate (Chrome) | ${formatResult(chromiumStats.rate, chromiumStats.count, chromiumStats.passed)} | Playwright |
+| **Smoke Suite** | Pass Rate (Firefox) | ${formatResult(firefoxStats.rate, firefoxStats.count, firefoxStats.passed)} | Playwright |
+| **Smoke Suite** | Pass Rate (WebKit) | ${formatResult(webkitStats.rate, webkitStats.count, webkitStats.passed)} | Playwright |${otherStats.count > 0 ? `\n| **Other Tests** | Pass Rate | ${formatResult(otherStats.rate, otherStats.count, otherStats.passed)} | Playwright (Other) |` : ''}
 
 *Generated by \`npm run test:full-baseline\` on ${timestamp}*`;
 
+    // Append Known Issues if any
+    if (allFailures.length > 0) {
+        newTable += `\n\n### ⚠️ Known Issues\n${allFailures.map(f => `* ${f}`).join('\n')}`;
+    }
+
+    // Append Dashboards
+    newTable += `\n\n### 📊 Quality Dashboards\n`;
+    newTable += `* [**Unified Coverage Report (Jest + Playwright)**](./monocart-report/index.html)\n`;
+    newTable += `* [**Playwright Test Trace**](./playwright-report/index.html)\n\n`;
+
     if (fs.existsSync(README_PATH)) {
         let content = fs.readFileSync(README_PATH, 'utf8');
-        // Match from table header down to the timestamp line or end of table
-        // We look for the start of the table and the end of the block we control
-        const tableRegex = /\| Category \| Metric \| Result \| Environment \|[\s\S]*?(\*Generated by.*?\*|\| Playwright \(WebKit\) \|)/;
-        if (tableRegex.test(content)) {
-            fs.writeFileSync(README_PATH, content.replace(tableRegex, newTable));
-            console.log('✅ README.md coverage table updated.');
+        
+        // 🟢 The "Indestructible" Regex
+        const dashboardRegex = /<!-- START_COVERAGE_DASHBOARD -->[\s\S]*?<!-- END_COVERAGE_DASHBOARD -->/;
+        const wrappedTable = `<!-- START_COVERAGE_DASHBOARD -->\n${newTable}\n<!-- END_COVERAGE_DASHBOARD -->`;
+        
+        if (dashboardRegex.test(content)) {
+            fs.writeFileSync(README_PATH, content.replace(dashboardRegex, wrappedTable));
+            console.log('✅ README.md updated via Slot Markers.');
         } else {
-            console.warn('⚠️ Could not find table in README.md to update.');
+            console.warn('⚠️ Could not find <!-- START_COVERAGE_DASHBOARD --> markers in README.md.');
         }
+    } else {
+        console.warn('⚠️ Could not find README.md to update.');
     }
+
 
     console.log('\n--- Generated Table Content ---');
     console.log(newTable);

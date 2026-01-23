@@ -4,6 +4,7 @@
  * [cite: 2026-01-15] FIXED: Aligned with Stripe-based UI architecture.
  */
 import { test, expect } from '@playwright/test';
+import { addCoverageReport } from 'monocart-reporter';
 import { getVectors } from './test-helpers';
 
 // [cite: 2026-01-15] AUTHORITY: Prevent GPU collisions by running these 3D tests serially
@@ -29,6 +30,13 @@ test.describe('Parametric Visual Invariants', () => {
       await stripe.locator('button.TAreaInterface___TitleButton').click();
       // Ensure the expansion animation is finished
       await expect(container).toHaveClass(/Controls_Show/);
+    }
+  });
+
+  test.afterEach(async ({ page }, testInfo) => {
+    const coverage = await page.evaluate(() => window.__coverage__);
+    if (coverage) {
+      await addCoverageReport(coverage, testInfo);
     }
   });
 

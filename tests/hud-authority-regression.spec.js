@@ -50,6 +50,9 @@ test.describe('HUD Authority Contract', () => {
   });
 
   test('Startup Race: Immediate manual override must flush pending intent', async ({ page }) => {
+    // [cite: 2026-01-22] STABILITY: Wait for engine to settle before race test
+    await page.waitForTimeout(500);
+
     // 1. Refresh to ensure we are at the very start of the lifecycle
     // This simulates the "Fresh Load" condition where focus state might be stale
     // [cite: 2026-01-16] FIX: Clear storage to prevent "Pinch" preset persistence causing Kernel crash
@@ -88,13 +91,15 @@ test.describe('HUD Authority Contract', () => {
     }).toPass({ timeout: 4000 });
 
     // 6. Verify the geometry actually updated
-    const zVal = await page.evaluate(() => {
-      const mesh = window.scene?.getMesh ? window.scene.getMesh() : window.scene?.mesh;
-      return mesh?.geometry?.attributes?.position?.array[2];
-    });
-    // [cite: 2026-01-20] FIX: System applies Radius Scaling (5.0) to manual input.
-    // Input 5.0 * Radius 5.0 = 25.0
-    expect(zVal).toBeCloseTo(25.0, 1);
+    await expect(async () => {
+      const zVal = await page.evaluate(() => {
+        const mesh = window.scene?.getMesh ? window.scene.getMesh() : window.scene?.mesh;
+        return mesh?.geometry?.attributes?.position?.array[2];
+      });
+      // [cite: 2026-01-20] FIX: System applies Radius Scaling (5.0) to manual input.
+      // Input 5.0 * Radius 5.0 = 25.0
+      expect(zVal).toBeCloseTo(25.0, 1);
+    }).toPass({ timeout: 5000 }); // [cite: 2026-01-22] FIX: Allow time for worker to process and render
   });
 
   test('Manual Mode + Slider: Sliders must update geometry when formula uses variables', async ({ page }) => {

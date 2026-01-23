@@ -1,61 +1,120 @@
-import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
+  import { defineConfig, devices } from '@playwright/test';
+  import path from 'path';
+  import fs from 'fs';
+  import { fileURLToPath } from 'url';
+  import { summarizeShards } from './scripts/summarizeShards.js'; // We will create this
 
-// 🟢 Standard ES Module replacement for __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+  // 🟢 Standard ES Module replacement for __dirname
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
 
-// Check if we are in coverage mode
-const isCoverage = process.env.VITE_COVERAGE === 'true';
-const is3DHeavy = process.argv.some(arg => arg.includes('smoke') || arg.includes('Visual') || arg.includes('hud'));
+  function ts() {
+    return new Date().toISOString();
+  }
 
-export default defineConfig({
-  testDir: './tests',
-  testIgnore: '**/*.test.js', // [cite: 2026-01-18] FIX: Ignore Jest unit tests to prevent runner collision
-  workers: is3DHeavy ? 1 : (process.env.CI ? 2 : undefined),
-  fullyParallel: !is3DHeavy,
-  timeout: process.env.CI ? 60000 : 30000, // 🟢 Double timeout in CI
-  expect: {
-    timeout: process.env.CI ? 10000 : 5000,
-  },
-  reporter: [
-    ['list'],
-    ['monocart-reporter', {  
-        name: "Parametric 2026 Unified Report",
+  // Check if we are in coverage mode
+  const isCoverage = process.env.VITE_COVERAGE === 'true';
+  const is3DHeavy = process.argv.some(arg => arg.includes('smoke') || arg.includes('Visual') || arg.includes('hud'));
+
+  export default defineConfig({
+    testDir: './tests',
+    testIgnore: '**/*.test.js', // [cite: 2026-01-18] FIX: Ignore Jest unit tests to prevent runner collision
+    workers: is3DHeavy ? 1 : (process.env.CI ? 2 : undefined),
+    fullyParallel: !is3DHeavy,
+    timeout: process.env.CI ? 60000 : 30000, // 🟢 Double timeout in CI
+    expect: {
+      timeout: process.env.CI ? 10000 : 5000,
+    },
+    reporter: [
+      ['list'],
+      ['html', { 
+        outputFolder: 'playwright-report', 
+        open: 'never' 
+      }],
+      ['json', { outputFile: 'playwright-report.json' }],
+      ['monocart-reporter', {  
+        name: "Parametric Unified Coverage (Jest + Playwright)",
         outputDir: path.resolve(__dirname, 'monocart-report'),
         coverage: {
-            // Use Istanbul provider when VITE_COVERAGE is true
-            provider: isCoverage ? 'istanbul' : 'v8', 
-            entryFilter: (entry) => entry.url.includes('src'),
-            sourceFilter: (sourcePath) => sourcePath.includes('src'),
-            all: true, 
-            lcov: true, 
-            reports: [
-                'v8',
-                ['console-summary'],
-                ['istanbul', {
-                    file: 'coverage-final.json',
-                    dir: 'coverage' 
-                }]
-            ]
-        }
-    }]
-  ],
-  use: {
-    // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
-    baseURL: 'http://localhost:3000/parametric/', 
-    trace: 'on-first-retry',
-    onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
-  },
+          provider: 'istanbul',
+          saveJson: true,                  // keep this true
+          coverageDir: path.resolve(__dirname, 'monocart-report/coverage'),
+          cleanCache: false,               // prevent Monocart from deleting JSON shards
+          verbose: true, // 🔍 log shard collection internally
+          onEnd: async (results, coverageReport) => {
+            console.log('\n--- 🧪 SHARD SUMMARY ---');
+            
+            // 🟢 1. The Settle Guard: Wait for OS file descriptors to close
+            await new Promise(resolve => setTimeout(resolve, 500));
 
-webServer: {
-    command: isCoverage ? 'VITE_COVERAGE=true npm run start' : 'npm run start',
-    url: 'http://localhost:3000/parametric/',
-    // 🟢 THE FIX: In CI, we reuse the server started by start-server-and-test
-    reuseExistingServer: true, 
-    timeout: 120 * 1000,
-    stderr: 'pipe',
-    stdout: 'pipe',
-  },
-});
+            // 🟢 2. Point to the specific coverage sub-folder
+            const actualShardDir = path.resolve(__dirname, 'raw-shards');
+            
+            // 🟢 3. Await the async summary
+            await summarizeShards(actualShardDir);
+          },
+          hooks: {
+            'coverage:write': ({ filePath, size }) => {
+              console.log(`🕒 [${ts()}] 💾 [Shard Flush] Writing file: ${filePath} | size: ${size} bytes`);
+            },
+            'coverage:flush': () => {
+              console.log(`🕒 [${ts()}] 🔄 [Coverage Flush] Monocart flushing in-memory coverage`);
+            }
+          },
+          reports: [
+            // ✅ Human-readable summary
+            ['console-summary'],
+            ['html', { 
+              outputDir: path.resolve(__dirname, 'monocart-report/coverage') 
+            }],
+            // ✅ Machine-readable JSON shard
+            ['istanbul', {
+              outputDir: path.resolve(__dirname, 'monocart-report/coverage'),
+              file: '[projectName].json'
+            }]
+          ]
+        }
+      }]
+    ],
+    use: {
+      // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
+      baseURL: 'http://localhost:3000/parametric/', 
+      trace: 'on',
+      onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
+      collectCoverage: true, // 🟢 Harvest the data from the browser
+      contextOptions: {
+        // Ensure the browser doesn't clear the memory too early
+        ignoreHTTPSErrors: true,
+      },
+      // 🟢 FORCE ENV FOR COVERAGE
+      env: {
+        ...process.env,
+        VITE_COVERAGE: 'true'
+      }
+    },
+
+    projects: [
+      {
+        name: 'chromium',
+        use: { ...devices['Desktop Chrome'] },
+      },
+      {
+        name: 'firefox',
+        use: { ...devices['Desktop Firefox'] },
+      },
+      {
+        name: 'webkit',
+        use: { ...devices['Desktop Safari'] },
+      },
+    ],
+
+    webServer: {
+      command: 'cross-env VITE_COVERAGE=true npm run start -- --force',
+      url: 'http://localhost:3000/parametric/',
+      // 🟢 THE FIX: In CI, we reuse the server started by start-server-and-test
+      reuseExistingServer: true, 
+      timeout: 120 * 1000,
+      stderr: 'pipe',
+      stdout: 'pipe',
+    },
+  });

@@ -1,0 +1,59 @@
+name: Unified Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Unified Test Suite
+        run: npm run test:run-all-suites
+        env:
+          VITE_COVERAGE: true
+          CI: true
+
+      # 🚀 Deploy to GitHub Pages (Only on Main)
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: . 
+          branch: gh-pages
+          clean: true
+
+      # 💬 Post Results to Pull Request
+      - name: PR Report Comment
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ### 📊 Quality Check Complete
+            | Report Type | Link |
+            | :--- | :--- |
+            | **Unified Coverage** | [View Coverage Details](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/monocart-report/index.html) |
+            | **Playwright Trace** | [View Test Trace](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/playwright-report/index.html) |
+            
+            *Coverage for this PR is generated from fused Jest and Playwright data.*

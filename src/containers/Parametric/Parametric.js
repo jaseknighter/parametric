@@ -222,9 +222,13 @@ const Parametric = () => {
       runFormulaAudit(INITIAL_PARAMETRIC_OBJ);
 
       // 4. Boundary Assertions (Proxy Traps)
+      // [cite: 2026-01-23] SILENCE: Suppress expected warnings during audit to keep console clean
+      const originalWarn = console.warn;
+      console.warn = () => {};
       const ro = assertReadOnly({ a: 1, nested: { b: 2 } }, 'CoverageTest');
       try { ro.a = 2; } catch (e) {} // Exercise set trap
       try { delete ro.a; } catch (e) {} // Exercise delete trap
+      console.warn = originalWarn;
       const _ = ro.nested.b; // Exercise recursive get
       assertReadOnly(null); // Exercise null guard
       assertReadOnly(123); // Exercise primitive guard
