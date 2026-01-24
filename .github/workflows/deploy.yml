@@ -76,6 +76,27 @@ jobs:
         env:
           VITE_COVERAGE: true # 🟢 Ensure the build is instrumented
 
+      - name: Security Audit & Path Scrubbing
+        if: always()
+        run: |
+          echo "🔍 Scanning reports for sensitive patterns..."
+          
+          # 1. Define forbidden patterns (Local paths, sensitive keywords)
+          # We include the runner path to ensure internal CI metadata isn't leaked
+          FORBIDDEN=("/Users/" "password" "secret_key" "127.0.0.1" "/home/runner/work/")
+          
+          for pattern in "${FORBIDDEN[@]}"; do
+            if grep -ri "$pattern" playwright-report monocart-report; then
+              echo "⚠️ WARNING: Sensitive pattern '$pattern' detected in reports."
+              
+              # 2. Automated Scrubbing (Optional but recommended)
+              # Instead of failing, we 'anonymize' the files in place
+              echo "🛡️ Scrubbing detected patterns..."
+              grep -rl "$pattern" playwright-report monocart-report | xargs sed -i "s|$pattern|[REDACTED]|g"
+            fi
+          done
+          echo "✅ Security Audit & Scrubbing complete."
+
       # 🟢 NEW: Inject Reports into the Build Distribution
       - name: Inject Reports into Dist
         if: always() && steps.auto_commit.outputs.changes_detected == 'false'
