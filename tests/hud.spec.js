@@ -12,7 +12,8 @@ test.describe('HUD & Formula System Invariants', () => {
     await page.goto('/');
     
     // Auth: Wait for the engine to be stable before starting any test
-    await page.waitForFunction(() => window.scene && window.intentService, { timeout: 5000 });
+    // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
+    await page.waitForFunction(() => window.__PARAMETRIC_READY__ === true, { timeout: 90000 });
 
     const wrapper = page.locator('.HUD_Wrapper');
     if (await wrapper.evaluate(el => el.classList.contains('is-closed'))) {

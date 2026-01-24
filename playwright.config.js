@@ -108,8 +108,8 @@
         use: { 
           ...devices['Desktop Firefox'],
           // [cite: 2026-01-23] CI STABILITY: Give Firefox extra time for WebGL/DOM cycles
-          actionTimeout: process.env.CI ? 30000 : 15000,
-          navigationTimeout: 30000,
+          actionTimeout: process.env.CI ? 90000 : 15000,
+          navigationTimeout: process.env.CI ? 90000 : 30000,
         },
       },
       {

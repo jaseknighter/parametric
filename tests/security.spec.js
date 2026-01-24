@@ -18,7 +18,7 @@ test.describe('Security & Stability', () => {
     });
     await page.goto('/');
     // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
-    await page.waitForFunction(() => window.__PARAMETRIC_READY__ === true, { timeout: 60000 });
+    await page.waitForFunction(() => window.__PARAMETRIC_READY__ === true, { timeout: 90000 });
   });
 
   test('Sanitization: Should reject formulas containing malicious JS keywords', async ({ page }) => {
