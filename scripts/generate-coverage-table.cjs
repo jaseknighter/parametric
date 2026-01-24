@@ -201,8 +201,8 @@ async function main() {
 
     // Append Dashboards
     newTable += `\n\n### 📊 Quality Dashboards\n`;
-    newTable += `* [**Unified Coverage Report (Jest + Playwright)**](./monocart-report/index.html)\n`;
-    newTable += `* [**Playwright Test Trace**](./playwright-report/index.html)\n\n`;
+    newTable += `* [**Unified Coverage Report (Jest + Playwright)**](https://jaseknighter.github.io/parametric/reports/coverage/index.html)\n`;
+    newTable += `* [**Playwright Test Trace**](https://jaseknighter.github.io/parametric/reports/playwright/index.html)\n\n`;
 
     if (fs.existsSync(README_PATH)) {
         let content = fs.readFileSync(README_PATH, 'utf8');
