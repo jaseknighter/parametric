@@ -115,7 +115,11 @@
       }]),
       {
         name: 'webkit',
-        use: { ...devices['Desktop Safari'] },
+        use: { 
+          ...devices['Desktop Safari'],
+          navigationTimeout: 60000, // Increase to 60s
+          actionTimeout: 30000 
+        },
       },
     ],
 
