@@ -111,13 +111,13 @@
           actionTimeout: process.env.CI ? 90000 : 15000,
           navigationTimeout: process.env.CI ? 90000 : 30000,
         },
-        // [cite: 2026-01-24] CI STABILITY: Skip heavy 3D tests on Firefox Linux (Software Renderer)
+        // 🟢 REGEX FIX: Ensures these files are skipped regardless of path depth
         testIgnore: [
-          '**/*.test.js',
+          /\.test\.js$/, // Matches Jest files
           ...(process.env.CI ? [
-            '**/smoke.spec.js', 
-            '**/VisualInvariant.spec.js', 
-            '**/SceneInteraction.spec.js'
+            /smoke\.spec\.js$/, 
+            /VisualInvariant\.spec\.js$/, 
+            /SceneInteraction\.spec\.js$/
           ] : [])
         ],
       },
