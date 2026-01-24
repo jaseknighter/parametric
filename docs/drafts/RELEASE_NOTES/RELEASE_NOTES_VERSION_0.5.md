@@ -21,7 +21,7 @@ This release represents a fundamental "core transplant" of the Parametric 3D Eng
 To ensure the integrity of the v0.5.0 baseline, we implemented a rigorous cross-platform validation layer:
 - Hardened Handshake: Implemented a waitForFunction signal (window.__PARAMETRIC_READY__) with a 5s retry to synchronize the test runner with the Worker’s internal readiness.
 - Graceful Settle Guard: Added a 500ms teardown delay in afterEach to allow WebKit to safely serialize heavy coverage data without crashing.
-- Pragmatic CI Optimization: Established a "Chromium for Coverage, All for Logic" strategy, ensuring stable 89% coverage metrics while maintaining cross-browser rendering integrity.
+- Pragmatic CI Optimization: Established a "Chromium for Coverage, All for Logic" strategy. By utilizing Chromium as the primary "Coverage Oracle" in production CI, we mitigate WebKit-specific memory exhaustion during Istanbul instrumentation while maintaining 100% logic validation across all engines in the local development tier.
 - Automated Leak Guard: Integrated a programmatic sanitization gate to ensure local paths and internal CI metadata are scrubbed from public-facing reports.
 
 ---
