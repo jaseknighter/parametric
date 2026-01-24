@@ -30,7 +30,7 @@ CI logic and coverage validated via Chromium (V8). Full cross-browser parity (We
 
 <details>
 <summary><strong>Test Coverage & Pass Rates</strong></summary>
-
+ 
 <!-- START_COVERAGE_DASHBOARD -->
 | Category | Metric | Result | Environment |
 | :--- | :--- | :--- | :--- |
