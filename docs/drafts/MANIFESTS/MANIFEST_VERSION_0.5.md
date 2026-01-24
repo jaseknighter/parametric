@@ -12,7 +12,7 @@
     - [5. Interaction and UX](#5-interaction-and-ux)
     - [6. Documentation and Governance](#6-documentation-and-governance)
   - [Post-v0.5 Priorities: Transparency \& Test Depth](#post-v05-priorities-transparency--test-depth)
-    - [**Known Limitations**](#known-limitations)
+    - [**Known Limitations \& CI Deviations**](#known-limitations--ci-deviations)
 
 ---
 
@@ -47,11 +47,9 @@ To protect the host environment from potentially malicious mathematical scripts,
 v0.5 establishes a formal, deterministic testing baseline that eliminates environment-based "flakiness."
 
 * **Deterministic Worker Handshake:** Testing is governed by a signal-driven architecture (`window.__PARAMETRIC_READY__`). The test suite synchronizes directly with the Worker’s internal readiness state, ensuring interactions only occur after a successful first-frame render.
-* **Environmental Patience Buffers:** A 90-second "Soak Time" is established for software-rendered CI environments (Linux/Firefox/WebKit) to ensure baseline visual snapshots are captured with 100% reliability.
+* **Environmental Patience Buffers:** A 90-second "Soak Time" is established for software-rendered CI environments (Linux/Chromium/WebKit) to ensure baseline visual snapshots are captured with 100% reliability.
 * **Unified Coverage (The 80% Rule):** Reached ~89% Statement Coverage across the entire codebase. Jest and Playwright reports are merged into a "Single Pane of Glass" via Monocart, verified through a "Settle Guard" to prevent shard data loss.
 * **Observer Standard Validation:** "Precision Shadowing" tests ensure that UI interactions (focusing, dragging, clicking) are mathematically silent and do not deform the geometry during diagnostic monitoring.
-
-
 
 ---
 
@@ -76,6 +74,7 @@ This release is governed by the following core documents:
 2. **Quality of Quality (Validation Depth):** Moving from "Existence" testing to "Accuracy" testing (Predicate-based validation of vertex distributions).
 3. **Snapshot Regression:** Hardening visual snapshots across diverse engine configurations.
 
-### **Known Limitations**
-* **CI Execution Latency (Firefox/Linux):** Due to software-based WebGL emulation on virtualized runners, the engine requires a significant "warm-up" period. 
-* **Cumulative Test Duration:** While the 90s handshake buffer ensures reliability, heavy UI tests consistently utilize the full 90s window (1.5m) to resolve the first-frame render. Total CI suite duration for Firefox is significantly elevated compared to local execution.
+### **Known Limitations & CI Deviations**
+* **Targeted Browser Exclusion:** 3D-heavy E2E specs (Smoke Suite, Visual Invariants) are explicitly skipped for Firefox on headless Linux runners. This is a deliberate exclusion to bypass virtualized WebGL context restrictions (`AllowWebgl2:false`).
+* **Environmental Baseline:** Visual regression authority for v0.5.0 is established via Chromium and WebKit. Firefox functional integrity is maintained through isolated unit and logic test coverage.
+* **Cumulative Test Duration:** While the 90s handshake buffer ensures reliability, heavy UI tests utilize the full buffer to resolve renders on virtualized hardware.

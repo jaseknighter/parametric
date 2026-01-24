@@ -12,29 +12,27 @@ This release represents a fundamental "core transplant" of the Parametric 3D Eng
 
 ## 🏛️ CI Determinism & Stability (The "Solid" Baseline)
 To ensure the integrity of the v0.5.0 release, we implemented a rigorous cross-platform validation layer:
-* **Deterministic Worker Handshake:** Replaced poll-based testing with a signal-driven architecture (`window.__PARAMETRIC_READY__`). The test suite now synchronizes directly with the Worker’s internal readiness state.
-* **Environmental Patience Buffers:** Established a 90-second "Soak Time" for software-rendered CI environments (Linux/Firefox/WebKit). This ensures visual baselines are captured accurately even on hardware-constrained virtual runners.
-* **Unified Coverage Merging:** Implemented a "Settle Guard" to ensure 100% of telemetry—from Jest unit tests to cross-browser Playwright shards—is captured and merged into a single source of truth.
+* **Deterministic Worker Handshake:** Replaced poll-based testing with a signal-driven architecture (`window.__PARAMETRIC_READY__`). The suite now synchronizes directly with the Worker’s internal readiness state.
+* **Targeted CI Optimization:** Established a 90-second "Soak Time" for software-rendered environments. We explicitly optimized the Firefox CI path to focus on unit/logic integrity while relying on Chromium and WebKit for visual regression, bypassing headless Linux WebGL limitations.
+* **Unified Coverage Merging:** Implemented a "Settle Guard" to ensure 100% of telemetry—from Jest unit tests to cross-browser Playwright shards—is captured and merged into a single source of truth (~89% statement coverage).
 
 ## ⚖️ What Remains the Same: The Interface
-To maintain continuity, the primary application pillars have been preserved:
-* **UI & UX Layout:** The primary layout, controls, and interaction patterns remain unchanged to preserve user muscle memory.
-* **Data Schema:** The underlying JSON schema is fully backwards compatible; existing "recipes" and parameter states remain functional.
-* **Core Visual Identity:** The aesthetic and rendering style of the parametric shapes remain consistent with previous versions.
+* **UI & UX Layout:** Primary controls and interaction patterns remain unchanged to preserve user muscle memory.
+* **Data Schema:** The underlying JSON schema is fully backwards compatible; existing "recipes" remain functional.
+* **Core Visual Identity:** The aesthetic rendering style remains consistent with previous versions.
 
 ## 📚 Documentation and Governance
-The 2026 v0.5 refactor is governed by a set of **Foundational Invariants**—core rules that ensure system stability across threads. 
+The v0.5 refactor is governed by a set of **Foundational Invariants**—core rules that ensure system stability across threads.
 
 * [Architecture Specs](./docs/ARCHITECTURE.md)
 * [Parametric Authority](./docs/PARAMETRIC_AUTHORITY.md)
 * [Design Patterns](./docs/DESIGN_PATTERNS.md)
 * [Implementation Notes](./docs/IMPLEMENTATION_NOTES.md)
-* [Glossary](./docs/GLOSSARY.md)
 
 ## 🛡️ Transactional Integrity & Observability
-* **Observer Standard Validation:** Precision Shadowing tests ensure that UI interactions (focusing, dragging, clicking) remain mathematically silent and do not deform the geometry.
-* **Central Channel Authority:** All system telemetry is governed by a unified registry in `ParametricConstants.js`, providing real-time visibility into Worker sync.
-* **The "All-or-Nothing" Rule:** An implementation of the Invariant principle ensuring the engine updates every point in a mesh atomically, preventing "glitchy" intermediate states.
+* **Observer Standard Validation:** Precision Shadowing tests ensure that UI interactions remain mathematically silent and do not deform geometry during monitoring.
+* **Central Channel Authority:** All system telemetry is governed by a unified registry in `ParametricConstants.js`.
+* **The "All-or-Nothing" Rule:** An implementation of the Invariant principle ensuring the engine updates every point in a mesh atomically.
 
 ## 🧠 A Note on AI Collaboration
-This release was rearchitected with the intensive assistance of Large Language Models (LLMs). The development process utilized the AI for high-velocity implementation and complex debugging (notably resolving the Firefox CI bottlenecks
+This release was rearchitected with the intensive assistance of Large Language Models (LLMs). The development process utilized AI for high-velocity implementation and complex debugging while the **Human Operator (Epistemic Anchor)** worked to maintain architectural authority, oversight, and final validation of all mathematical invariants.
