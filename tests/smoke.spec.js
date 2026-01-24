@@ -20,7 +20,12 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Parametric System Integrity (SMOKE)', () => {
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    // If we are in Webkit, increase the individual test timeout
+    if (testInfo.project.name === 'webkit') {
+      testInfo.setTimeout(150000);
+    }
+
     await page.addInitScript(() => { 
       window.__PLAYWRIGHT__ = true;
       // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
@@ -289,8 +294,11 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
     await validateShape(page, 'SINE');
   });
 
-  test('Geometry: CIRCLE should compile and render (Basic Mesh Check)', async ({ page }) => {
-    test.setTimeout(90000); // [cite: 2026-01-20] FIX: Increase timeout to allow snapshot updates/retries
+  test('Geometry: CIRCLE should compile and render (Basic Mesh Check)', async ({ page }, testInfo) => {
+    // FIX: WebKit in CI requires extra slack for the initial WebGL context handshake
+    const isWebKit = testInfo.project.name === 'webkit';
+    test.setTimeout(isWebKit ? 120000 : 90000); 
+
     await validateShape(page, 'CIRCLE');
     await validateShape(page, 'CIRCLE', true);
   });

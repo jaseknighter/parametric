@@ -71,4 +71,56 @@ describe('ParametricIntentService Projections', () => {
     expect(intentService.state.rid).toBe(rid);
     expect(intentService.state.radius).toBe(10);
   });
+
+  test('broadcastChange should be blocked during sync', () => {
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+    intentService._isSyncing = true;
+    intentService.broadcastChange('testKey', 123);
+    expect(dispatchSpy).not.toHaveBeenCalled();
+    intentService._isSyncing = false;
+    dispatchSpy.mockRestore();
+  });
+
+  test('setIntent should be blocked during sync', () => {
+    intentService._isSyncing = true;
+    const original = intentService.state.bendAmtX;
+    intentService.setIntent('bendAmtX', 999);
+    expect(intentService.state.bendAmtX).toBe(original);
+    intentService._isSyncing = false;
+  });
+
+  test('setIntent should ignore keys not in registry', () => {
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+    intentService.setIntent('nonExistentKey', 123);
+    expect(dispatchSpy).not.toHaveBeenCalled();
+    dispatchSpy.mockRestore();
+  });
+
+  test('setIntentBatch should be blocked during sync', () => {
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
+    intentService._isSyncing = true;
+    intentService.setIntentBatch({ bendAmtX: 999 });
+    expect(dispatchSpy).not.toHaveBeenCalled();
+    intentService._isSyncing = false;
+    dispatchSpy.mockRestore();
+  });
+
+  test('projectForCPU should handle undefined settings and type conversion', () => {
+    // Test fallback to state when setting is undefined
+    intentService.state.bendAmtX = 5;
+    const result = intentService.projectForCPU({});
+    expect(result.mathScope.bendAmtX).toBe(intentService.project('bendAmtX', 5));
+
+    // Test numeric conversion
+    const resultStr = intentService.projectForCPU({ bendAmtX: "10" });
+    expect(resultStr.mathScope.bendAmtX).toBe(intentService.project('bendAmtX', 10));
+  });
+
+  test('syncFromReducer should skip if RID matches', () => {
+    intentService.state.rid = 100;
+    const spy = jest.spyOn(intentService, 'getValueByPath');
+    intentService.syncFromReducer({ rid: 100 });
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
 });

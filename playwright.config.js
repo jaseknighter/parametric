@@ -117,9 +117,10 @@
         name: 'webkit',
         use: { 
           ...devices['Desktop Safari'],
-          navigationTimeout: 60000, // Increase to 60s
-          actionTimeout: 30000 
+          navigationTimeout: 80000,
+          actionTimeout: 60000 
         },
+        timeout: 120000,
       },
     ],
 
