@@ -1,0 +1,431 @@
+{
+  "modulating": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ]
+    },
+    "modulateAmtX": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ]
+    },
+    "modulateAmtY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ]
+    },
+    "modulateAmtZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "modulateAmtXY": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ]
+    },
+    "modulateAmtYZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "modulateAmtXZ": {
+      "u": {
+        "from": 0,
+        "to": {
+          "operators": "*",
+          "operands": [
+            2,
+            "Math.PI"
+          ]
+        }
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                2
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [
+            1
+          ]
+        }
+      ]
+    },
+    "stingrayXY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "-",
+              "operands": [
+                "u",
+                "u"
+              ]
+            }
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                "u"
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "*",
+              "operands": [
+                "u",
+                "u"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "twistY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "sin",
+          "operands": [
+            "v"
+          ]
+        }
+      ],
+      "y": [
+        {
+          "operators": "sin",
+          "operands": [
+            {
+              "operators": "+",
+              "operands": [
+                "v",
+                "u",
+                "v"
+              ]
+            }
+          ]
+        }
+      ],
+      "z": [
+        {
+          "operators": "cos",
+          "operands": [
+            "v"
+          ]
+        }
+      ]
+    }
+  }
+}

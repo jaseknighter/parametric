@@ -1,0 +1,202 @@
+{
+  "ascending": {
+    "none": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ]
+    },
+    "ascendX": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": "*",
+          "operands": ["u",1]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ]
+    },
+    "ascendY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ]
+    },
+    "ascendZ": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+
+
+    "ascendXY": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ]
+    },
+    "ascendYZ": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    },
+    "ascendXZ": {
+      "u": {
+        "from": 0,
+        "to": 1
+      },
+      "v": {
+        "from": 0,
+        "to": 1
+      },
+      "x": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ],
+      "y": [
+        {
+          "operators": null,
+          "operands": [0]
+        }
+      ],
+      "z": [
+        {
+          "operators": null,
+          "operands": ["u"]
+        }
+      ]
+    }
+  }
+}

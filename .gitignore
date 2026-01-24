@@ -1,2 +1,25 @@
 .DS_Store
 node_modules/
+dist/
+build/
+
+# Playwright Outputs
+playwright/.cache/
+playwright/.auth/
+blob-report/
+
+# Test Artifacts (Ignored on Main, handled by Action)
+coverage/
+monocart-report/
+playwright-report/
+raw-shards/
+test-results/
+
+# Playwright Snapshots (Actual/Diff)
+*-actual.png
+*-diff.png
+
+# Environment / Logs
+.env
+.env.*
+*.log
