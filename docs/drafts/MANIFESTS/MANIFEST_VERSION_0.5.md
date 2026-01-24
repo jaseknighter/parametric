@@ -19,6 +19,7 @@ To ensure the integrity of the v0.5.0 release, we implemented a rigorous validat
 - **Unified Coverage Merging**: Reached a verified **88.08% Statement Coverage** by merging Jest unit data with multi-browser Playwright shards (Chromium, Firefox, Webkit).
 - **Automated Leak Guard**: Integrated a programmatic sanitization gate to ensure local paths (`/Users/...`) and internal CI metadata are scrubbed from public reports.
 - **Subpath Normalization**: Implemented client-side trailing slash redirection to ensure reliable asset resolution on GitHub Pages.
+- **Sequential Integration (Safety Fuse)**: Orchestrated the GitHub Actions workflow to separate the `test` and `deploy` stages. Deployment now utilizes an artifact handshake; if the testing job identifies a regression, the deployment job is automatically neutralized, ensuring the live environment only reflects verified, integrated code.
 
 ## Documentation and Governance
 The v0.5 refactor is governed by a set of Foundational Invariants:

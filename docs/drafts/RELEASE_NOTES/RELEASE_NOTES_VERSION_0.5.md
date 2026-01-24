@@ -22,6 +22,7 @@ Version 0.5.0 marks the transition of the Parametric Geometry Explorer into a pr
 - **Always-On Coverage**: Local development environments are now fully instrumented by default, ensuring "it works on my machine" translates to "it works in production."
 - **Privacy Guard**: Programmatic scrubbing of internal file paths and metadata from all public-facing reports.
 - **Subpath Resilience**: Improved URL handling for GitHub Pages deployment.
+- **The "Safety Fuse" CI**: Implemented a strictly sequential CI pipeline. Deployment is gated behind a full test-suite clearance; if a mathematical invariant or logic test fails, the "fuse" blows and the live site is protected from receiving the broken update.
 
 ---
 
