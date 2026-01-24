@@ -1,0 +1,31 @@
+name: Update Snapshots
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      
+      - name: Update Snapshots
+        run: npx playwright test --update-snapshots
+        env:
+          VITE_COVERAGE: true
+          CI: true
+        
+      - name: Commit & Push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update playwright snapshots [skip ci]"
+          file_pattern: 'tests/**/*.png'
