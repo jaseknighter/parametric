@@ -44,7 +44,8 @@ Debug.init({
 
 // [cite: 2026-01-18] COVERAGE: Dummy component to exercise Watchdog branches in E2E
 const CoverageWatchdog = () => {
-  useRenderWatchdog('CoverageWatchdog', 0);
+  // [cite: 2026-01-23] QUIET: Increase threshold to 100fps to ignore HUD typing bursts
+  useRenderWatchdog('CoverageWatchdog', 100);
   const lastLogRef = useRef(0);
   
   useEffect(() => {

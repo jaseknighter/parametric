@@ -53,7 +53,9 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
     }
 
     if (type === 'ERROR') {
-      Debug.error("WORKER", "🚨 [Worker-Logic-Mismatch]", {
+      // [cite: 2026-01-23] QUIET HUD: Demote worker syntax errors to warnings to prevent console spam during typing.
+      // These are expected when the user is editing the formula.
+      Debug.warn("WORKER", "🚨 [Worker-Logic-Mismatch]", {
         error: msg.error,
         failedSource: msg.failedSource
       });
