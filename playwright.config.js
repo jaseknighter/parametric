@@ -19,7 +19,7 @@
   export default defineConfig({
     testDir: './tests',
     testIgnore: '**/*.test.js', // [cite: 2026-01-18] FIX: Ignore Jest unit tests to prevent runner collision
-    workers: is3DHeavy ? 1 : (process.env.CI ? 2 : undefined),
+    workers: is3DHeavy ? 1 : (process.env.CI ? 1 : 3),
       fullyParallel: !is3DHeavy,
       timeout: process.env.CI ? 60000 : 30000, // 🟢 Double timeout in CI
       expect: {

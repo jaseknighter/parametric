@@ -12,6 +12,7 @@ jest.mock('../../utilities/debug', () => ({
   Debug: {
     log: jest.fn(),
     error: jest.fn(),
+    warn: jest.fn(),
     isEnabled: jest.fn(() => true),
     enable: jest.fn()
   }

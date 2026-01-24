@@ -53,6 +53,9 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
     }
 
     if (type === 'ERROR') {
+      // [cite: 2026-01-23] TEST HOOK: Expose error for Playwright even if console is quiet
+      if (typeof window !== 'undefined') window.__lastWorkerError = msg.error;
+
       // [cite: 2026-01-23] QUIET HUD: Demote worker syntax errors to warnings to prevent console spam during typing.
       // These are expected when the user is editing the formula.
       Debug.warn("WORKER", "🚨 [Worker-Logic-Mismatch]", {
