@@ -126,15 +126,11 @@ jobs:
           mkdir -p dist/reports/coverage
           mkdir -p dist/reports/playwright
           
-          # Copy everything from monocart-report to coverage
-          if [ -d "monocart-report" ]; then
-            cp -r monocart-report/* dist/reports/coverage/
-          fi
+          # Copy contents of Monocart output
+          cp -r monocart-report/* dist/reports/coverage/
           
-          # Copy everything from playwright-report to playwright
-          if [ -d "playwright-report" ]; then
-            cp -r playwright-report/* dist/reports/playwright/
-          fi
+          # Copy contents of Playwright output
+          cp -r playwright-report/* dist/reports/playwright/
           
           touch dist/.nojekyll
 
