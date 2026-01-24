@@ -155,12 +155,11 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload Pages Artifact
-        if: always() # 🟢 FORCE THIS SO THE 404s GO AWAY
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          # This MUST point to the folder where you bundled everything
+          path: dist/
 
       - name: Deploy to GitHub Pages
-        if: always() # 🟢 FORCE THE DEPLOYMENT
         id: deployment
         uses: actions/deploy-pages@v4
