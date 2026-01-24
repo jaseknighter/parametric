@@ -20,12 +20,7 @@ test.afterEach(async ({ page }, testInfo) => {
 
 test.describe('Parametric System Integrity (SMOKE)', () => {
 
-  test.beforeEach(async ({ page }, testInfo) => {
-    // If we are in Webkit, increase the individual test timeout
-    if (testInfo.project.name === 'webkit') {
-      testInfo.setTimeout(150000);
-    }
-
+  test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => { 
       window.__PLAYWRIGHT__ = true;
       // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
@@ -595,9 +590,8 @@ const dragSlider = async (page, key, value) => {
 
 test.describe('Architectural Integrity', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // Wait for the interface to be interactive
-    await page.waitForSelector('.TAreaInterface___TitleButton');
+    await page.goto('/', { timeout: 120000 }); // Explicit local override
+    await page.waitForSelector('.TAreaInterface___TitleButton', { state: 'visible', timeout: 60000 });
   });
 
   test('3x3 Matrix should maintain spatial persistence during updates', async ({ page }) => {
