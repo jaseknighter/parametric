@@ -62,25 +62,20 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
     await page.goto('/');
 
-    // [cite: 2026-01-22] CONFIG CHECK: Verify Server Instrumentation
-    // If the test runner expects coverage, the server MUST provide it.
+    // [cite: 2026-01-24] HARDENING: Robust Coverage Handshake
     if (process.env.VITE_COVERAGE === 'true') {
-      const isInstrumented = await page.evaluate(() => !!window.__coverage__);
+      // Give the server a few seconds to inject the coverage object (prevents WebKit flakes)
+      const isInstrumented = await page.waitForFunction(() => !!window.__coverage__, { 
+        timeout: 5000 
+      }).catch(() => false);
+
       if (!isInstrumented) {
         const msg = [
-          '',
-          '\x1b[41m\x1b[37m 🚨 FATAL CONFIGURATION ERROR 🚨 \x1b[0m',
-          '\x1b[31mThe test runner is expecting code coverage (VITE_COVERAGE=true),',
-          'but the application server is not instrumented (window.__coverage__ is missing).\x1b[0m',
-          '',
-          '\x1b[33m🛠️  HOW TO FIX:\x1b[0m',
-          '1. Stop your current \'npm start\' server.',
-          '2. Restart it with coverage enabled:',
-          '   \x1b[32mVITE_COVERAGE=true npm start\x1b[0m',
-          ''
+          '🚨 FATAL CONFIGURATION ERROR: window.__coverage__ is missing.',
+          'The server is not instrumented. Ensure VITE_COVERAGE=true is set.'
         ].join('\n');
         console.error(msg);
-        throw new Error('Server missing coverage instrumentation. See terminal for instructions.');
+        throw new Error(msg);
       }
     }
 
