@@ -11,8 +11,8 @@ test.describe('Display Layer Coverage', () => {
   test('Explicitly render Display Layer components', async ({ page }) => {
     await page.goto('/');
     
-    // Wait for the app to be ready (Scene & Service)
-    await page.waitForFunction(() => window.scene && window.intentService);
+    // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
+    await page.waitForFunction(() => window.workerReady === true, { timeout: 60000 });
 
     // Force interaction that definitely uses the Display Layer (ParametricScene)
     // Changing the shape triggers a full geometry rebuild and render cycle.

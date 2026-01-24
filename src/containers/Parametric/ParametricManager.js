@@ -17,6 +17,12 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
   let highestRidProcessed = -1; // [cite: 2026-01-16] FIX: Monotonic Guard
   let lastDispatchedRid = -1;   // [cite: 2026-01-17] MVA: Track latest intent for flush
 
+  // [cite: 2026-01-24] TEST HANDSHAKE: Reset global flag on init
+  if (typeof window !== 'undefined') {
+    window.workerReady = false;
+    window.PARAMETRIC_READY = false; // [cite: 2026-01-24] ALIAS: For signal-based testing
+  }
+
   const worker = workerLoader();
   Debug.log("WORKER", `🏗️ [Manager] New Instance Created: ${instanceId}`);
 
@@ -88,6 +94,13 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
     // 4. Geometry Result Processing
     if (type === 'RESULT' && msg.positions) {
       const scene = thunkScene();
+
+      // [cite: 2026-01-24] TEST HANDSHAKE: Signal Playwright that the engine is "Hot" (First Frame)
+      if (typeof window !== 'undefined' && !window.workerReady) {
+        window.workerReady = true;
+        window.PARAMETRIC_READY = true; // [cite: 2026-01-24] ALIAS: Signal-based testing
+        Debug.log("WORKER", "🚀 [Manager] 3D Engine is hot! (First Frame Rendered)");
+      }
 
       if (window.__DEBUG_HUD__) {
         Debug.log("WORKER", `▶️ Applying RID:${rid} Manual:${msg.isManual}`);

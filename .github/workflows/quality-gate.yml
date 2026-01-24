@@ -29,11 +29,29 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Unified Test Suite
-        run: npm run test:run-all-suites
+      - name: Clean Artifacts
+        run: npm run clean:artifacts
+
+      - name: Run Unit Tests (Jest)
+        run: cross-env VITE_COVERAGE=true npm run test -- --coverage
+
+      - name: Run E2E Tests (Playwright)
+        run: cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json VITE_COVERAGE=true npx playwright test --project=chromium --project=firefox --project=webkit
         env:
           VITE_COVERAGE: true
           CI: true
+
+      - name: Ensure Shard Directory
+        if: always()
+        run: mkdir -p raw-shards
+
+      - name: Merge Coverage
+        if: always()
+        run: npm run coverage:merge
+
+      - name: Generate Coverage Table
+        if: always()
+        run: npm run coverage-table
 
       # 🚀 Deploy to GitHub Pages (Only on Main)
       - name: Deploy to GitHub Pages

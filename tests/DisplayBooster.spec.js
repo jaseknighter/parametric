@@ -11,8 +11,8 @@ test.describe('Display Layer Coverage Booster', () => {
   test('High-Intensity Interaction (ParametricScene)', async ({ page }) => {
     await page.goto('/');
     
-    // Wait for scene to be ready
-    await page.waitForFunction(() => window.scene && window.intentService);
+    // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
+    await page.waitForFunction(() => window.workerReady === true, { timeout: 60000 });
     
     const canvas = page.locator('canvas');
     await expect(canvas).toBeVisible();

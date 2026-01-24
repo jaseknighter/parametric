@@ -15,7 +15,8 @@ test.describe('Console Noise Control', () => {
     });
 
     await page.goto('/');
-    await page.waitForFunction(() => window.scene && window.intentService);
+    // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
+    await page.waitForFunction(() => window.workerReady === true, { timeout: 60000 });
 
     // Check errors
     const workerErrors = errors.filter(e => e.includes('Worker-Logic-Mismatch'));
