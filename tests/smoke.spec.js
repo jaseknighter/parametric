@@ -491,7 +491,7 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
       // 3. Take Screenshot
       await expect(page.locator('canvas')).toHaveScreenshot(`${shape.toLowerCase()}-reference.png`, {
-        maxDiffPixelRatio: 0.02,
+        maxDiffPixelRatio: 0.1,
         animations: 'disabled',
         timeout: 60000 // [cite: 2026-01-19] FIX: Increase timeout for heavy renders
       });

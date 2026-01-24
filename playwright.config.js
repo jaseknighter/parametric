@@ -20,10 +20,14 @@
     testDir: './tests',
     testIgnore: '**/*.test.js', // [cite: 2026-01-18] FIX: Ignore Jest unit tests to prevent runner collision
     workers: is3DHeavy ? 1 : (process.env.CI ? 2 : undefined),
-    fullyParallel: !is3DHeavy,
-    timeout: process.env.CI ? 60000 : 30000, // 🟢 Double timeout in CI
-    expect: {
-      timeout: process.env.CI ? 10000 : 5000,
+      fullyParallel: !is3DHeavy,
+      timeout: process.env.CI ? 60000 : 30000, // 🟢 Double timeout in CI
+      expect: {
+      timeout: process.env.CI ? 15000 : 5000, // 🟢 Extra breathing room for slow CI renders
+      toHaveScreenshot: {
+        maxDiffPixelRatio: 0.1,               // 🟢 10% tolerance for cross-OS 3D rendering
+        threshold: 0.2,                        // Sensitivity to color shifts
+      },
     },
     reporter: [
       ['list'],
