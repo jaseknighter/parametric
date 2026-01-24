@@ -49,6 +49,8 @@
     "preview": "vite preview",
     "clean:artifacts": "rimraf raw-shards monocart-report playwright-report test-results coverage",
     "test": "jest --coverage --reporters=default --coverageReporters=json --coverageReporters=text",
+    "test:coverage": "cross-env VITE_COVERAGE=true npm run test -- --coverage",
+    "test:e2e": "cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json VITE_COVERAGE=true npx playwright test",
     "test:watch": "jest --watch",
     "test:smoke": "cross-env npx playwright test smoke.spec.js",
     "test:smoke:watch": "cross-env npx playwright test smoke.spec.js --watch",
