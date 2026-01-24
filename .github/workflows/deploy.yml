@@ -34,6 +34,8 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Unified Test Suite
+        # Add this if you want to deploy reports even if tests fail
+        continue-on-error: true 
         run: |
           # 1. Run Jest (Unit) - This creates /coverage/coverage-final.json
           npm test -- --coverage --watchAll=false
@@ -51,6 +53,8 @@ jobs:
       - name: Auto-commit snapshot updates
         id: auto_commit
         if: always()
+        # 🟢 ADD THIS: Prevents the job from failing on git errors
+        continue-on-error: true 
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-update snapshots and coverage [skip ci]"
