@@ -22,7 +22,8 @@
 ### 0. Migrate issues/features out of this list and start addressing them
 - [ ] **Start using GitHub issues:** Move items from this list into GitHub Issues.
 ### 1. Architectural Integrity & Debt
-- [ ] **Create some kind of blue/green deployment process** 
+- [ ] **Conduct a full SRE Audit of Code + Process** 
+- [ ] **Create a blue/green deployment process** 
 - [ ] **Mobile Optimization:** Fix typography and controls overlapping the HUD.
 - [ ] **Separation of Concerns Audit:** Review code against specs to fix gaps; specifically, move remaining business logic out of the Worker thread.
 - [ ] **"The Exorcism":** Identify and remove any legacy non-React DOM manipulations or "lingering" 2019-era logic.
