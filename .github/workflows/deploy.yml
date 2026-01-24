@@ -67,6 +67,8 @@ jobs:
           
       - name: Build
         run: npm run build
+        env:
+          VITE_COVERAGE: true # 🟢 Ensure the build is instrumented
 
       # 🟢 NEW: Inject Reports into the Build Distribution
       - name: Inject Reports into Dist
