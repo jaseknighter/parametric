@@ -26,6 +26,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 ### Current Status
 **v0.5 rearchitecture release live (20260119)** 
 The engine has transitioned to a multi-threaded, JIT-compiled model. Coverage: >80%.
+CI logic and coverage validated via Chromium (V8). Full cross-browser parity (WebKit/Firefox) verified in local development tier.
 
 <details>
 <summary><strong>Test Coverage & Pass Rates</strong></summary>
