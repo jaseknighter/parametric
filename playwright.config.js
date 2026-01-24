@@ -119,6 +119,10 @@
         name: 'webkit',
         use: { 
           ...devices['Desktop Safari'],
+          // 🟢 THE FIX: Disable coverage harvesting for WebKit only in CI
+          // This removes the "Fatal Handshake" wall and lets the tests run 
+          // at full speed without the heavy instrumentation overhead.
+          collectCoverage: !process.env.CI, 
           // [cite: 2026-01-24] CI STABILITY: Throttling resource usage
           launchOptions: {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
