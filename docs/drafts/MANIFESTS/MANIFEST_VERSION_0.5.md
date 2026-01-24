@@ -14,7 +14,7 @@ This release represents a fundamental "core transplant" of the Parametric 3D Eng
 To ensure the integrity of the v0.5.0 release, we implemented a rigorous cross-platform validation layer:
 - Deterministic Worker Handshake: Replaced poll-based testing with a signal-driven architecture. The suite now synchronizes directly with the Worker’s internal readiness state.
 - Targeted CI Optimization: Established robust patience buffers for software-rendered environments, specifically optimizing the WebKit and Chromium paths for 100% reliability.
-- Unified Coverage Merging: Implemented a "Settle Guard" to ensure all telemetry is captured and merged into a single source of truth, maintaining a project-wide standard of **>80% Line Coverage**.
+- Unified Coverage Merging: Implemented a "Settle Guard" to ensure all telemetry is captured and merged into a single source of truth, maintaining a project-wide standard of >80% Line Coverage.
 - Automated Leak Guard: Integrated a programmatic sanitization gate to ensure local paths and internal CI metadata are scrubbed from public-facing reports.
 
 ## Documentation and Governance (DRAFT)
