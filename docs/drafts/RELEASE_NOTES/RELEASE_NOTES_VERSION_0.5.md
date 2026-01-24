@@ -10,10 +10,12 @@ This release represents a fundamental "core transplant" of the Parametric 3D Eng
 * **Zero-Copy Memory Transfers:** Minimized latency by transferring ownership of vertex buffers rather than cloning data.
 * **Heads-Up Display (HUD):** A new "control room" interface providing transparency into shape generation. By enabling direct code editing alongside traditional sliders, it allows the user to transition from a "shape explorer" to a "mathematical author."
 
+
+
 ## 🏛️ CI Determinism & Stability (The "Solid" Baseline)
 To ensure the integrity of the v0.5.0 release, we implemented a rigorous cross-platform validation layer:
 * **Deterministic Worker Handshake:** Replaced poll-based testing with a signal-driven architecture (`window.__PARAMETRIC_READY__`). The suite now synchronizes directly with the Worker’s internal readiness state.
-* **Targeted CI Optimization:** Established a 90-second "Soak Time" for software-rendered environments. We explicitly optimized the Firefox CI path to focus on unit/logic integrity while relying on Chromium and WebKit for visual regression, bypassing headless Linux WebGL limitations.
+* **Targeted CI Optimization:** Established a 90-second "Soak Time" for software-rendered environments. We explicitly optimized the CI path to focus visual regression on Chromium and WebKit, bypassing headless Linux limitations that historically stalled the pipeline.
 * **Unified Coverage Merging:** Implemented a "Settle Guard" to ensure 100% of telemetry—from Jest unit tests to cross-browser Playwright shards—is captured and merged into a single source of truth (~89% statement coverage).
 
 ## ⚖️ What Remains the Same: The Interface
@@ -35,4 +37,4 @@ The v0.5 refactor is governed by a set of **Foundational Invariants**—core rul
 * **The "All-or-Nothing" Rule:** An implementation of the Invariant principle ensuring the engine updates every point in a mesh atomically.
 
 ## 🧠 A Note on AI Collaboration
-This release was rearchitected with the intensive assistance of Large Language Models (LLMs). The development process utilized AI for high-velocity implementation and complex debugging while the **Human Operator (Epistemic Anchor)** worked to maintain architectural authority, oversight, and final validation of all mathematical invariants.
+This release was rearchitected with the intensive assistance of Large Language Models (LLMs). The development process utilized AI for high-velocity implementation and complex debugging—notably resolving the asynchronous signaling bottlenecks—while the **Human Operator (Epistemic Anchor)** maintained architectural authority, oversight, and final validation of all mathematical invariants.
