@@ -64,6 +64,28 @@ jobs:
       - name: Build
         run: npm run build
 
+      # 🟢 NEW: Inject Reports into the Build Distribution
+      - name: Inject Reports into Dist
+        if: always() # Ensures reports are available even if some tests failed
+        run: |
+          echo "Creating report directories in dist..."
+          mkdir -p dist/reports/coverage
+          mkdir -p dist/reports/playwright
+          
+          echo "Copying Monocart Coverage Report..."
+          # Note: monocart-report/coverage contains the HTML/JS/CSS
+          if [ -d "monocart-report/coverage" ]; then
+            cp -r monocart-report/coverage/* dist/reports/coverage/
+          fi
+          
+          echo "Copying Playwright HTML Report..."
+          if [ -d "playwright-report" ]; then
+            cp -r playwright-report/* dist/reports/playwright/
+          fi
+          
+          # Optional: Create a simple index file for the reports folder
+          echo "<html><body><h1>QA Dashboards</h1><ul><li><a href='coverage/'>Coverage Report</a></li><li><a href='playwright/'>Playwright Results</a></li></ul></body></html>" > dist/reports/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
