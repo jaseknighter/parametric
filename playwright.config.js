@@ -85,7 +85,7 @@
       // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
       baseURL: 'http://localhost:3000/parametric/', 
       navigationTimeout: process.env.CI ? 120000 : 60000,
-      actionTimeout: 0,
+      actionTimeout: process.env.CI ? 60000 : 30000,
       trace: 'on-first-retry',
       onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
       collectCoverage: true, // 🟢 Harvest the data from the browser
@@ -119,8 +119,6 @@
         name: 'webkit',
         use: { 
           ...devices['Desktop Safari'],
-          navigationTimeout: 80000,
-          actionTimeout: 60000 
         },
         timeout: 120000,
       },
