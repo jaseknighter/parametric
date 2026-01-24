@@ -11,7 +11,10 @@ import { addCoverageReport } from 'monocart-reporter';
  */
 
 test.afterEach(async ({ page }, testInfo) => {
-  // Capture the raw coverage object from the browser before the context closes
+  // [cite: 2026-01-24] WEBKIT FIX: Graceful Settle
+  // Give the browser event loop a moment to breathe before grabbing heavy coverage data
+  await page.waitForTimeout(500); 
+  
   const coverage = await page.evaluate(() => window.__coverage__);
   if (coverage) {
     await addCoverageReport(coverage, testInfo);

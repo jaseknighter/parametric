@@ -119,6 +119,10 @@
         name: 'webkit',
         use: { 
           ...devices['Desktop Safari'],
+          // [cite: 2026-01-24] CI STABILITY: Throttling resource usage
+          launchOptions: {
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          },
         },
         timeout: 120000,
       },
