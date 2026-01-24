@@ -85,7 +85,8 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
     }
 
     await page.waitForSelector('#three');
-    await page.waitForFunction(() => window.scene && window.intentService);
+    // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
+    await page.waitForFunction(() => window.__PARAMETRIC_READY__ === true, { timeout: 60000 });
   });
 
   /**

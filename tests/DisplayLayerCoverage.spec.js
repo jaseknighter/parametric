@@ -12,7 +12,7 @@ test.describe('Display Layer Coverage', () => {
     await page.goto('/');
     
     // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
-    await page.waitForFunction(() => window.workerReady === true, { timeout: 60000 });
+    await page.waitForFunction(() => window.__PARAMETRIC_READY__ === true, { timeout: 60000 });
 
     // Force interaction that definitely uses the Display Layer (ParametricScene)
     // Changing the shape triggers a full geometry rebuild and render cycle.

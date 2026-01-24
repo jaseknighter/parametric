@@ -20,7 +20,7 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
   // [cite: 2026-01-24] TEST HANDSHAKE: Reset global flag on init
   if (typeof window !== 'undefined') {
     window.workerReady = false;
-    window.PARAMETRIC_READY = false; // [cite: 2026-01-24] ALIAS: For signal-based testing
+    window.__PARAMETRIC_READY__ = false; // [cite: 2026-01-24] ALIAS: Signal-based testing
   }
 
   const worker = workerLoader();
@@ -98,7 +98,7 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
       // [cite: 2026-01-24] TEST HANDSHAKE: Signal Playwright that the engine is "Hot" (First Frame)
       if (typeof window !== 'undefined' && !window.workerReady) {
         window.workerReady = true;
-        window.PARAMETRIC_READY = true; // [cite: 2026-01-24] ALIAS: Signal-based testing
+        window.__PARAMETRIC_READY__ = true; // [cite: 2026-01-24] ALIAS: Signal-based testing
         Debug.log("WORKER", "🚀 [Manager] 3D Engine is hot! (First Frame Rendered)");
       }
 
