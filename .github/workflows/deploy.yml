@@ -33,11 +33,19 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      - name: Run Smoke Suite
-        run: npm run test:full-baseline:ci
-        env:
-          CI: true
-          VITE_COVERAGE: true
+      - name: Run Unified Test Suite
+        run: |
+          # 1. Run Jest (Unit) - This creates /coverage/coverage-final.json
+          npm test -- --coverage --watchAll=false
+          
+          # 2. Run Playwright (E2E) - This creates /raw-shards/*.json
+          VITE_COVERAGE=true npx playwright test
+          
+          # 3. Merge Shards & Generate HTML
+          node scripts/merge-coverage.cjs
+          
+          # 4. Update README Table with fresh data
+          node scripts/generate-coverage-table.cjs
 
       # 🟢 NEW AUTOMATION STEP:
       - name: Auto-commit snapshot updates
@@ -140,7 +148,7 @@ jobs:
           
           echo "Copying Playwright HTML Report..."
           if [ -d "playwright-report" ]; then
-            cp -r playwright-report/* dist/playwright-report/
+            cp -a playwright-report dist/playwright-report
           fi
 
       - name: Setup Pages
