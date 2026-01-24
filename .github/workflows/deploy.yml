@@ -15,11 +15,8 @@ permissions:
   id-token: write
 
 jobs:
-  build-and-deploy:
+  test:
     runs-on: ubuntu-latest
-    environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,25 +50,43 @@ jobs:
           file_pattern: 'tests/**/*.spec.js-snapshots/*.png'
           disable_globbing: false
 
-      # 🔍 DIAGNOSTIC: Run this IMMEDIATELY after tests if they fail
-      - name: List Files for Debugging
-        if: always()
-        run: |
-          echo "Checking root directory:"
-          ls -F
-          echo "Searching for monocart-report directory:"
-          find . -name "monocart-report" -type d
-
       - name: Upload Test Reports
         if: always() 
         uses: actions/upload-artifact@v4
         with:
-          name: parametric-test-results # Changing the name to be sure it's fresh
-          path: test-results/ # 🟢 THIS IS THE KEY
+          name: test-reports
+          path: |
+            monocart-report/
+            playwright-report/
+            test-results/
           retention-days: 7
-          
+
+  build-and-deploy:
+    needs: test # <--- THIS IS THE KEY: Wait for tests to finish
+    if: always() # Run even if tests failed (to deploy reports)
+    runs-on: ubuntu-latest
+    environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Download Test Reports
+        uses: actions/download-artifact@v4
+        with:
+          name: test-reports
+
       - name: Build
-        if: success() && steps.auto_commit.outputs.changes_detected == 'false'
         run: npm run build
         env:
           VITE_COVERAGE: true # 🟢 Ensure the build is instrumented
