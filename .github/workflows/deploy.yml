@@ -50,13 +50,13 @@ jobs:
       # 🟢 NEW AUTOMATION STEP:
       - name: Auto-commit snapshot updates
         id: auto_commit
-        if: always() # Run even if tests failed (because snapshots might have updated)
+        if: always()
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-update snapshots and coverage [skip ci]"
-          # 🟢 Scope write access to ONLY the snapshot folders and README
-          file_pattern: 'tests/**/*.spec.js-snapshots/*.png README.md'
-          disable_globbing: false
+          # Point to the folders generally; Git won't crash if they are empty
+          file_pattern: 'README.md tests/'
+          disable_globbing: true
 
       - name: Upload Test Reports
         if: always() 
@@ -120,44 +120,23 @@ jobs:
           done
           echo "✅ Security Audit & Scrubbing complete."
 
-      # 🟢 NEW: Bundle Reports into the Build Distribution
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          # 1. Create a fallback dist if the build failed (so reports still deploy)
-          if [ ! -d "dist" ]; then
-            echo "⚠️ Build directory missing. Creating fallback."
-            mkdir -p dist
-            cp index.html dist/ 2>/dev/null || echo "No index.html found in root"
-          fi
-
-          # 2. Add the .nojekyll guard for GitHub Pages
-          touch dist/.nojekyll
-
-          # 3. Create standardized report paths
-          echo "Creating report directories in dist..."
           mkdir -p dist/reports/coverage
           mkdir -p dist/reports/playwright
           
-          # 4. Copy Monocart (Merged) Report
-          # Note: We copy from monocart-report/* directly based on your script
+          # Copy everything from monocart-report to coverage
           if [ -d "monocart-report" ]; then
-            echo "Copying Monocart Coverage Report..."
             cp -r monocart-report/* dist/reports/coverage/
-          else
-            echo "❌ Error: monocart-report directory not found!"
           fi
           
-          # 5. Copy Playwright HTML Report
+          # Copy everything from playwright-report to playwright
           if [ -d "playwright-report" ]; then
-            echo "Copying Playwright HTML Report..."
-            cp -a playwright-report/. dist/reports/playwright/
-          else
-            echo "❌ Error: playwright-report directory not found!"
+            cp -r playwright-report/* dist/reports/playwright/
           fi
-
-          echo "✅ Bundling complete. Listing dist structure:"
-          ls -R dist/reports
+          
+          touch dist/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
