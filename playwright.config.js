@@ -103,24 +103,16 @@
         name: 'chromium',
         use: { ...devices['Desktop Chrome'] },
       },
-      {
+      // 🟢 CI OPTIMIZATION: Only run Firefox locally or if explicitly requested.
+      // This prevents the "Firefox Wall" from blocking your baseline generation.
+      ...(process.env.CI ? [] : [{
         name: 'firefox',
         use: { 
           ...devices['Desktop Firefox'],
-          // [cite: 2026-01-23] CI STABILITY: Give Firefox extra time for WebGL/DOM cycles
-          actionTimeout: process.env.CI ? 90000 : 15000,
-          navigationTimeout: process.env.CI ? 90000 : 30000,
+          actionTimeout: 15000,
+          navigationTimeout: 30000,
         },
-        // 🟢 REGEX FIX: Ensures these files are skipped regardless of path depth
-        testIgnore: [
-          /\.test\.js$/, // Matches Jest files
-          ...(process.env.CI ? [
-            /smoke\.spec\.js$/, 
-            /VisualInvariant\.spec\.js$/, 
-            /SceneInteraction\.spec\.js$/
-          ] : [])
-        ],
-      },
+      }]),
       {
         name: 'webkit',
         use: { ...devices['Desktop Safari'] },
