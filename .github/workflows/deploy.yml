@@ -53,9 +53,9 @@ jobs:
         if: always() # Run even if tests failed (because snapshots might have updated)
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: auto-update snapshots from CI [skip ci]"
-          # 🟢 Scope write access to ONLY the snapshot folders
-          file_pattern: 'tests/**/*.spec.js-snapshots/*.png'
+          commit_message: "chore: auto-update snapshots and coverage [skip ci]"
+          # 🟢 Scope write access to ONLY the snapshot folders and README
+          file_pattern: 'tests/**/*.spec.js-snapshots/*.png README.md'
           disable_globbing: false
 
       - name: Upload Test Reports
@@ -124,32 +124,40 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          # 1. If build was skipped (due to test failure), create a fallback dist
+          # 1. Create a fallback dist if the build failed (so reports still deploy)
           if [ ! -d "dist" ]; then
-            echo "⚠️ Build directory missing. Creating fallback from root."
+            echo "⚠️ Build directory missing. Creating fallback."
             mkdir -p dist
-            cp index.html dist/
-            [ -f "manifest.json" ] && cp manifest.json dist/
+            cp index.html dist/ 2>/dev/null || echo "No index.html found in root"
           fi
 
-          # 2. Add the .nojekyll guard directly INTO the dist folder
+          # 2. Add the .nojekyll guard for GitHub Pages
           touch dist/.nojekyll
 
-          # 3. Copy the reports so they are accessible via the project subpath
+          # 3. Create standardized report paths
           echo "Creating report directories in dist..."
-          mkdir -p dist/monocart-report
-          mkdir -p dist/playwright-report
+          mkdir -p dist/reports/coverage
+          mkdir -p dist/reports/playwright
           
-          echo "Copying Monocart Coverage Report..."
-          # Note: monocart-report/coverage contains the HTML/JS/CSS
-          if [ -d "monocart-report/coverage" ]; then
-            cp -r monocart-report/coverage/* dist/monocart-report/
+          # 4. Copy Monocart (Merged) Report
+          # Note: We copy from monocart-report/* directly based on your script
+          if [ -d "monocart-report" ]; then
+            echo "Copying Monocart Coverage Report..."
+            cp -r monocart-report/* dist/reports/coverage/
+          else
+            echo "❌ Error: monocart-report directory not found!"
           fi
           
-          echo "Copying Playwright HTML Report..."
+          # 5. Copy Playwright HTML Report
           if [ -d "playwright-report" ]; then
-            cp -a playwright-report dist/playwright-report
+            echo "Copying Playwright HTML Report..."
+            cp -a playwright-report/. dist/reports/playwright/
+          else
+            echo "❌ Error: playwright-report directory not found!"
           fi
+
+          echo "✅ Bundling complete. Listing dist structure:"
+          ls -R dist/reports
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
