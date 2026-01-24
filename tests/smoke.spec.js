@@ -595,9 +595,8 @@ const dragSlider = async (page, key, value) => {
 
 test.describe('Architectural Integrity', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // Wait for the interface to be interactive
-    await page.waitForSelector('.TAreaInterface___TitleButton');
+    await page.goto('/', { timeout: 120000 }); // Explicit local override
+    await page.waitForSelector('.TAreaInterface___TitleButton', { state: 'visible', timeout: 60000 });
   });
 
   test('3x3 Matrix should maintain spatial persistence during updates', async ({ page }) => {

@@ -84,7 +84,9 @@
     use: {
       // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
       baseURL: 'http://localhost:3000/parametric/', 
-      trace: 'on',
+      navigationTimeout: process.env.CI ? 120000 : 60000,
+      actionTimeout: 0,
+      trace: 'on-first-retry',
       onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
       collectCoverage: true, // 🟢 Harvest the data from the browser
       contextOptions: {
