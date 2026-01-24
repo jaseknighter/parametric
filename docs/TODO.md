@@ -24,6 +24,7 @@
 ### 1. Architectural Integrity & Debt
 - [ ] **Conduct a full SRE Audit of Code + Process** 
 - [ ] **Create a blue/green deployment process** 
+- [ ] **move remaining console.log/warn/errors into debug mode** 
 - [ ] **Mobile Optimization:** Fix typography and controls overlapping the HUD.
 - [ ] **Separation of Concerns Audit:** Review code against specs to fix gaps; specifically, move remaining business logic out of the Worker thread.
 - [ ] **"The Exorcism":** Identify and remove any legacy non-React DOM manipulations or "lingering" 2019-era logic.

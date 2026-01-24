@@ -97,8 +97,8 @@ jobs:
           done
           echo "✅ Security Audit & Scrubbing complete."
 
-      # 🟢 NEW: Inject Reports into the Build Distribution
-      - name: Inject Reports into Dist
+      # 🟢 NEW: Bundle Reports into the Build Distribution
+      - name: Bundle Reports into Dist
         if: always() 
         run: |
           # 1. If build was skipped (due to test failure), create a fallback dist
@@ -112,19 +112,20 @@ jobs:
           # 2. Add the .nojekyll guard directly INTO the dist folder
           touch dist/.nojekyll
 
+          # 3. Copy the reports so they are accessible via the project subpath
           echo "Creating report directories in dist..."
-          mkdir -p dist/reports/coverage
-          mkdir -p dist/reports/playwright
+          mkdir -p dist/monocart-report
+          mkdir -p dist/playwright-report
           
           echo "Copying Monocart Coverage Report..."
           # Note: monocart-report/coverage contains the HTML/JS/CSS
           if [ -d "monocart-report/coverage" ]; then
-            cp -r monocart-report/coverage/* dist/reports/coverage/
+            cp -r monocart-report/coverage/* dist/monocart-report/
           fi
           
           echo "Copying Playwright HTML Report..."
           if [ -d "playwright-report" ]; then
-            cp -r playwright-report/* dist/reports/playwright/
+            cp -r playwright-report/* dist/playwright-report/
           fi
 
       - name: Setup Pages
