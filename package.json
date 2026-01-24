@@ -44,7 +44,7 @@
     "husky": "^8.0.0"
   },
   "scripts": {
-    "start": "vite",
+    "start": "cross-env VITE_COVERAGE=true vite",
     "build": "vite build",
     "preview": "vite preview",
     "clean:artifacts": "rimraf raw-shards monocart-report playwright-report test-results coverage",
@@ -56,8 +56,8 @@
     "test:smoke:watch": "cross-env npx playwright test smoke.spec.js --watch",
     "test:full-baseline": "cross-env VITE_COVERAGE=true start-server-and-test 'npm run start -- --force' http://localhost:3000/parametric/ 'cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json npx playwright test --project=chromium --project=firefox --project=webkit'",
     "test:full-baseline:ci": "cross-env start-server-and-test 'VITE_COVERAGE=true npm run start' http://localhost:3000/parametric/ 'cross-env VITE_COVERAGE=true npx playwright test tests/ --project=chromium --update-snapshots'",
-    "test:run-all-suites": "npm run clean:artifacts && cross-env VITE_COVERAGE=true npm run test -- --coverage && cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json VITE_COVERAGE=true npx playwright test --project=chromium --project=firefox --project=webkit && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
-    "test:run-all-suites:ci": "cross-env VITE_COVERAGE=true npm run test -- --coverage && cross-env VITE_COVERAGE=true npx playwright test tests/ --project=chromium --project=firefox --project=webkit --update-snapshots && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
+    "test:run-all-suites": "cross-env VITE_COVERAGE=true npm run clean:artifacts && npm run test && npm run test:e2e && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
+    "test:run-all-suites:ci": "cross-env VITE_COVERAGE=true npm run test && npm run test:full-baseline:ci && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
     "coverage:merge": "node scripts/merge-coverage.cjs",
     "coverage-table": "node scripts/generate-coverage-table.cjs",
     "prepare": "husky install"

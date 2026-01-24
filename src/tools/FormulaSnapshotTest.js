@@ -10,6 +10,7 @@
 import formulas, { calculateVector } from '../containers/Parametric/ParametricGeometryFormulas.js';
 import { SHAPE_KEYS } from '../shared/ParametricConstants.js';
 import { getFormulaExecutionScope } from '../utilities/VariableBridge.js';
+import { Debug } from '../utilities/debug.js';
 
 export const runFormulaAudit = (settings) => {
     const u = 0.5;
@@ -64,7 +65,7 @@ export const runFormulaAudit = (settings) => {
     const isStable = isValid(delta.x) && isValid(delta.y) && isValid(delta.z) &&
                      delta.x < 1e-6 && delta.y < 1e-6 && delta.z < 1e-6;
 
-    console.log(`📊 [Formula Audit] Result: ${isStable ? 'STABLE ✅' : 'DRIFT DETECTED ❌'}`);
+    Debug.log('AUDIT', `📊 [Formula Audit] Result: ${isStable ? 'STABLE ✅' : 'DRIFT DETECTED ❌'}`);
     if (!isStable) {
         console.table({ localResult, workerResult, delta });
     }
