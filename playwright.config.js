@@ -117,10 +117,11 @@
       url: 'http://localhost:3000/parametric/',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
+      // 🟢 THE MISSING LINK:
+      env: {
+        VITE_COVERAGE: 'true',
+      },
       stderr: 'pipe',
       stdout: 'pipe',
-      env: {
-        VITE_COVERAGE: 'true'
-      }
     },
   });
