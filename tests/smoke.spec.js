@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getVectors, waitForVector, clickAndWaitForVector, assertStateMirroring, testShiftDragAllAxes } from './test-helpers';
+import { getVectors, waitForVector, clickAndWaitForVector, assertStateMirroring, testShiftDragAllAxes, ensureCoverageGated } from './test-helpers';
 import { addCoverageReport } from 'monocart-reporter';
 
 /**
@@ -67,16 +67,8 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
     // [cite: 2026-01-24] HARDENING: Browser-Specific Handshake
     if (process.env.VITE_COVERAGE === 'true') {
-      const isWebKit = test.info().project.name === 'webkit';
-      
-      const isInstrumented = await page.waitForFunction(() => !!window.__coverage__, { 
-        timeout: 5000 
-      }).catch(() => false);
-
-      // Only throw FATAL if it's NOT WebKit (Chromium must stay instrumented)
-      if (!isInstrumented && !isWebKit) {
-        throw new Error('🚨 FATAL CONFIGURATION ERROR: window.__coverage__ is missing on Chromium.');
-      }
+      // Use the shared gate
+      await ensureCoverageGated(page);
     }
 
     await page.waitForSelector('#three');

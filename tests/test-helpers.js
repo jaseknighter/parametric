@@ -5,6 +5,18 @@
 import { expect } from '@playwright/test';
 import { INTENT_CONFIG } from '../src/shared/ParametricConstants';
 
+export async function ensureCoverageGated(page) {
+  try {
+    await page.waitForFunction(() => {
+      // 🛡️ The Invariant: Object must exist and contain keys
+      return typeof window.__coverage__ === 'object' && Object.keys(window.__coverage__).length > 0;
+    }, { timeout: 15000 }); // 15s is plenty for a warm runner
+  } catch (e) {
+    const env = await page.evaluate(() => import.meta.env.VITE_COVERAGE).catch(() => 'unknown');
+    throw new Error(`🚨 INSTRUMENTATION LEAK: VITE_COVERAGE is ${env}, but window.__coverage__ is missing. Page path: ${page.url()}`);
+  }
+}
+
 export async function getVectors(page) {
   return page.evaluate(() => {
     return window.intentService?.state?.vectors || [];
