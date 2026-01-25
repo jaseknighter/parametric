@@ -99,6 +99,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: test-reports
+          path: holding-area
 
       - name: Build
         run: npm run build
@@ -115,13 +116,13 @@ jobs:
           FORBIDDEN=("/Users/" "password" "secret_key" "127.0.0.1" "/home/runner/work/")
           
           for pattern in "${FORBIDDEN[@]}"; do
-            if grep -ri "$pattern" playwright-report monocart-report; then
+            if grep -ri "$pattern" holding-area; then
               echo "⚠️ WARNING: Sensitive pattern '$pattern' detected in reports."
               
               # 2. Automated Scrubbing (Optional but recommended)
               # Instead of failing, we 'anonymize' the files in place
               echo "🛡️ Scrubbing detected patterns..."
-              grep -rl "$pattern" playwright-report monocart-report | xargs sed -i "s|$pattern|[REDACTED]|g"
+              grep -rl "$pattern" holding-area | xargs sed -i "s|$pattern|[REDACTED]|g"
             fi
           done
           echo "✅ Security Audit & Scrubbing complete."
@@ -129,12 +130,23 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          mkdir -p dist
-          # Copy the folders into dist root
-          cp -R monocart-report dist/
-          cp -R playwright-report dist/
+          # Create target directories explicitly
+          mkdir -p dist/monocart-report dist/playwright-report
+          
+          # Copy contents from holding area
+          # Using cp -a for archive mode (recursive, preserves attributes)
+          if [ -d "holding-area/monocart-report" ]; then
+            cp -a holding-area/monocart-report/. dist/monocart-report/
+          fi
+          if [ -d "holding-area/playwright-report" ]; then
+            cp -a holding-area/playwright-report/. dist/playwright-report/
+          fi
+          
           # Prevent Jekyll from processing
           touch dist/.nojekyll
+          
+          # Verify contents
+          ls -R dist/monocart-report dist/playwright-report || echo "Listing failed"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
