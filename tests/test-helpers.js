@@ -1,6 +1,8 @@
 /**
  * @fileoverview test-helpers.js
  * [cite: 2026-01-15] AUTHORITY: State-driven synchronization with enhanced diagnostics.
+ * GUIDELINE: Tests must assert against the highest-level stable authority available 
+ * (IntentService/Reducer), and only descend to GPU state when explicitly testing rendering.
  */
 import { expect } from '@playwright/test';
 import { INTENT_CONFIG } from '../src/shared/ParametricConstants';

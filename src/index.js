@@ -30,6 +30,15 @@ if (!isDebug) {
   };
 }
 
+// [cite: 2026-01-25] GATE: Signal coverage capability to test runner
+if (import.meta.env.VITE_COVERAGE === 'true') {
+  window.__COVERAGE_ENABLED__ = true;
+  // [cite: 2026-01-25] HARDENING: Warn if instrumentation failed to inject
+  if (typeof window.__coverage__ === 'undefined') {
+    console.warn('[Coverage] Enabled but __coverage__ not yet present at entry');
+  }
+}
+
 Debug.init({
   enabled: isDebug,
   channels: isDebug ? ['WATCHDOG', 'INTENT', 'WORKER', 'AUDIT'] : []

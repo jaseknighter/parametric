@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { getVectors, waitForVector, clickAndWaitForVector, assertStateMirroring, testShiftDragAllAxes, ensureCoverageGated } from './test-helpers';
+import { getVectors, waitForVector, clickAndWaitForVector, assertStateMirroring, testShiftDragAllAxes } from './test-helpers';
 import { addCoverageReport } from 'monocart-reporter';
 
 /**
@@ -26,21 +26,35 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => { 
       window.__PLAYWRIGHT__ = true;
-      // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
-      if (window.Debug) window.Debug.enable('intent', 'sync', 'WORKER');
+    });
+
+    // [cite: 2026-01-25] INVARIANT: Enforce Coverage Bootstrap
+    await page.addInitScript(() => {
+      Object.defineProperty(window, '__coverage_gate__', {
+        get() {
+          if (window.__COVERAGE_ENABLED__) {
+            if (!window.__coverage__ || Object.keys(window.__coverage__).length === 0) {
+              throw new Error('🚨 INSTRUMENTATION FAILURE: Coverage enabled but __coverage__ missing');
+            }
+          }
+          return true;
+        }
+      });
     });
 
     // [cite: 2026-01-20] TEST FIX: Disable CSS Animations globally.
     // This prevents flaky timeouts when waiting for UI drawers to open/close.
     await page.addInitScript(() => {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        *, *::before, *::after {
-          animation-duration: 0s !important;
-          transition-duration: 0s !important;
-        }
-      `;
-      document.head.appendChild(style);
+      if (document.head) {
+        const style = document.createElement('style');
+        style.innerHTML = `
+          *, *::before, *::after {
+            animation-duration: 0s !important;
+            transition-duration: 0s !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     });
 
     page.on('console', msg => {
@@ -65,11 +79,15 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
     await page.goto('/');
 
-    // [cite: 2026-01-24] HARDENING: Browser-Specific Handshake
-    if (process.env.VITE_COVERAGE === 'true') {
-      // Use the shared gate
-      await ensureCoverageGated(page);
-    }
+    // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
+    await page.evaluate(() => {
+      if (window.Debug) window.Debug.enable('intent', 'sync', 'WORKER');
+    });
+
+    // [cite: 2026-01-25] GATE: Wait for coverage to stabilize (allow microtask tick)
+    await page.waitForFunction(() => !window.__COVERAGE_ENABLED__ || window.__coverage__, { timeout: 5000 });
+    // Enforce invariant (throws specific error if missing after wait)
+    await page.evaluate(() => window.__coverage_gate__);
 
     await page.waitForSelector('#three');
     // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)
