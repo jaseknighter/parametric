@@ -129,14 +129,11 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          mkdir -p dist/monocart-report
-          mkdir -p dist/playwright-report
-          
-          # Copy the actual contents. If the folders don't exist, this will fail 
-          # loudly so we can see it in the logs.
-          cp -R monocart-report/. dist/monocart-report/
-          cp -R playwright-report/. dist/playwright-report/
-          
+          mkdir -p dist
+          # Copy the folders into dist root
+          cp -R monocart-report dist/
+          cp -R playwright-report dist/
+          # Prevent Jekyll from processing
           touch dist/.nojekyll
 
       - name: Setup Pages
