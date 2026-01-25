@@ -129,14 +129,10 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          # 1. Ensure dist exists
           mkdir -p dist
-          
-          # 2. Copy reports into the ROOT of dist so URLs are clean
-          # This matches the new links in generate-coverage-table.cjs
-          cp -r monocart-report dist/ || echo "Monocart missing"
-          cp -r playwright-report dist/ || echo "Playwright missing"
-          
+          # Copy the FOLDERS themselves into dist, so they live at the root
+          cp -r monocart-report dist/
+          cp -r playwright-report dist/
           touch dist/.nojekyll
 
       - name: Setup Pages
