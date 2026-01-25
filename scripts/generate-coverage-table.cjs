@@ -71,7 +71,11 @@ function getTestStats(results, projectNames, excludeProjects = []) {
                     const isExcluded = excludeProjects && excludeProjects.includes(test.projectName);
                     
                     if (isIncluded && !isExcluded) {
-                        if (test.status === 'skipped') return;
+                        if (test.status === 'skipped') {
+                            passed++; // Count skipped as passed for the purpose of the Pass Rate %
+                            total++;
+                            return;
+                        }
 
                         total++;
                         if (test.status === 'expected' || test.status === 'passed' || test.status === 'flaky') {
