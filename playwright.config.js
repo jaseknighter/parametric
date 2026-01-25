@@ -113,7 +113,7 @@
     ],
 
     webServer: {
-      command: 'cross-env VITE_COVERAGE=true npm run start -- --force',
+      command: 'cross-env VITE_COVERAGE=true npm run start -- --port 3000',
       url: 'http://localhost:3000/parametric/',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,

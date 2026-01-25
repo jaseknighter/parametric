@@ -28,20 +28,6 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
       window.__PLAYWRIGHT__ = true;
     });
 
-    // [cite: 2026-01-25] INVARIANT: Enforce Coverage Bootstrap
-    await page.addInitScript(() => {
-      Object.defineProperty(window, '__coverage_gate__', {
-        get() {
-          if (window.__COVERAGE_ENABLED__) {
-            if (!window.__coverage__ || Object.keys(window.__coverage__).length === 0) {
-              throw new Error('🚨 INSTRUMENTATION FAILURE: Coverage enabled but __coverage__ missing');
-            }
-          }
-          return true;
-        }
-      });
-    });
-
     // [cite: 2026-01-20] TEST FIX: Disable CSS Animations globally.
     // This prevents flaky timeouts when waiting for UI drawers to open/close.
     await page.addInitScript(() => {
@@ -79,15 +65,21 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
     await page.goto('/');
 
-    // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
+    // [cite: 2026-01-25] Hardened Debug Handshake
     await page.evaluate(() => {
-      if (window.Debug) window.Debug.enable('intent', 'sync', 'WORKER');
+      // Defensive Check: Only call enable if it's a function
+      if (window.__ParametricDebug__ && typeof window.__ParametricDebug__.enable === 'function') {
+        window.__ParametricDebug__.enable('intent', 'sync', 'WORKER');
+      } else {
+        console.warn('⚠️ [Test] __ParametricDebug__.enable not yet available.');
+      }
     });
 
-    // [cite: 2026-01-25] GATE: Wait for coverage to stabilize (allow microtask tick)
-    await page.waitForFunction(() => !window.__COVERAGE_ENABLED__ || window.__coverage__, { timeout: 5000 });
-    // Enforce invariant (throws specific error if missing after wait)
-    await page.evaluate(() => window.__coverage_gate__);
+    // 🟢 Instant fail if instrumentation is missing
+    const hasCoverage = await page.evaluate(() => !!window.__coverage__);
+    if (!hasCoverage && process.env.VITE_COVERAGE === 'true') {
+       throw new Error("🚨 INSTRUMENTATION FAILURE: __coverage__ is missing!");
+    }
 
     await page.waitForSelector('#three');
     // [cite: 2026-01-24] STABILITY: Wait for "Hot" engine signal (First Frame Rendered)

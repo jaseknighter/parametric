@@ -38,11 +38,16 @@ if (import.meta.env.VITE_COVERAGE === 'true') {
     console.warn('[Coverage] Enabled but __coverage__ not yet present at entry');
   }
 }
+// Signal that the app has finished module evaluation
+window.__PARAMETRIC_READY__ = true;
 
 Debug.init({
   enabled: isDebug,
   channels: isDebug ? ['WATCHDOG', 'INTENT', 'WORKER', 'AUDIT'] : []
 });
+
+// [cite: 2026-01-25] NAMESPACE: Expose Debug on a unique key to avoid browser collisions
+window.__ParametricDebug__ = Debug;
 
 // Render the application
 ReactDOM.render(<App />, document.getElementById('root'));

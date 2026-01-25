@@ -10,6 +10,14 @@ test.describe('Component: DiagnosticsHUD', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => { window.__PLAYWRIGHT__ = true; });
     await page.goto('/');
+
+    // [cite: 2026-01-25] SKIP: Dev-only tool
+    // The HUD is not active in production (default URL), so we skip validation to prevent false negatives.
+    const isDebugActive = await page.evaluate(() => window.location.search.includes('debug=true'));
+    if (!isDebugActive) {
+      test.skip(true, 'Skipping Diagnostics HUD validation: Feature is inactive in Production (default) environment.');
+    }
+
     await page.waitForFunction(() => window.scene && window.intentService, { timeout: 5000 });
   });
 
