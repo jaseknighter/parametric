@@ -49,6 +49,23 @@ jobs:
           # 4. Update README Table with fresh data
           node scripts/generate-coverage-table.cjs
 
+      - name: Upload Test Reports
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            monocart-report/
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # This MUST point to the folder where you bundled everything
+          path: dist/
+
       # 🟢 NEW AUTOMATION STEP:
       - name: Auto-commit snapshot updates
         id: auto_commit
@@ -61,17 +78,6 @@ jobs:
           # Point to the folders generally; Git won't crash if they are empty
           file_pattern: 'README.md tests/'
           disable_globbing: true
-
-      - name: Upload Test Reports
-        if: always() 
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: |
-            monocart-report/
-            playwright-report/
-            test-results/
-          retention-days: 7
 
   build-and-deploy:
     needs: test # <--- THIS IS THE KEY: Wait for tests to finish
@@ -140,12 +146,6 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # This MUST point to the folder where you bundled everything
-          path: dist/
 
       - name: Deploy to GitHub Pages
         id: deployment
