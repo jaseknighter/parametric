@@ -206,10 +206,11 @@ async function main() {
     }
 
     // Append Dashboards
+    // Replace the old URL generation with these flat paths
     newTable += `\n\n### 📊 Quality Dashboards\n`;
-    newTable += `* [**Unified Coverage Report (Jest + Playwright)**](https://jaseknighter.github.io/parametric/reports/coverage/index.html)\n`;
-    newTable += `* [**Playwright Test Trace**](https://jaseknighter.github.io/parametric/reports/playwright/index.html)\n\n`;
-
+    newTable += `* [**Unified Coverage Report (Jest + Playwright)**](https://jaseknighter.github.io/parametric/monocart-report/index.html)\n`;
+    newTable += `* [**Playwright Test Trace**](https://jaseknighter.github.io/parametric/playwright-report/index.html)\n\n`;
+    
     if (fs.existsSync(README_PATH)) {
         let content = fs.readFileSync(README_PATH, 'utf8');
         
