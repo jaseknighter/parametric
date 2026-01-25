@@ -130,11 +130,14 @@ jobs:
           mkdir -p dist/reports/coverage
           mkdir -p dist/reports/playwright
           
-          # Copy contents of Monocart output
-          cp -r monocart-report/* dist/reports/coverage/
+          # 🟢 FIX: Ensure we copy the internal files, not the folder itself
+          if [ -d "monocart-report" ]; then
+            cp -r monocart-report/* dist/reports/coverage/
+          fi
           
-          # Copy contents of Playwright output
-          cp -r playwright-report/* dist/reports/playwright/
+          if [ -d "playwright-report" ]; then
+            cp -r playwright-report/* dist/reports/playwright/
+          fi
           
           touch dist/.nojekyll
 
