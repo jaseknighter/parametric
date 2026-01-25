@@ -57,3 +57,4 @@
 - [ ] Archive Legacy Code: Preserve the original 2019 CRA source code in a dedicated orphan branch (legacy/original-2019).
 - [ ] The DOM Purge: Remove remaining non-React direct DOM manipulations hidden in legacy helpers.
 - [ ] Framework Decoupling: Define a strict API between the React UI and the Vanilla 3D engine to enable future framework-agnostic usage.
+- [ ] Documentation Restructuring: Reorganize `/docs` into the Quad-Pillar structure (`architecture`, `dev`, `ops`, `testing`) as defined in the manifest.
