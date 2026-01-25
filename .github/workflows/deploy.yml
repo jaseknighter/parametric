@@ -123,13 +123,12 @@ jobs:
             fi
           done
           echo "✅ Targeted Scrubbing complete."
+
       - name: Bundle Reports into Dist
         if: always() 
         run: |
           mkdir -p dist/monocart-report dist/playwright-report
           
-          # 🟢 Surgical Content Copy: ensures assets (css/js) are included
-          # We check if the expected folder exists in holding-area and copy EVERYTHING inside it.
           if [ -d "holding-area/monocart-report" ]; then
             echo "📦 Copying Monocart Report + All Assets..."
             cp -RT holding-area/monocart-report/ dist/monocart-report/
@@ -143,9 +142,19 @@ jobs:
           touch dist/.nojekyll
           
           echo "📂 Deployment Verification (Searching for CSS/JS):"
-          find dist/monocart-report -name "*.css" -o -name "*.js" | head -n 10- name: Setup Pages
+          find dist/monocart-report -name "*.css" -o -name "*.js" | head -n 10
+
+      - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
