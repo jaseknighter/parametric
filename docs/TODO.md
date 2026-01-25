@@ -1,65 +1,59 @@
-<!-- TODO.md -->
-
 # 📝 Project Scratchpad & Strategic Backlog
 
 > "It is worse than chaos — it’s almost working." — *Anonymous LLM*
 
 ---
 
-## 🚩 Pre-v0.5: Final Hardening (The Baseline)
-*Critical tasks required to stabilize the rearchitecture for public release.*
-
-- [x] **Security Review:** Perform a final audit of the `Function` constructor and string sanitization paths.
-- [X] **Mobile Optimization:** Fix viewport scaling and touch-event collisions for the geometry canvas.
-- [x] **Environment Cleaning:** Ensure the Diagnostic HUD is excluded or disabled by default in the production build.
-- [ ] **Documentation:** Finalize and commit `README.md`, `ARCHITECTURE.md`, and `TESTING.md`.
+## 🚩 Pre-v0.5: The Baseline Anchor (Final Handshake)
+- [x] Security Review: Final audit of Function constructor and string sanitization.
+- [x] Mobile Optimization: Initial fix for viewport scaling and touch collisions.
+- [x] Environment Cleaning: Diagnostic HUD excluded from production by default.
+- [x] Documentation: Baseline versions of README.md, ARCHITECTURE.md, and TESTING.md (PST Verified).
+- [x] CI Hardening: Implementation of the "Holding Area" artifact pattern to prevent report 404s.
 
 ---
 
 ## 🛰️ Post-v0.5: Fidelity & Observability
-*Transitioning from "Does it work?" to "Is it right?" and "Is it stable?"*
 
-### 0. Migrate issues/features out of this list and start addressing them
-- [ ] **Start using GitHub issues:** Move items from this list into GitHub Issues.
-### 1. Architectural Integrity & Debt
-- [ ] **Conduct a full SRE Audit of Code + Process** 
-- [ ] **Create a blue/green deployment process** 
-- [ ] **move remaining console.log/warn/errors into debug mode** 
-- [ ] **Mobile Optimization:** Fix typography and controls overlapping the HUD.
-- [ ] **Separation of Concerns Audit:** Review code against specs to fix gaps; specifically, move remaining business logic out of the Worker thread.
-- [ ] **"The Exorcism":** Identify and remove any legacy non-React DOM manipulations or "lingering" 2019-era logic.
-- [ ] **Magic Number Cleanup:** Abstract hardcoded values (e.g., `radius = 5`) into a centralized constants/config file.
-- [ ] **Brittle Code Pass:** Replace silent null-fallbacks with explicit warnings:
-  > `console.warn('[VariableBridge] Received null/undefined vectorParams. Falling back to identity (0).');`
-- [ ] **Code reorganization:** Move non-container code out of `/containers` and into more logical locations (e.g. `/logic`, `/workers`, etc.).
+### 0. Lockdown for Reporting (Sustainable Automation)
+- [ ] Implement a Single Source of Truth for Paths: Migrate report folder names and URLs into a centralized /src/shared/paths.js to be shared by Node scripts and CI YAML.
+- [ ] Enforce Slot Markers: Hard-code the use of markers in all README update scripts to prevent accidental overwriting of manual prose.
+- [ ] Automated CI/Workflow Contract: Update YAML to read folder names directly from environment variables or shared constants rather than hardcoded strings.
+- [ ] Explicit Skipped Test Handling: Standardize the logic that treats "Skipped" as "Passed" across the generator script and the README narrative for 100% transparency.
+- [ ] Preflight Linting: Add a bash/Node preflight check to the workflow that validates folder existence and URL integrity before the final deployment.
 
-### 2. Testing
-- [ ] **Test Performance Optomization**: improve how tests are run so they aren't slowed down unecessarily (e.g. for overly long timeouts).
-- [ ] **Numerical Accuracy:** Update tests to move beyond existence checks (e.g., replace `not.toBe(0)` with actual expected slider values).
-- [ ] **Architectural Guards:** Implement compliance tests:
-  - `test('Security Guard: getFormulaExecutionScope must filter unknown keys')`
-  - `test('Architectural Guard: assertReadOnly must throw on mutation')`
-- [ ] **Test Externalization:** Move test expectations into a configuration file for easier review and updates.
-- [ ] **Dynamic smoke tests:** Update Playwright to autogenerate test cases based on JSON shape schemas.
-- [x] **Cross-Browser Smoke Suite:** Configured WebKit & Firefox runners for critical path (HUD/Canvas).
-- [ ] **Mobile Validation:** Add automated UI tests specifically for mobile breakpoints and interactions.
+### 1. Narratives for Test Results (The "Quality Narrative")
+- [ ] Inject Domain Descriptions: Update the coverage table generator to include static "Why this matters" context for Services, Web Workers, and Logic layers.
+- [ ] Intelligent Result Analysis: Add logic to generate a summary paragraph in the README that "reads" the coverage numbers and provides a status insight (e.g., "Gold Standard" vs "At Risk").
+- [ ] Contextual Deep-Links: Include a link in the README to an 'ABOUT_COVERAGE.md' that explains the mathematical importance of high coverage in a 3D environment.
 
-### 3. Antifragility, Performance & Observability
-- [ ] **Remove things that hide fragility:** for example, adding a ternary test for `null` when setting a variable rather than allowing things to fail to surface underlying problems
-- [ ] **Final Performance Benchmarking:** Establish the "Vertex Ceiling" for desktop vs. mobile.
-- [ ] **Live Telemetry:** Implement the Grafana/Loki observability bridge.
-- [ ] **HUD Refinement:** Add a "Minimize" feature to the Diagnostic HUD to prevent UI clutter.
+### 2. Drift Exorcism (Mathematical Fidelity)
+- [ ] Synchronize Global Math Scope: Verify that both the Main Thread and Web Worker have access to identical constants (π, e, etc.) to eliminate precision deltas.
+- [ ] Math.js Precision Alignment: Standardize the mathjs configuration across both "brains" to ensure floating-point entropy is handled identically.
+- [ ] Resolve Test #40 Regression: Explicitly fix the delta issue where Local results (-5) differed from Worker results (0) for identical formulas.
+- [ ] Numerical Drift Audit Tool: Implement a permanent "Observer Standard" test that flags any coordinate divergence greater than 0.000001 between threads.
 
-### 4. Project Heritage & Cleanup
-- [ ] **Archive Legacy Code:** Preserve the original 2019 source in an orphan branch:
-  ```bash
-  git checkout --orphan legacy/original-2019
-  git rm -rf .
-  # (Copy 2019 files into the folder)
-  git add .
-  git commit -m "ARCHIVE: Preserve original 2019 source code"
-  git push origin legacy/original-2019
-  git checkout main
+### 3. Blue/Green Deployment & Rollbacks
+- [ ] Blue/Green Staging Validation: Restructure the workflow to deploy to a staging sub-path or branch and run live E2E tests before updating the main site.
+- [ ] Automated Rollback Logic: Implement a failure-triggered job that re-deploys the last known successful Artifact ID if live site validation fails.
+- [ ] Manual Revert Strategy: Document the process for using GitHub Environments to "Rewind" the site to a previous deployment via the Actions tab.
+- [ ] Versioned URL Structure: Implement a folder-based versioning system (e.g., /v0.5.0/index.html) so previous iterations remain reachable and hosted.
+- [ ] Smoke Test Prod: Add a final YAML job that uses curl to verify a 200 OK status on the live URL after the deployment is marked complete.
 
-### 5. Other stuff
- - [ ] **Decoupling from React:** explore how to "decouple" the React UI even further from the Vanilla Engine to ensure the core math is 100% framework-agnostic
+### 4. Accessibility & UI Universalization
+- [ ] HUD Screen Reader Support: Implement ARIA-live regions for formula validation errors so non-visual users receive immediate feedback on syntax errors.
+- [ ] Focus Management: Ensure that opening/closing drawers and HUD windows moves focus correctly to prevent "Focus Traps" for keyboard-only users.
+- [ ] Semantic Math: Explore the use of MathML or hidden descriptive text for formulas to describe the geometric transformations to assistive technology.
+- [ ] High-Contrast Canvas Guard: Implement a feature to toggle high-contrast vertex colors to improve visibility for users with visual impairments.
+
+### 5. Git Automation & Migration
+- [ ] Templated Issue Creation: Establish GitHub Issue Templates (.github/ISSUE_TEMPLATE/) for Bug Reports and Feature Requests to ensure consistent data collection.
+- [ ] Git-Based Issue Lifecycle: Develop a script or workflow that allows creating, labeling, and closing issues directly from Git commit messages (e.g., "resolves #123").
+- [ ] Pull Request Automation: Implement a PR template that automatically runs the "Numerical Drift" audit and requires a "Green" status before allowing a merge.
+- [ ] Project Board Sync: Configure a GitHub Project to automatically move issues to "Done" when the corresponding branch is merged into main.
+
+### 6. Architectural Integrity & Heritage
+- [ ] Issue Externalization: Move all items from this scratchpad into individual GitHub Issues with labels for debt, feature, and stability.
+- [ ] Archive Legacy Code: Preserve the original 2019 CRA source code in a dedicated orphan branch (legacy/original-2019).
+- [ ] The DOM Purge: Remove remaining non-React direct DOM manipulations hidden in legacy helpers.
+- [ ] Framework Decoupling: Define a strict API between the React UI and the Vanilla 3D engine to enable future framework-agnostic usage.
