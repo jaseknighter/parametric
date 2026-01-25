@@ -60,12 +60,6 @@ jobs:
             test-results/
           retention-days: 7
 
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # This MUST point to the folder where you bundled everything
-          path: dist/
-
       # 🟢 NEW AUTOMATION STEP:
       - name: Auto-commit snapshot updates
         id: auto_commit
@@ -146,6 +140,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/ # This now contains the App + Reports
 
       - name: Deploy to GitHub Pages
         id: deployment
