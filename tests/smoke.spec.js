@@ -26,21 +26,21 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => { 
       window.__PLAYWRIGHT__ = true;
-      // [cite: 2026-01-15] Enable Intent logging to debug persistence failures
-      if (window.Debug) window.Debug.enable('intent', 'sync', 'WORKER');
     });
 
     // [cite: 2026-01-20] TEST FIX: Disable CSS Animations globally.
     // This prevents flaky timeouts when waiting for UI drawers to open/close.
     await page.addInitScript(() => {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        *, *::before, *::after {
-          animation-duration: 0s !important;
-          transition-duration: 0s !important;
-        }
-      `;
-      document.head.appendChild(style);
+      if (document.head) {
+        const style = document.createElement('style');
+        style.innerHTML = `
+          *, *::before, *::after {
+            animation-duration: 0s !important;
+            transition-duration: 0s !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     });
 
     page.on('console', msg => {
@@ -65,18 +65,20 @@ test.describe('Parametric System Integrity (SMOKE)', () => {
 
     await page.goto('/');
 
-    // [cite: 2026-01-24] HARDENING: Browser-Specific Handshake
-    if (process.env.VITE_COVERAGE === 'true') {
-      const isWebKit = test.info().project.name === 'webkit';
-      
-      const isInstrumented = await page.waitForFunction(() => !!window.__coverage__, { 
-        timeout: 5000 
-      }).catch(() => false);
-
-      // Only throw FATAL if it's NOT WebKit (Chromium must stay instrumented)
-      if (!isInstrumented && !isWebKit) {
-        throw new Error('🚨 FATAL CONFIGURATION ERROR: window.__coverage__ is missing on Chromium.');
+    // [cite: 2026-01-25] Hardened Debug Handshake
+    await page.evaluate(() => {
+      // Defensive Check: Only call enable if it's a function
+      if (window.__ParametricDebug__ && typeof window.__ParametricDebug__.enable === 'function') {
+        window.__ParametricDebug__.enable('intent', 'sync', 'WORKER');
+      } else {
+        console.warn('⚠️ [Test] __ParametricDebug__.enable not yet available.');
       }
+    });
+
+    // 🟢 Instant fail if instrumentation is missing
+    const hasCoverage = await page.evaluate(() => !!window.__coverage__);
+    if (!hasCoverage && process.env.VITE_COVERAGE === 'true') {
+       throw new Error("🚨 INSTRUMENTATION FAILURE: __coverage__ is missing!");
     }
 
     await page.waitForSelector('#three');

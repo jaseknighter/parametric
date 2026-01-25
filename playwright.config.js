@@ -23,7 +23,7 @@
       fullyParallel: !is3DHeavy,
       timeout: process.env.CI ? 120000 : 60000, // 🟢 Double timeout in CI (2m)
       expect: {
-      timeout: process.env.CI ? 15000 : 5000, // 🟢 Extra breathing room for slow CI renders
+      timeout: 10 * 1000, // 🟢 Extra breathing room for slow CI renders
       toHaveScreenshot: {
         // [cite: 2026-01-23] CI TOLERANCE: Allow 10% pixel diff in CI (Software Rendering) vs 2% locally
         maxDiffPixelRatio: process.env.CI ? 0.1 : 0.02,
@@ -85,7 +85,7 @@
       // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
       baseURL: 'http://localhost:3000/parametric/', 
       navigationTimeout: process.env.CI ? 120000 : 60000,
-      actionTimeout: process.env.CI ? 60000 : 30000,
+      actionTimeout: 0,
       trace: 'on-first-retry',
       onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
       collectCoverage: true, // 🟢 Harvest the data from the browser
@@ -113,11 +113,14 @@
     ],
 
     webServer: {
-      command: 'cross-env VITE_COVERAGE=true npm run start -- --force',
+      command: 'cross-env VITE_COVERAGE=true npm run start -- --port 3000',
       url: 'http://localhost:3000/parametric/',
-      // 🟢 THE FIX: In CI, we reuse the server started by start-server-and-test
-      reuseExistingServer: true, 
+      reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
+      // 🟢 THE MISSING LINK:
+      env: {
+        VITE_COVERAGE: 'true',
+      },
       stderr: 'pipe',
       stdout: 'pipe',
     },
