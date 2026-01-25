@@ -34,6 +34,8 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Unified Test Suite
+        env:
+          VITE_COVERAGE: "true"
         # Add this if you want to deploy reports even if tests fail
         continue-on-error: true 
         run: |

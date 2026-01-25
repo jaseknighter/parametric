@@ -115,10 +115,12 @@
     webServer: {
       command: 'cross-env VITE_COVERAGE=true npm run start -- --force',
       url: 'http://localhost:3000/parametric/',
-      // 🟢 THE FIX: In CI, we reuse the server started by start-server-and-test
-      reuseExistingServer: true, 
+      reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       stderr: 'pipe',
       stdout: 'pipe',
+      env: {
+        VITE_COVERAGE: 'true'
+      }
     },
   });
