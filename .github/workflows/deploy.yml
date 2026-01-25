@@ -36,19 +36,11 @@ jobs:
       - name: Run Unified Test Suite
         env:
           VITE_COVERAGE: "true"
-        # Add this if you want to deploy reports even if tests fail
         continue-on-error: true 
         run: |
-          # 1. Run Jest (Unit) - This creates /coverage/coverage-final.json
           npm test -- --coverage --watchAll=false
-          
-          # 2. Run Playwright (E2E) - This creates /raw-shards/*.json
           VITE_COVERAGE=true npx playwright test
-          
-          # 3. Merge Shards & Generate HTML
           node scripts/merge-coverage.cjs
-          
-          # 4. Update README Table with fresh data
           node scripts/generate-coverage-table.cjs
 
       - name: Upload Test Reports
@@ -62,22 +54,19 @@ jobs:
             test-results/
           retention-days: 7
 
-      # 🟢 NEW AUTOMATION STEP:
       - name: Auto-commit snapshot updates
         id: auto_commit
         if: always()
-        # 🟢 ADD THIS: Prevents the job from failing on git errors
         continue-on-error: true 
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-update snapshots and coverage [skip ci]"
-          # Point to the folders generally; Git won't crash if they are empty
           file_pattern: 'README.md tests/'
           disable_globbing: true
 
   build-and-deploy:
-    needs: test # <--- THIS IS THE KEY: Wait for tests to finish
-    if: always() # Run even if tests failed (to deploy reports)
+    needs: test
+    if: always()
     runs-on: ubuntu-latest
     environment:
         name: github-pages
@@ -104,19 +93,14 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_COVERAGE: true # 🟢 Ensure the build is instrumented
+          VITE_COVERAGE: true
 
       - name: Security Audit & Path Scrubbing
         if: always()
         run: |
           echo "🔍 Scanning Monocart reports for sensitive patterns..."
-          
-          # We only scrub the monocart-report; 
-          # Playwright's report is a fragile SPA and should not be sed-edited.
           FORBIDDEN=("/Users/" "/home/runner/work/" "secret_key")
-          
           for pattern in "${FORBIDDEN[@]}"; do
-            # 🟢 TARGETED: Only look in holding-area/monocart-report
             if grep -ri "$pattern" holding-area/monocart-report; then
               echo "⚠️ Scrubbing '$pattern' from Monocart HTML..."
               grep -rl "$pattern" holding-area/monocart-report | xargs -r sed -i "s|$pattern|[REDACTED]|g"
@@ -128,19 +112,15 @@ jobs:
         if: always() 
         run: |
           mkdir -p dist/monocart-report dist/playwright-report
-          
           if [ -d "holding-area/monocart-report" ]; then
             echo "📦 Copying Monocart Report + All Assets..."
             cp -RT holding-area/monocart-report/ dist/monocart-report/
           fi
-
           if [ -d "holding-area/playwright-report" ]; then
             echo "📦 Copying Playwright Report + All Assets..."
             cp -RT holding-area/playwright-report/ dist/playwright-report/
           fi
-          
           touch dist/.nojekyll
-          
           echo "📂 Deployment Verification (Searching for CSS/JS):"
           find dist/monocart-report -name "*.css" -o -name "*.js" | head -n 10
 
@@ -151,14 +131,6 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/ # This now contains the App + Reports
 
       - name: Deploy to GitHub Pages
         id: deployment
