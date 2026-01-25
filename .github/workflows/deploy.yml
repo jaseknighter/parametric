@@ -129,16 +129,16 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          mkdir -p dist/reports/coverage
-          mkdir -p dist/reports/playwright
+          mkdir -p dist/monocart-report
+          mkdir -p dist/playwright-report
           
           # 🟢 FIX: Ensure we copy the internal files, not the folder itself
           if [ -d "monocart-report" ]; then
-            cp -r monocart-report/* dist/reports/coverage/
+            cp -r monocart-report/* dist/monocart-report/
           fi
           
           if [ -d "playwright-report" ]; then
-            cp -r playwright-report/* dist/reports/playwright/
+            cp -r playwright-report/* dist/playwright-report/
           fi
           
           touch dist/.nojekyll
