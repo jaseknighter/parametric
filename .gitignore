@@ -23,3 +23,7 @@ test-results/
 .env
 .env.*
 *.log
+
+# CI / Local Bundle Workspace
+holding-area/
+scripts/temp/

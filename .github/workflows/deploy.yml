@@ -109,45 +109,42 @@ jobs:
       - name: Security Audit & Path Scrubbing
         if: always()
         run: |
-          echo "🔍 Scanning reports for sensitive patterns..."
+          echo "🔍 Scanning Monocart reports for sensitive patterns..."
           
-          # 1. Define forbidden patterns (Local paths, sensitive keywords)
-          # We include the runner path to ensure internal CI metadata isn't leaked
-          FORBIDDEN=("/Users/" "password" "secret_key" "127.0.0.1" "/home/runner/work/")
+          # We only scrub the monocart-report; 
+          # Playwright's report is a fragile SPA and should not be sed-edited.
+          FORBIDDEN=("/Users/" "/home/runner/work/" "secret_key")
           
           for pattern in "${FORBIDDEN[@]}"; do
-            if grep -ri "$pattern" holding-area; then
-              echo "⚠️ WARNING: Sensitive pattern '$pattern' detected in reports."
-              
-              # 2. Automated Scrubbing (Optional but recommended)
-              # Instead of failing, we 'anonymize' the files in place
-              echo "🛡️ Scrubbing detected patterns..."
-              grep -rl "$pattern" holding-area | xargs sed -i "s|$pattern|[REDACTED]|g"
+            # 🟢 TARGETED: Only look in holding-area/monocart-report
+            if grep -ri "$pattern" holding-area/monocart-report; then
+              echo "⚠️ Scrubbing '$pattern' from Monocart HTML..."
+              grep -rl "$pattern" holding-area/monocart-report | xargs -r sed -i "s|$pattern|[REDACTED]|g"
             fi
           done
-          echo "✅ Security Audit & Scrubbing complete."
-
+          echo "✅ Targeted Scrubbing complete."
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          # Create target directories explicitly
           mkdir -p dist/monocart-report dist/playwright-report
           
-          # Copy contents from holding area
-          # Using cp -a for archive mode (recursive, preserves attributes)
-          if [ -d "holding-area/monocart-report" ]; then
-            cp -a holding-area/monocart-report/. dist/monocart-report/
-          fi
-          if [ -d "holding-area/playwright-report" ]; then
-            cp -a holding-area/playwright-report/. dist/playwright-report/
-          fi
-          
-          # Prevent Jekyll from processing
-          touch dist/.nojekyll
-          
-          # Verify contents
-          ls -R dist/monocart-report dist/playwright-report || echo "Listing failed"
+          # 🟢 IMPROVED: Robust discovery logic in case artifact paths are nested
+          MONOCART_SRC=$(find holding-area -name "index.html" | grep "monocart-report" | xargs dirname | head -n 1)
+          PLAYWRIGHT_SRC=$(find holding-area -name "index.html" | grep "playwright-report" | xargs dirname | head -n 1)
 
+          if [ -n "$MONOCART_SRC" ]; then
+            echo "📦 Copying Monocart from $MONOCART_SRC"
+            cp -a "$MONOCART_SRC/." dist/monocart-report/
+          fi
+
+          if [ -n "$PLAYWRIGHT_SRC" ]; then
+            echo "📦 Copying Playwright from $PLAYWRIGHT_SRC"
+            cp -a "$PLAYWRIGHT_SRC/." dist/playwright-report/
+          fi
+          
+          touch dist/.nojekyll
+          echo "📂 Final Deployment Tree Verification:"
+          ls -R dist/monocart-report/index.html dist/playwright-report/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
