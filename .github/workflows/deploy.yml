@@ -129,17 +129,13 @@ jobs:
       - name: Bundle Reports into Dist
         if: always() 
         run: |
-          mkdir -p dist/monocart-report
-          mkdir -p dist/playwright-report
+          # 1. Ensure dist exists
+          mkdir -p dist
           
-          # 🟢 FIX: Ensure we copy the internal files, not the folder itself
-          if [ -d "monocart-report" ]; then
-            cp -r monocart-report/* dist/monocart-report/
-          fi
-          
-          if [ -d "playwright-report" ]; then
-            cp -r playwright-report/* dist/playwright-report/
-          fi
+          # 2. Copy reports into the ROOT of dist so URLs are clean
+          # This matches the new links in generate-coverage-table.cjs
+          cp -r monocart-report dist/ || echo "Monocart missing"
+          cp -r playwright-report dist/ || echo "Playwright missing"
           
           touch dist/.nojekyll
 

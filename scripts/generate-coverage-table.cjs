@@ -71,6 +71,8 @@ function getTestStats(results, projectNames, excludeProjects = []) {
                     const isExcluded = excludeProjects && excludeProjects.includes(test.projectName);
                     
                     if (isIncluded && !isExcluded) {
+                        if (test.status === 'skipped') return;
+
                         total++;
                         if (test.status === 'expected' || test.status === 'passed' || test.status === 'flaky') {
                             passed++;
