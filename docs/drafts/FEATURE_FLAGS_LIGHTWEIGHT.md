@@ -101,18 +101,34 @@ if (isFeatureEnabled('pinchToZoomDisable')) {
 
 ---
 
-## 5. Debugging & MVP
+## 5. Debugging & Verification
 
-### Console Command
-To list all available flags and their current status in the browser console:
-```js
+### The MVP Verification Test (`hudHeaderLowercase`)
+This flag serves as the "Sanity Check" for the entire pipeline. It verifies that a logic change in the Registry can successfully bypass CSS constraints and reach the screen.
+
+* **Flag Name:** `hudHeaderLowercase`
+* **Initial State:** `EXP`
+* **Success Criteria:** The HUD Status text transitions from uppercase to lowercase.
+
+#### How to Verify Manually:
+1.  **Standard View**:
+    *   **Dev:** `http://localhost:3000/parametric/`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/`
+    *   *Result:* HUD shows `FORMULA EDITOR (AUTO)`
+2.  **Experimental View**:
+    *   **Dev:** `http://localhost:3000/parametric/?flag_on=hudHeaderLowercase`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/?flag_on=hudHeaderLowercase`
+    *   *Result:* HUD shows `FORMULA EDITOR (auto)`
+3.  **Override View**:
+    *   **Dev:** `http://localhost:3000/parametric/?flag_off=hudHeaderLowercase`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/?flag_off=hudHeaderLowercase`
+    *   *Result:* HUD reverts to `FORMULA EDITOR (AUTO)`
+
+### Console Audit
+Type this in the browser console to see the live state of all "Contractual Invariants":
+```javascript
 listFeatureFlags()
 ```
-
-### MVP Test Flag (`hudHeaderLowercase`)
-*   **State:** `EXP` (Permanent)
-*   **Purpose:** Verifies the feature flag pipeline is operational without affecting core logic.
-*   **Behavior:** When enabled via `?flag_on=hudHeaderLowercase`, the HUD status text (e.g., "MANUAL") renders in lowercase ("manual").
 
 ---
 

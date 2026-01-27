@@ -17,7 +17,6 @@ A browser-based environment for exploring complex mathematical surfaces and para
 - [Documentation](#documentation)
   - [Background](#background)
   - [Release Manifest v0.5: The Unified Engine Baseline](#release-manifest-v05-the-unified-engine-baseline)
-  - [Recent Releases](#recent-releases)
   - [DRAFT Technical Documentation (LLM Generated)](#draft-technical-documentation-llm-generated)
 - [Post-v0.5 Priorities: Transparency \& Test Depth](#post-v05-priorities-transparency--test-depth)
 - [Reporting Issues \& Feature Requests](#reporting-issues--feature-requests)
@@ -99,6 +98,10 @@ I hope you enjoy exploring the application as much as I have enjoyed building it
 
 ---
 
+#### Recent Releases
+
+* **[v0.5.0.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.0.1)** (2026-01-27): Infrastructure Baseline. Established resilient Feature Flag system, Self-Healing tests, and neutralized UI styling invariants.
+
 #### Release Manifest v0.5: The Unified Engine Baseline
 
 The v0.5 release represents a core transplant to enable modern performance and mathematical fidelity.
@@ -149,6 +152,7 @@ The following sections are under active development and subject to change.
    * [Implementation Notes](./docs/drafts/IMPLEMENTATION_NOTES.md)
    * [Formula Authority State Machine](./docs/drafts/FORMULA_AUTHORITY_STATE_MACHINE.md)
    * [Observability](./docs/drafts/OBSERVABILITY.md)
+   * [Feature Flags (Lightweight Spec)](./docs/drafts/development/FEATURE_FLAGS_LIGHTWEIGHT.md)
 * **Reference**
    * [Glossary](./docs/drafts/GLOSSARY.md)
 
