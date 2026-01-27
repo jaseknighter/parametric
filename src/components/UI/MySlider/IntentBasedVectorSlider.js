@@ -10,7 +10,7 @@ import { FEATURE_DOMAINS, INTENT_CONFIG } from "../../../shared/ParametricConsta
 import { getFeaturePath, ParametricRegistry } from "../../../services/ParametricRegistry"; 
 import { intentService } from "../../../services/ParametricIntentService";
 
-const IntentBasedVectorSlider = ({ parametricObj, handleUpdate, activeKey, axesLabels }) => {
+const IntentBasedVectorSlider = ({ parametricObj, handleUpdate, activeKey, axesLabels, isOpen, isA11yEnabled, sectionId }) => {
   const statePath = useMemo(() => getFeaturePath(activeKey), [activeKey]);
   
   const activeDomain = useMemo(() => {
@@ -79,7 +79,13 @@ const IntentBasedVectorSlider = ({ parametricObj, handleUpdate, activeKey, axesL
 
   // Inside IntentBasedVectorSlider.js - The Return Block
   return (
-    <div className="TAreaInterface_controlsContainer">
+    <div 
+      id={sectionId}
+      className="TAreaInterface_controlsContainer"
+      style={isA11yEnabled ? { display: isOpen ? 'grid' : 'none', visibility: isOpen ? 'visible' : 'hidden' } : undefined} // [cite: 2026-01-27] A11Y: Remove from tab order when closed
+      aria-hidden={isA11yEnabled ? !isOpen : undefined}
+      role={isA11yEnabled ? "region" : undefined}
+    >
       {axesLabels.map((label, i) => {
         const canonical = CANONICAL_KEYS[activeKey]?.[label] || label;
         
@@ -90,13 +96,18 @@ const IntentBasedVectorSlider = ({ parametricObj, handleUpdate, activeKey, axesL
 
         return (
           <div key={`${activeKey}_${label}`} className={`UISliderContainer UISliderContainer__${i + 1}`}>
-            <label className="SliderLabel">{label}</label>
+            {/* 🛡️ A11y: Generate a stable, unique ID for the label */}
+            <label id={`label-${activeKey}-${label}`} className="SliderLabel">
+              {label}
+            </label>
             <MySlider
               domain={activeDomain} 
               // [cite: 2026-01-06] Real Solution: Never pass undefined to MySlider
               defaultValues={[safeDefault]} 
               handleUpdate={(values, event) => onSliderChange(values, label, event)}
               testID={`slider-${activeKey}-${label}-handle`}
+              // 🛡️ Wave B: Pass the label ID and the enabled state
+              ariaLabelledBy={`label-${activeKey}-${label}`}
             />
           </div>
         );

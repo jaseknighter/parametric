@@ -8,6 +8,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Slider, Rail, Handles, Tracks, Ticks } from "react-compound-slider";
 import { SliderRail, Handle, Track, Tick } from "./MySliderComponents";
 import { SLIDER_STEP, SLIDER_THROTTLE_MS, INTENT_CONFIG } from "../../../shared/ParametricConstants";
+import { isFeatureEnabled } from "../../../shared/featureFlagUtils";
 
 const sliderStyle = {
   position: "relative",
@@ -16,9 +17,11 @@ const sliderStyle = {
   touchAction: "none"
 };
 
-const MySlider = ({ domain: propsDomain, defaultValues, handleUpdate, testID }) => {
+const MySlider = ({ domain: propsDomain, defaultValues, handleUpdate, testID, ariaLabelledBy }) => {
   const domain = useMemo(() => propsDomain || [0, 10], [propsDomain]);
   const [values, setValues] = useState(() => (defaultValues || [0]).slice());
+
+  const isA11yEnabled = isFeatureEnabled('accessibilityHardening');
   
   const lastNotifiedStr = useRef(JSON.stringify(defaultValues || []));
   const isDragging = useRef(false);
@@ -144,6 +147,9 @@ const MySlider = ({ domain: propsDomain, defaultValues, handleUpdate, testID }) 
                   domain={domain} 
                   getHandleProps={getHandleProps} 
                   data-testid={testID}  // SMOKE TESTING
+                  // 🛡️ Wave B Moat: Apply the label relationship to the handle
+                  aria-labelledby={isA11yEnabled ? ariaLabelledBy : undefined}
+                  tabIndex={isA11yEnabled ? 0 : -1} // 🛡️ Feature Flag: Only focusable if A11y enabled
                 />
               ))}
             </div>

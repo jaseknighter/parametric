@@ -17,6 +17,7 @@ export const Debug = {
     this._channels = new Set(channels);
     if (this._enabled) {
       console.log(`%c🛠️ Debug Configured: [${[...this._channels].join(", ")}]`, "color: #2196f3; font-weight: bold;");
+      console.log(`%c💡 Tip: Run Debug.listFlags() to see active features.`, "color: #2196f3; font-style: italic; font-size: 0.8em;");
     }
   },
 

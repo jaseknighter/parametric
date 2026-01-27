@@ -52,30 +52,18 @@ export function Handle({
   getHandleProps,
   disabled,
   'data-testid': testID, // SMOKE TESTING
+  ...rest // 🛡️ Capture ARIA props
 }) {
   return (
-    <Fragment>
-      <div
-        data-testid={testID} // SMOKE TESTING
-        style={{
-          top: `${percent}%`,
-          left: '50%', 
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          WebkitTapHighlightColor: 'rgba(0,0,0,0.5)',
-          zIndex: 5,
-          width: 28,
-          height: 28,
-          cursor: 'pointer',
-          backgroundColor: 'none',
-        }}
-        {...getHandleProps(id)}
-      />
-      <div
+    <div
         role="slider"
+        tabIndex="0" // 🛡️ Make focusable
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
+        {...getHandleProps(id)} // 🛡️ Apply interaction handlers here
+        {...rest} // 🛡️ Apply ARIA props to the interactive element
+        data-testid={testID}
         style={{
           top: `${percent}%`,
           left: '50%', // 🟢 FIXED
@@ -85,9 +73,12 @@ export function Handle({
           width: "2.5vh",
           height: "1.0vh",
           backgroundColor: disabled ? '#666' : "rgba(25,25,25,.5)",
+          cursor: 'pointer',
+          // 🛡️ A11Y: Increase hit area with transparent border
+          border: '8px solid transparent',
+          backgroundClip: 'padding-box',
         }}
       />
-    </Fragment>
   )
 }
 

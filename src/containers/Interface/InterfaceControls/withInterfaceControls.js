@@ -6,6 +6,7 @@
  * [cite: 2026-01-12]
  */
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { isFeatureEnabled } from "../../../shared/featureFlagUtils";
 
 /**
  * withInterfaceControls
@@ -32,6 +33,10 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
     // 🟢 IDENTITY RESOLUTION: Prioritize propID from Interface.js loop
     const controlID = propID || defaultID;
     
+    // [cite: 2026-01-27] A11Y: Feature Flag check
+    const isA11yEnabled = isFeatureEnabled('accessibilityHardening');
+    const sectionId = `section-content-${controlID}`;
+
     const [isOpen, setIsOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const controlsRef = useRef(null);
@@ -136,6 +141,8 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
           handleUpdate={handleUpdateProxy} 
           updateControlsRef={updateControlsRef}
           isOpen={isOpen}
+          isA11yEnabled={isA11yEnabled}
+          sectionId={sectionId}
         />
       </div>
     );

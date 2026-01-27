@@ -321,6 +321,21 @@ export const createSceneManager = (canvas, options = {}) => {
     ready: readyPromise,
     scene: scene, 
     stopMotion,
+    rotate: (dx, dy) => {
+      applyScreenSpaceRotation(dx, dy);
+      needsRender = true;
+    },
+    zoom: (amt) => {
+      const factor = amt > 0 ? 0.9 : 1.1;
+      const target = controls.target;
+      const offset = camera.position.clone().sub(target);
+      offset.multiplyScalar(factor);
+      const len = offset.length();
+      if (len < controls.minDistance) offset.setLength(controls.minDistance);
+      if (len > controls.maxDistance) offset.setLength(controls.maxDistance);
+      camera.position.copy(target).add(offset);
+      needsRender = true;
+    },
     // [cite: 2026-01-21] TEST HOOK: Expose velocity for conflict prevention tests
     getVelocity: () => Math.max(Math.abs(velocityX), Math.abs(velocityY)),
     getMesh: () => mesh,

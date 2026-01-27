@@ -43,6 +43,8 @@ const ParametricView = forwardRef((props, ref) => {
     onExport, 
     onToggleHUD, 
     onTestToggle,
+    onRotate,
+    onZoom,
     onBenchmark,
     onIterationChange,
     layoutMode // [cite: 2026-01-20] LAYOUT AUTHORITY
@@ -72,6 +74,90 @@ const ParametricView = forwardRef((props, ref) => {
   const isMobileHud = isFeatureEnabled('mobileHudOptimization');
   // FEATURE_FLAG_END: mobileHudOptimization
 
+  // FEATURE_FLAG_START: accessibilityHardening
+  const isA11y = isFeatureEnabled('accessibilityHardening');
+  // FEATURE_FLAG_END: accessibilityHardening
+
+  // [cite: 2026-01-27] DEBUG: Focus Watcher for A11y
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Tab') {
+        setTimeout(() => {
+          console.log(`[A11y Debug] Focused Element:`, document.activeElement);
+          console.log(`[A11y Debug] Tag: ${document.activeElement.tagName} | Class: ${document.activeElement.className}`);
+        }, 0);
+      }
+    };
+    if (isA11y) window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isA11y]);
+
+  // [cite: 2026-01-27] A11Y: Global Navigation Shortcuts (Landmark Jumping)
+  useEffect(() => {
+    const handleJump = (e) => {
+      if (!isA11y) return;
+      
+      // Alt + I -> Jump to Interface (First Button)
+      if (e.altKey && e.key.toLowerCase() === 'i') {
+        document.querySelector('.TAreaInterface___TitleButton')?.focus();
+      }
+      // Alt + H -> Jump to HUD Header
+      if (e.altKey && e.key.toLowerCase() === 'h') {
+        document.querySelector('.HUD_Header')?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleJump);
+    return () => window.removeEventListener('keydown', handleJump);
+  }, [isA11y]);
+
+  // [cite: 2026-01-27] A11Y: Consolidated Keyboard Controls (Landmarks + Rotation)
+  useEffect(() => {
+    if (!isA11y) return;
+
+    const handleA11yKeys = (e) => {
+      // 1. Landmark Warps (Alt + Key)
+      if (e.altKey) {
+        const warps = {
+          'c': '#three',
+          'h': '.HUD_Header',
+          'i': '.TAreaInterface___TitleButton'
+        };
+        const target = warps[e.key.toLowerCase()];
+        if (target) {
+          e.preventDefault();
+          document.querySelector(target)?.focus();
+        }
+      }
+
+      // 2. Keyboard Rotation (Only when Canvas is focused)
+      if (document.activeElement.id === 'three') {
+        const step = 20; // Use fixed step for manual rotation
+        const rotationKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+        
+        if (rotationKeys.includes(e.key)) {
+          e.preventDefault();
+          let dx = 0, dy = 0;
+          if (e.key === 'ArrowLeft')  dx = -step;
+          if (e.key === 'ArrowRight') dx = step;
+          if (e.key === 'ArrowUp')    dy = -step;
+          if (e.key === 'ArrowDown')  dy = step;
+
+          if (onRotate) onRotate(dx, dy);
+        }
+      
+        // 3. Keyboard Zoom (Shift + Arrow)
+        if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+          e.preventDefault();
+          const zoomIn = e.key === 'ArrowUp';
+          if (onZoom) onZoom(zoomIn ? 1 : -1);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleA11yKeys);
+    return () => window.removeEventListener('keydown', handleA11yKeys);
+  }, [isA11y, onRotate, onZoom]);
+
   // --- 🧊 RENDER STABILIZATION ---
   /**
    * Memoized FormulaHUD
@@ -88,9 +174,10 @@ const ParametricView = forwardRef((props, ref) => {
         isManualOverride={isManualOverride}
         layoutMode={layoutMode} // [cite: 2026-01-20] FIX: Ensure HUD reacts to layout shifts
         displayMode={displayMode} // [cite: 2026-01-27] FIX: Pass feature-flagged display mode
+        isA11yEnabled={isA11y} // [cite: 2026-01-27] A11Y: Pass flag for focus management
       />
     );
-  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode]);
+  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode, isA11y]);
 
   /**
    * Memoized Interface
@@ -154,15 +241,34 @@ const ParametricView = forwardRef((props, ref) => {
   const isSystemHealthy = hasEverBeenReady || status === 'READY' || status === 'STABLE' || isBusy;
   const showBreach = !isSystemHealthy && !!error && !isBooting && status !== 'INIT' && !isBusy;
 
+  // [cite: 2026-01-27] A11Y: Dynamic Canvas Description (Semantic Parallelism)
+  const activeShape = parametricObj?.transformationInstructions?.shaping?.formula || "Geometry";
+  const canvasLabel = `Interactive 3D ${activeShape}. Use arrow keys to rotate, Shift+Arrows to zoom. Status: ${isMathematicalError ? 'Error' : 'Stable'}.`;
+  const vertexCount = numIndices ? (numIndices / 6).toLocaleString() : 0;
+
+  // [cite: 2026-01-27] A11Y: Semantic Parallel Description
+  // Provides a "Shadow DOM" textual representation of the 3D state.
+  const semanticDescription = (
+    <section className="sr-only" aria-live="polite">
+      <h2>3D Geometry Narrative</h2>
+      <p>The current visualization is a {activeShape}.</p>
+      <p>Geometric complexity: {vertexCount} vertices.</p>
+      <p>
+        {isManualOverride 
+          ? "The surface is generated via a custom mathematical formula." 
+          : "The surface is controlled via the shaping and projecting presets."}
+      </p>
+      <p>Mathematical Engine Status: {isMathematicalError ? "Error in current formula" : "Stable and rendering"}.</p>
+    </section>
+  );
+
   return (
-    <div className={`Container layout-${layoutMode} ${isMobileHud ? 'feature-mobile-hud' : ''}`}>
+    <div className={`Container layout-${layoutMode} ${isMobileHud ? 'feature-mobile-hud' : ''} ${isA11y ? 'flag-a11y-on' : ''}`}>
       <header className="Header">
         Parametric Equations 
-        {mode && (
-          <span className="worker-pill">
-            {displayMode} | {avgLat?.toFixed(1)}ms | {memoryUtilization}% MEM
-          </span>
-        )}
+        <span className="worker-pill" aria-live={isA11y ? "polite" : undefined}>
+          {mode ? `${displayMode} | ${avgLat?.toFixed(1)}ms | ${memoryUtilization}% MEM` : "System Idle"}
+        </span>
         {showOverlay && (
           <DiagnosticsHUD 
             systemState={{ isBusy, currentRequestId }} 
@@ -181,8 +287,17 @@ const ParametricView = forwardRef((props, ref) => {
       </header>
 
       <div className="Three_Grid_Area" style={{ gridArea: 'three', position: 'relative' }}>
-        <canvas className="Three" id="three" ref={ref} />
+        <canvas 
+          className="Three" 
+          id="three" 
+          ref={ref} 
+          role={isA11y ? "application" : undefined}
+          tabIndex={isA11y ? 0 : -1}
+          aria-label={isA11y ? canvasLabel : undefined}
+        />
         
+        {isA11y && semanticDescription}
+
         <div className="Worker_Status_Indicator">
           <div className={`status-dot ${isBusy ? 'processing' : (status?.toLowerCase() || 'idle')}`} />
           <span>{isBusy ? 'PROCESSING' : (isBooting ? 'BOOTING...' : (status || "IDLE"))}</span>
@@ -231,6 +346,8 @@ ParametricView.propTypes = {
   onExport: PropTypes.func.isRequired,
   onToggleHUD: PropTypes.func.isRequired,
   onTestToggle: PropTypes.func,
+  onRotate: PropTypes.func,
+  onZoom: PropTypes.func,
   onBenchmark: PropTypes.func,
   onIterationChange: PropTypes.func,
   layoutMode: PropTypes.string

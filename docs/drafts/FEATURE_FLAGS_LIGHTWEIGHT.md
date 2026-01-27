@@ -1,4 +1,6 @@
-# Feature Flags: Lightweight Three-State System
+# Feature Flags: Lightweight Three-State System - DRAFT (v0.5.1)
+
+**NOTE: AI generated, still under review.**
 
 This is a minimal, maintainable approach for controlling experimental and permanent features in the Parametric Engine. It supports **OFF**, **ON**, and **EXP** (experimental) states.
 
@@ -101,18 +103,34 @@ if (isFeatureEnabled('pinchToZoomDisable')) {
 
 ---
 
-## 5. Debugging & MVP
+## 5. Debugging & Verification
 
-### Console Command
-To list all available flags and their current status in the browser console:
-```js
+### The MVP Verification Test (`hudHeaderLowercase`)
+This flag serves as the "Sanity Check" for the entire pipeline. It verifies that a logic change in the Registry can successfully bypass CSS constraints and reach the screen.
+
+* **Flag Name:** `hudHeaderLowercase`
+* **Initial State:** `EXP`
+* **Success Criteria:** The HUD Status text transitions from uppercase to lowercase.
+
+#### How to Verify Manually:
+1.  **Standard View**:
+    *   **Dev:** `http://localhost:3000/parametric/`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/`
+    *   *Result:* HUD shows `FORMULA EDITOR (AUTO)`
+2.  **Experimental View**:
+    *   **Dev:** `http://localhost:3000/parametric/?flag_on=hudHeaderLowercase`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/?flag_on=hudHeaderLowercase`
+    *   *Result:* HUD shows `FORMULA EDITOR (auto)`
+3.  **Override View**:
+    *   **Dev:** `http://localhost:3000/parametric/?flag_off=hudHeaderLowercase`
+    *   **Prod:** `https://jaseknighter.github.io/parametric/?flag_off=hudHeaderLowercase`
+    *   *Result:* HUD reverts to `FORMULA EDITOR (AUTO)`
+
+### Console Audit
+Type this in the browser console to see the live state of all "Contractual Invariants":
+```javascript
 listFeatureFlags()
 ```
-
-### MVP Test Flag (`hudHeaderLowercase`)
-*   **State:** `EXP` (Permanent)
-*   **Purpose:** Verifies the feature flag pipeline is operational without affecting core logic.
-*   **Behavior:** When enabled via `?flag_on=hudHeaderLowercase`, the HUD status text (e.g., "MANUAL") renders in lowercase ("manual").
 
 ---
 
@@ -129,6 +147,35 @@ listFeatureFlags()
 * This system is **lightweight**: no build steps, no frameworks, no deployment changes needed.
 * The EXP state works in **any environment**, including production, staging, or local testing.
 * Adding new features is as simple as defining a new flag in `FEATURE_FLAGS.js`.
+
+---
+
+## 7. Post 0.5.X Improvements
+
+### The "Pre-Commit Guard" (Automated Diff Checking)
+To prevent accidental feature leaks, we can implement a Git Hook (using `husky` and `lint-staged`) that scans staged files for new logic that isn't wrapped in a feature flag check.
+
+**Example Logic (`scripts/guard-feature-leak.js`):**
+```javascript
+const { execSync } = require('child_process');
+
+// Get the current diff
+const diff = execSync('git diff --cached').toString();
+
+// Regex to find new blocks of code (lines starting with +)
+const newLines = diff.split('\n').filter(line => line.startsWith('+') && !line.startsWith('+++'));
+
+// CHECK: If we see a new 'Export' or 'A11y' string without an 'isFeatureEnabled' nearby
+const suspectedLeaks = newLines.filter(line => {
+  return (line.includes('aria-') || line.includes('Export')) && !line.includes('isFeatureEnabled');
+});
+
+if (suspectedLeaks.length > 0) {
+  console.warn("⚠️ [FLAG GUARD] Potential feature leak detected in new code.");
+  console.warn("Ensure new v0.5.X logic is wrapped in isFeatureEnabled().");
+  // process.exit(1); // Uncomment to block the commit
+}
+```
 
 ---
 

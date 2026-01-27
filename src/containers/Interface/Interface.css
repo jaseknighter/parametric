@@ -83,7 +83,7 @@ select {
 ////////////////////////////////////////////////////// */
 
 .TAreaInterface_controlsContainer {
-  display: grid !important;
+  display: grid;
   overflow: hidden;
   grid-area: controls;
   width: 0rem;
