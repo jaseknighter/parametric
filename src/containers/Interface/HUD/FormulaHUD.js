@@ -15,7 +15,8 @@ const FormulaHUD = ({
   isManualOverride, 
   isFormulaValid, 
   isMathematicalError,
-  layoutMode // [cite: 2026-01-20] FIX: React to layout mode changes
+  layoutMode, // [cite: 2026-01-20] FIX: React to layout mode changes
+  displayMode // [cite: 2026-01-27] FIX: Receive feature-flagged display mode
 }) => {
   const textareaRef = useRef(null);
   const containerRef = useRef(null);
@@ -167,6 +168,9 @@ const FormulaHUD = ({
     }
   };
 
+  // PRIORITY: 1. Passed prop from parent, 2. Logic-based fallback
+  const activeStatus = displayMode || (isManualOverride ? "MANUAL" : "AUTO");
+
   return (
     <div className="FormulaHUD_Container" ref={containerRef}>
       <div 
@@ -184,7 +188,7 @@ const FormulaHUD = ({
         }}
       >
         <div className="HUD_Header" onPointerDown={startDrag} onClick={handleToggle}>
-          <span>{isManualOverride ? "FORMULA EDITOR (MANUAL)" : "FORMULA EDITOR (AUTO)"}</span>
+          <span>FORMULA EDITOR ({activeStatus})</span>
           <div className={`Status_Dot ${isMathematicalError ? "MathError" : (isFormulaValid ? "Valid" : "Invalid")}`} />
         </div>
         <div className="HUD_Content_Area" style={{ height: isOpen ? `${size.height}px` : "0px" }}>

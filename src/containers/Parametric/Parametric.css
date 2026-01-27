@@ -79,6 +79,19 @@ html {
   cursor: pointer; 
 }
 
+.worker-pill {
+  font-size: 1rem;
+  vertical-align: middle;
+  margin-left: 1rem;
+  opacity: 0.8;
+  text-transform: none; /* 🛡️ CRITICAL: Allows Feature Flag to control casing */
+}
+
+/* [cite: 2026-01-27] FIX: Allow JS to control HUD header casing */
+.HUD_Header span {
+  text-transform: none !important;
+}
+
 .Footer {
   z-index: 4;
   grid-area: footer;
