@@ -11,6 +11,13 @@
 - [x] Documentation: Baseline versions of README.md, ARCHITECTURE.md, and TESTING.md (PST Verified).
 - [x] CI Hardening: Implementation of the "Holding Area" artifact pattern to prevent report 404s.
 
+## 📦 v0.5.x Patch Cycle (In Progress)
+- [x] **v0.5.0.1:** Infrastructure Baseline (Feature Flags, Self-Healing, MVP Test)
+- [ ] **v0.5.1:** Accessibility Hardening (ARIA, Roles, Live Regions) `[Flag: accessibilityHardening]`
+- [ ] **v0.5.2:** Mobile HUD & Interaction (Bottom Dock, Micro-HUD, Pinch-Guard) `[Flag: mobileHudOptimization]`
+- [ ] **v0.5.3:** Documentation Bridge (About Link) `[Flag: docsBridge]`
+- [ ] **v0.5.4:** Instructional Refinement (Contextual Guidance) `[Flag: instructionalRefinement]`
+
 ---
 
 ## 🛰️ Post-v0.5: Fidelity & Observability
@@ -57,3 +64,4 @@
 - [ ] Archive Legacy Code: Preserve the original 2019 CRA source code in a dedicated orphan branch (legacy/original-2019).
 - [ ] The DOM Purge: Remove remaining non-React direct DOM manipulations hidden in legacy helpers.
 - [ ] Framework Decoupling: Define a strict API between the React UI and the Vanilla 3D engine to enable future framework-agnostic usage.
+- [ ] Documentation Restructuring: Reorganize `/docs` into the Quad-Pillar structure (`architecture`, `dev`, `ops`, `testing`) as defined in the manifest.

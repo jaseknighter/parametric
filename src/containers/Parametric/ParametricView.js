@@ -7,6 +7,7 @@
  */
 import React, { forwardRef, useMemo, useState, useEffect, memo } from "react";
 import PropTypes from "prop-types";
+import { isFeatureEnabled } from "../../shared/featureFlagUtils";
 
 // Safety & Utilities
 import { assertReadOnly } from "../../utilities/assertDiagnosticsBoundary";
@@ -59,6 +60,18 @@ const ParametricView = forwardRef((props, ref) => {
   const { status, mode, avgLat, numIndices, isBusy, currentRequestId, error } = safeStats || {};
   const [logs, setLogs] = useState([]);
 
+  // FEATURE_FLAG_START: hudHeaderLowercase
+  // MVP Feature Flag: Lowercase Header for Pipeline Verification
+  const isLowercaseHeader = isFeatureEnabled('hudHeaderLowercase');
+  // [cite: 2026-01-27] FIX: Robust fallback. If 'mode' (Worker Status) is missing, derive from local state.
+  const rawMode = mode || (isManualOverride ? "MANUAL" : "AUTO");
+  const displayMode = isLowercaseHeader ? rawMode.toLowerCase() : rawMode;
+  // FEATURE_FLAG_END: hudHeaderLowercase
+
+  // FEATURE_FLAG_START: mobileHudOptimization
+  const isMobileHud = isFeatureEnabled('mobileHudOptimization');
+  // FEATURE_FLAG_END: mobileHudOptimization
+
   // --- 🧊 RENDER STABILIZATION ---
   /**
    * Memoized FormulaHUD
@@ -74,9 +87,10 @@ const ParametricView = forwardRef((props, ref) => {
         isMathematicalError={isMathematicalError} 
         isManualOverride={isManualOverride}
         layoutMode={layoutMode} // [cite: 2026-01-20] FIX: Ensure HUD reacts to layout shifts
+        displayMode={displayMode} // [cite: 2026-01-27] FIX: Pass feature-flagged display mode
       />
     );
-  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode]);
+  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode]);
 
   /**
    * Memoized Interface
@@ -141,12 +155,12 @@ const ParametricView = forwardRef((props, ref) => {
   const showBreach = !isSystemHealthy && !!error && !isBooting && status !== 'INIT' && !isBusy;
 
   return (
-    <div className={`Container layout-${layoutMode}`}>
+    <div className={`Container layout-${layoutMode} ${isMobileHud ? 'feature-mobile-hud' : ''}`}>
       <header className="Header">
         Parametric Equations 
         {mode && (
           <span className="worker-pill">
-            {mode} | {avgLat?.toFixed(1)}ms | {memoryUtilization}% MEM
+            {displayMode} | {avgLat?.toFixed(1)}ms | {memoryUtilization}% MEM
           </span>
         )}
         {showOverlay && (

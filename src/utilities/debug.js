@@ -1,4 +1,5 @@
 import { DEBUG_THROTTLES } from '../shared/ParametricConstants';
+import { FEATURE_FLAGS } from '../shared/FEATURE_FLAGS';
 
 /**
  * @fileoverview debug.js
@@ -79,6 +80,18 @@ export const Debug = {
     if (now - last > ms) {
       this._lastLog[`t_${channel}`] = now;
       console.log(`%c[${channel} (THROTTLED)]`, "color: #ff9800; font-weight: bold;", ...args);
+    }
+  },
+
+  /**
+   * Lists all feature flags and their current configuration state.
+   * Useful for verifying environment configuration.
+   */
+  listFlags() {
+    if (typeof window !== 'undefined' && window.listFeatureFlags) {
+      window.listFeatureFlags();
+    } else {
+      console.table(FEATURE_FLAGS);
     }
   }
 };
