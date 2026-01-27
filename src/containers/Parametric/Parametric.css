@@ -87,9 +87,50 @@ html {
   text-transform: none; /* 🛡️ CRITICAL: Allows Feature Flag to control casing */
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* [cite: 2026-01-27] A11Y: Ensure skip links are visible when focused */
+.sr-only.focusable:focus {
+  position: absolute;
+  width: auto;
+  height: auto;
+  clip: auto;
+  white-space: normal;
+  z-index: 9999;
+  background: white;
+  color: black;
+  padding: 1rem;
+  border: 2px solid black;
+  top: 0;
+  left: 0;
+}
+
+/* 🛡️ Ensure focus indicators are high-contrast for keyboard users */
+.flag-a11y-on :focus-visible {
+  outline: 3px solid #4da3ff !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 15px rgba(77, 163, 255, 0.6);
+}
+
 /* [cite: 2026-01-27] FIX: Allow JS to control HUD header casing */
 .HUD_Header span {
   text-transform: none !important;
+}
+
+/* [cite: 2026-01-27] A11Y: HUD Header Focus Ring */
+.HUD_Header:focus-visible {
+  outline: 3px solid #00ff00 !important; /* Neon Green */
+  outline-offset: -3px;
 }
 
 .Footer {
@@ -165,6 +206,27 @@ a:link {
 .TAreaInterface___TitleButton:has(~ .Controls_Show):active,
 .Controls_Show .TAreaInterface___TitleButton:active {
   background-color: #a26969 !important; /* Intermediate Pink */
+}
+
+/* [cite: 2026-01-27] A11Y: High-visibility focus ring for keyboard navigation */
+.TAreaInterface___TitleButton:focus-visible {
+  outline: 3px solid #4da3ff !important; /* Neon Blue */
+  outline-offset: -3px;
+  background: rgba(77, 163, 255, 0.1) !important;
+}
+
+/* [cite: 2026-01-27] A11Y: Global High-Contrast Focus Fallback */
+:focus-visible {
+  outline: 3px solid #4da3ff !important; /* Bright Action Blue */
+  outline-offset: 2px;
+  box-shadow: 0 0 10px rgba(77, 163, 255, 0.5);
+  z-index: 1000; /* Ensure focus ring sits on top */
+}
+
+/* [cite: 2026-01-27] A11Y: Slider Handle Focus Ring */
+.slider-handles div[role="slider"]:focus-visible {
+  outline: 2px solid white !important;
+  box-shadow: 0 0 10px #4da3ff;
 }
 
 /* [cite: 2026-01-16] FIX: Ensure Diagnostics HUD is visible to Playwright */

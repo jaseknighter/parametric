@@ -1,4 +1,6 @@
-# Feature Flags: Lightweight Three-State System
+# Feature Flags: Lightweight Three-State System - DRAFT (v0.5.1)
+
+**NOTE: AI generated, still under review.**
 
 This is a minimal, maintainable approach for controlling experimental and permanent features in the Parametric Engine. It supports **OFF**, **ON**, and **EXP** (experimental) states.
 
@@ -145,6 +147,35 @@ listFeatureFlags()
 * This system is **lightweight**: no build steps, no frameworks, no deployment changes needed.
 * The EXP state works in **any environment**, including production, staging, or local testing.
 * Adding new features is as simple as defining a new flag in `FEATURE_FLAGS.js`.
+
+---
+
+## 7. Post 0.5.X Improvements
+
+### The "Pre-Commit Guard" (Automated Diff Checking)
+To prevent accidental feature leaks, we can implement a Git Hook (using `husky` and `lint-staged`) that scans staged files for new logic that isn't wrapped in a feature flag check.
+
+**Example Logic (`scripts/guard-feature-leak.js`):**
+```javascript
+const { execSync } = require('child_process');
+
+// Get the current diff
+const diff = execSync('git diff --cached').toString();
+
+// Regex to find new blocks of code (lines starting with +)
+const newLines = diff.split('\n').filter(line => line.startsWith('+') && !line.startsWith('+++'));
+
+// CHECK: If we see a new 'Export' or 'A11y' string without an 'isFeatureEnabled' nearby
+const suspectedLeaks = newLines.filter(line => {
+  return (line.includes('aria-') || line.includes('Export')) && !line.includes('isFeatureEnabled');
+});
+
+if (suspectedLeaks.length > 0) {
+  console.warn("⚠️ [FLAG GUARD] Potential feature leak detected in new code.");
+  console.warn("Ensure new v0.5.X logic is wrapped in isFeatureEnabled().");
+  // process.exit(1); // Uncomment to block the commit
+}
+```
 
 ---
 

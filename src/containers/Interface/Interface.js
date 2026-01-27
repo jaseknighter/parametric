@@ -11,6 +11,7 @@ import VectorMenu from "./InterfaceControls/VectorGroupControl";
 import TexturingControl from "./InterfaceControls/TexturingControl";
 import Export3dControl from "./InterfaceControls/Export3dControl";
 import { Debug } from "../../utilities/debug";
+import { isFeatureEnabled } from "../../shared/featureFlagUtils";
 
 import "./Interface.css";
 
@@ -49,6 +50,9 @@ const Interface = ({
 }) => {
   const [openInterfaces, setOpenInterfaces] = useState([]);
   const interfaceRef = useRef(null);
+
+  // FEATURE_FLAG_START: accessibilityHardening
+  const isA11y = isFeatureEnabled('accessibilityHardening');
 
   // [cite: 2026-01-20] LAYOUT REACTION: Re-evaluate open panels only when mode changes.
   useLayoutEffect(() => {
@@ -133,9 +137,17 @@ const Interface = ({
   ]);
   
   return (
-    <div className={`Interface layout-${layoutMode}`} ref={interfaceRef}>
+    <nav 
+      className={`Interface layout-${layoutMode}`} 
+      ref={interfaceRef}
+      role={isA11y ? "navigation" : undefined}
+      aria-label={isA11y ? "Geometry Engine Controls" : undefined}
+    >
       {memoizedControls}
-    </div>
+      {isA11y && <div tabIndex={0} onFocus={() => document.querySelector('.Header')?.focus()} className="sr-only">
+        End of controls, jump to top
+      </div>}
+    </nav>
   );
 };
 

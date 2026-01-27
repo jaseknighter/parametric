@@ -532,6 +532,14 @@ const Parametric = () => {
     shipIntent({}, rid);
   }, [isEditingHUD, dispatch, handleHUDChange, shipIntent]);
 
+  const handleManualRotate = useCallback((dx, dy) => {
+    sceneManagerRef.current?.rotate(dx, dy);
+  }, []);
+
+  const handleManualZoom = useCallback((amt) => {
+    sceneManagerRef.current?.zoom(amt);
+  }, []);
+
   // STATE SYNC
   useEffect(() => {
     if (window.intentService) {
@@ -810,6 +818,8 @@ const Parametric = () => {
         onUpdateParametric={updateParametricObjHandler}
         onToggleHUD={setIsHUDActive}
         onFormulaChange={handleHUDChange}
+        onRotate={handleManualRotate}
+        onZoom={handleManualZoom}
         isTesting={isTesting}
         testIterations={testIterations}
         comparativeResults={comparativeResults}

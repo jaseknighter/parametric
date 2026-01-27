@@ -16,12 +16,14 @@ const FormulaHUD = ({
   isFormulaValid, 
   isMathematicalError,
   layoutMode, // [cite: 2026-01-20] FIX: React to layout mode changes
-  displayMode // [cite: 2026-01-27] FIX: Receive feature-flagged display mode
+  displayMode, // [cite: 2026-01-27] FIX: Receive feature-flagged display mode
+  isA11yEnabled // [cite: 2026-01-27] A11Y: Gate focus logic
 }) => {
   const textareaRef = useRef(null);
   const containerRef = useRef(null);
   const wrapperRef = useRef(null);
   const highlighterRef = useRef(null);
+  const headerRef = useRef(null); // [cite: 2026-01-27] A11Y: Ref for focus management
   const hasInjectedDefault = useRef(false);
   
   const [isOpen, setIsOpen] = useState(true); // [cite: 2026-01-20] FIX: Default to Open for tests/UX
@@ -148,6 +150,13 @@ const FormulaHUD = ({
     handleFormulaChange(normalized, { userEdit: true });
   };
 
+  // [cite: 2026-01-27] A11Y: Escape hatch for keyboard users
+  const handleEditorKeyDown = (e) => {
+    if (isA11yEnabled && e.key === 'Escape') {
+      headerRef.current?.focus();
+    }
+  };
+
   useLayoutEffect(() => {
     if (textareaRef.current && globalCursorPos !== null) {
       textareaRef.current.setSelectionRange(globalCursorPos, globalCursorPos);
@@ -158,6 +167,14 @@ const FormulaHUD = ({
   const handleToggle = () => {
     if (!isDragging && !hasMoved.current) setIsOpen(!isOpen);
     hasMoved.current = false;
+  };
+
+  // [cite: 2026-01-27] A11Y: Keyboard support for header toggle
+  const handleHeaderKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); // Prevent scroll on Space
+      handleToggle();
+    }
   };
 
   // [cite: 2026-01-14] Sync scroll for the highlighter background
@@ -187,41 +204,54 @@ const FormulaHUD = ({
           backgroundColor: "rgba(198, 137, 137, 0.4)", // Pinkish transparent
         }}
       >
-        <div className="HUD_Header" onPointerDown={startDrag} onClick={handleToggle}>
+        <div 
+          className="HUD_Header" 
+          ref={headerRef}
+          onPointerDown={startDrag} 
+          onClick={handleToggle}
+          tabIndex={isA11yEnabled ? 0 : -1} // [cite: 2026-01-27] A11Y: Gate focus to prevent double-tab loop
+          role="button"
+          aria-expanded={isOpen}
+          onKeyDown={handleHeaderKeyDown}
+        >
           <span>FORMULA EDITOR ({activeStatus})</span>
           <div className={`Status_Dot ${isMathematicalError ? "MathError" : (isFormulaValid ? "Valid" : "Invalid")}`} />
         </div>
-        <div className="HUD_Content_Area" style={{ height: isOpen ? `${size.height}px` : "0px" }}>
-          {/* [cite: 2026-01-14] Highlighter Layer for X/Y/Z Tints */}
-          <div className="HUD_Highlighter" ref={highlighterRef}>
-            {(formulaCode || "").split('\n').map((line, i) => {
-              const tLine = line.trim();
-              let tint = "";
-              if (tLine.startsWith("x")) tint = "tint-x";
-              else if (tLine.startsWith("y")) tint = "tint-y";
-              else if (tLine.startsWith("z")) tint = "tint-z";
-              return <div key={i} className={tint}>{line || '\u00A0'}</div>;
-            })}
+        {isOpen && (
+          <div className="HUD_Content_Area" style={{ height: `${size.height}px` }}>
+            {/* [cite: 2026-01-14] Highlighter Layer for X/Y/Z Tints */}
+            <div className="HUD_Highlighter" ref={highlighterRef}>
+              {(formulaCode || "").split('\n').map((line, i) => {
+                const tLine = line.trim();
+                let tint = "";
+                if (tLine.startsWith("x")) tint = "tint-x";
+                else if (tLine.startsWith("y")) tint = "tint-y";
+                else if (tLine.startsWith("z")) tint = "tint-z";
+                return <div key={i} className={tint}>{line || '\u00A0'}</div>;
+              })}
+            </div>
+            <textarea
+              ref={textareaRef}
+              onScroll={handleScroll}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              className="HUD_Textarea"
+              // [cite: 2026-01-14] AUTHORITY: React handles the sync via the prop.
+              value={formulaCode || ""}
+              onChange={handleChange}
+              onKeyDown={handleEditorKeyDown} // [cite: 2026-01-27] A11Y: Escape hatch
+              aria-label={isA11yEnabled ? "Mathematical Formula Editor" : undefined}
+              spellCheck="false"
+            />
+            <img 
+              src={resizeIcon} 
+              className="HUD_Resize_Handle" 
+              onPointerDown={startResize} 
+              alt="resize" 
+              draggable={false} 
+            />
           </div>
-          <textarea
-            ref={textareaRef}
-            onScroll={handleScroll}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            className="HUD_Textarea"
-            // [cite: 2026-01-14] AUTHORITY: React handles the sync via the prop.
-            value={formulaCode || ""}
-            onChange={handleChange}
-            spellCheck="false"
-          />
-          <img 
-            src={resizeIcon} 
-            className="HUD_Resize_Handle" 
-            onPointerDown={startResize} 
-            alt="resize" 
-            draggable={false} 
-          />
-        </div>
+        )}
       </div>
     </div>
   );

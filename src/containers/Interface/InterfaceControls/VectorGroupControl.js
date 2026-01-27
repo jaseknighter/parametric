@@ -8,11 +8,16 @@ import withInterfaceControls from './withInterfaceControls';
 import IntentBasedVectorSlider from '../../../components/UI/MySlider/IntentBasedVectorSlider';
 
 const VectorGroupControl = (props) => {
-  const { title, updateControlsRef } = props;
+  const { title, updateControlsRef, isA11yEnabled, isOpen, sectionId } = props;
   
   return (
     <>
-      <button onClick={updateControlsRef} className="TAreaInterface___TitleButton">
+      <button 
+        onClick={updateControlsRef} 
+        className="TAreaInterface___TitleButton"
+        aria-expanded={isA11yEnabled ? isOpen : undefined}
+        aria-controls={isA11yEnabled ? sectionId : undefined}
+      >
         <h3 className="TAreaInterface___TitleButton_Label">{title}</h3>
       </button>
       <IntentBasedVectorSlider 

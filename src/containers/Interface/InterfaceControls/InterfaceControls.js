@@ -27,7 +27,7 @@ const evalProjectingButtonClasses = (vector, row, col, currentVectors) => {
 
 /* --- ProjectingControl --- */
 const ProjectingControlComponent = (props) => {
-  const { parametricObj, handleUpdate, updateControlsRef } = props;
+  const { parametricObj, handleUpdate, updateControlsRef, isOpen, isA11yEnabled, sectionId } = props;
   const statePath = useMemo(() => getFeaturePath("PROJECTING"), []);
   
   // [cite: 2026-01-15] FIX: Read 3x3 grid from state, defaulting to sparse identity
@@ -75,10 +75,21 @@ const ProjectingControlComponent = (props) => {
 
   return (
     <>
-      <button onClick={updateControlsRef} className="TAreaInterface___TitleButton">
+      <button 
+        onClick={updateControlsRef} 
+        className="TAreaInterface___TitleButton"
+        aria-expanded={isA11yEnabled ? isOpen : undefined}
+        aria-controls={isA11yEnabled ? sectionId : undefined}
+      >
         <h3 className="TAreaInterface___TitleButton_Label">Project</h3>
       </button>
-      <div className="TAreaInterface_controlsContainer">
+      <div 
+        id={sectionId}
+        className="TAreaInterface_controlsContainer"
+        style={isA11yEnabled ? { display: isOpen ? 'grid' : 'none', visibility: isOpen ? 'visible' : 'hidden' } : undefined} // [cite: 2026-01-27] A11Y: Remove from tab order when closed
+        aria-hidden={isA11yEnabled ? !isOpen : undefined}
+        role={isA11yEnabled ? "region" : undefined}
+      >
         {/* 🟢 FIXED: Used Unified Grid Class with 3-Column Modifier */}
         <div className="ControlGrid_Base Grid__3Col">
           {AXES_LABELS.map((label, rowIndex) => (
@@ -106,7 +117,7 @@ const ProjectingControlComponent = (props) => {
 
 /* --- ShapingControl --- */
 const ShapingControlComponent = (props) => {
-  const { parametricObj, handleUpdate, updateControlsRef } = props;
+  const { parametricObj, handleUpdate, updateControlsRef, isOpen, isA11yEnabled, sectionId } = props;
   const currentFormula = parametricObj?.transformationInstructions?.shaping?.formula || SHAPE_KEYS.CIRCLE;
 
   const getBtnClass = (id) => {
@@ -127,10 +138,21 @@ const ShapingControlComponent = (props) => {
 
   return (
     <>
-      <button onClick={updateControlsRef} className="TAreaInterface___TitleButton">
+      <button 
+        onClick={updateControlsRef} 
+        className="TAreaInterface___TitleButton"
+        aria-expanded={isA11yEnabled ? isOpen : undefined}
+        aria-controls={isA11yEnabled ? sectionId : undefined}
+      >
         <h3 className="TAreaInterface___TitleButton_Label">Shape</h3>
       </button>
-      <div className="TAreaInterface_controlsContainer">
+      <div 
+        id={sectionId}
+        className="TAreaInterface_controlsContainer"
+        style={isA11yEnabled ? { display: isOpen ? 'grid' : 'none', visibility: isOpen ? 'visible' : 'hidden' } : undefined} // [cite: 2026-01-27] A11Y: Remove from tab order when closed
+        aria-hidden={isA11yEnabled ? !isOpen : undefined}
+        role={isA11yEnabled ? "region" : undefined}
+      >
         {/* 🟢 FIXED: Used Unified Grid Class with 2-Column Modifier */}
         <div className="ControlGrid_Base Grid__2Col">
           {Object.values(SHAPE_KEYS)
