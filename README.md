@@ -17,6 +17,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 - [Documentation](#documentation)
   - [Formula Editor: Manual Override](#formula-editor-manual-override)
   - [Interface Reference](#interface-reference)
+  - [Math Reference](#math-reference)
   - [Additional Features \& Formulas](#additional-features--formulas)
     - [1. Move Multiple Sliders at Once](#1-move-multiple-sliders-at-once)
     - [2. Animation](#2-animation)
@@ -27,7 +28,9 @@ A browser-based environment for exploring complex mathematical surfaces and para
   - [Technical Documentation (DRAFT - LLM Generated)](#technical-documentation-draft---llm-generated)
 - [Post-v0.5 Priorities: Transparency \& Test Depth](#post-v05-priorities-transparency--test-depth)
 - [Reporting Issues \& Feature Requests](#reporting-issues--feature-requests)
-- [Installation for Local Development](#installation-for-local-development)
+- [Development and Testing](#development-and-testing)
+  - [Feature Flags (v0.5.0.1)](#feature-flags-v0501)
+  - [Installation](#installation)
 - [Credits](#credits)
 
 ## Current Status
@@ -84,17 +87,23 @@ Provides a live view of GLSL expressions. Edits here override the interface pres
 
 | Interface Element | What does it do? | How does it work? |
 | :--- | :--- | :--- |
-| **Shape: Base Topology** | Choose the starting form for your 3D model. | Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation. |
-| **Project: Vector Mapping** | Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D. | Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates. |
-| **Bend: Curvature & Arching** | Curve the shape along its main axes. | theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta) |
-| **Pinch: Vertex Concentration** | Pull points together or spread them along an axis. | v' = sgn(v) * \|v\|^(1.0 + (amt * scalar)) * n |
-| **Texture: Surface Displacement** | Add fine bumps and waves to the surface. | 1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt) |
-| **Spiral: Coordinate Torsion** | Twist the shape around its center. | theta' = atan2(B, A) + (amt * r * scalar) |
-| **Modulate: Surface Oscillation** | Overlay gentle ripples or waves on the shape. | Delta = sin(u * freq) * cos(v * freq) * amt |
-| **Flatten: Linear Compression** | Compress the shape along one direction. | v' = v * (1.0 - amt) |
-| **Export: Geometry Output** | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
+| **Shape:** Base Topology | Choose the starting form for your 3D model. | Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation. |
+| **Project:** Vector Mapping | Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D. | Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates. |
+| **Bend:** Curvature & Arching | Curve the shape along its main axes. | theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta) |
+| **Pinch:** Vertex Concentration | Pull points together or spread them along an axis. | v' = sgn(v) * \|v\|^(1.0 + (amt * scalar)) * n |
+| **Texture:** Surface Displacement | Add fine bumps and waves to the surface. | 1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt) |
+| **Spiral:** Coordinate Torsion | Twist the shape around its center. | theta' = atan2(B, A) + (amt * r * scalar) |
+| **Modulate:** Surface Oscillation | Overlay gentle ripples or waves on the shape. | Delta = sin(u * freq) * cos(v * freq) * amt |
+| **Flatten:** Linear Compression | Compress the shape along one direction. | v' = v * (1.0 - amt) |
+| **Export:** Geometry Output | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
 
 <!-- END_UI_REFERENCE -->
+
+### Math Reference
+
+The following math functions and constants are supported in the Formula Editor:
+
+`sin`, `cos`, `tan`, `atan2`, `abs`, `sqrt`, `pow`, `exp`, `log`, `min`, `max`, `sign`, `floor`, `ceil`, `round`, `PI` (or `π`), `E`.
 
 ### Additional Features & Formulas
 
@@ -118,8 +127,8 @@ z = cos(v * PI) * (1.0 + sin(t) * 0.2);
 **Formula A**
 
 ```text
-x = cos(u * 2π) * sin(v * 4π)
-y = sin(u * 2π) * sin(v * π)
+x = cos(u * 2*π) * sin(v * 4*π)
+y = sin(u * 2*π) * sin(v * π)
 z = cos(v * π)
 ```
 
@@ -131,22 +140,22 @@ z = cos(v * π)
 **Formula B** 
 
 ```text
-x = sign(...) * abs(...)^3
-y = sin(u * 2π) * sin(v * π) + ...
-z = cos(v * π) + ...
+x = (sign(cos(u * 2 * π) * sin(v * π) + (1 + u * 0.2556) * cos(u * 0.2556 * (π * 12)) * 0.3) * pow(abs(cos(u * 2 * π) * sin(v * π) + (1 + u * 0.2556) * cos(u * 0.2556 * (π * 12)) * 0.3), 3.0000));
+y = sin(u * 2 * π) * sin(v * π) + (1 + u * 0.2556) * cos(u * 0.2556 * (π * 12)) * 0.3;
+z = cos(v * π) + (1 + u * 0.2556) * sin(u * 0.2556 * (π * 12)) * 0.3;
 ```
 
 * Builds on a base spherical surface like Formula A.
 * Adds **complex modulation and twisting**, including higher-frequency oscillations (`cos(u * 0.2556 * 12π)` and `sin(u * 0.2556 * 12π)`).
 * The `sign` and `pow(..., 3)` in `x` **amplify or flatten regions**, creating sharp peaks and valleys.
-* Result is a **highly sculpted, almost fractal-like 3D shape** with folds, spikes, and distortions.
+* Result is a **highly sculpted 3D shape** with folds, spikes, and distortions.
 
 **Formula C**
 
 ```text
 let pulse = sin(t * 0.5) * 1.6;
-x = cos(u * 2π) * sin(v * π) + cos(v * pulse * 12π) * 0.6
-y = sin(u * 2π * pulse) * sin(v * π)
+x = cos(u * 2*π) * sin(v * π) + cos(v * pulse * 12*π) * 0.6
+y = sin(u * 2*π * pulse) * sin(v * π)
 z = cos(v * π)
 ```
 
@@ -262,9 +271,21 @@ Note: the roadmap is pretty well set for the near future and I have not yet begu
 
 ---
 
-## Installation for Local Development
+## Development and Testing
 
-To set up the environment and the new Worker-based architecture locally:
+### Feature Flags (v0.5.0.1)
+The application uses a lightweight, URL-based feature flag system to safely deploy experimental features. Flags support three states: `OFF`, `ON`, and `EXP` (Experimental).
+
+*   **Enable a flag:** `?flag_on=featureName`
+*   **Disable a flag:** `?flag_off=featureName`
+
+For detailed specifications, see:
+*   Feature Flags: [Lightweight Spec](./docs/drafts/FEATURE_FLAGS_LIGHTWEIGHT.md)
+*   Feature Flags: (Testing Strategy)[./docs/drafts/FEATURE_FLAGS_TESTING.md]
+
+---
+
+### Installation
 
 1. **Clone the repo:**
    ```bash
