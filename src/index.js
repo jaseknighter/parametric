@@ -8,11 +8,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import { Debug } from './utilities/debug.js';
+import { FeatureFlags } from './shared/featureFlagUtils.js';
 
-// [cite: 2026-01-24] ROUTING FIX: Enforce trailing slash for base path
+// [cite: 2026-01-27] ROUTING FIX: Enforce trailing slash for base path
 // This ensures that visiting /parametric redirects to /parametric/ to match the Vite base.
-if (window.location.pathname === '/parametric') {
-  window.location.replace('/parametric/' + window.location.search);
+const baseUrl = import.meta.env.BASE_URL;
+if (baseUrl && baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) {
+  window.location.replace(baseUrl + window.location.search + window.location.hash);
 }
 
 // [cite: 2026-01-24] OBSERVABILITY: Initialize Debug Utility
@@ -48,6 +50,12 @@ Debug.init({
 
 // [cite: 2026-01-25] NAMESPACE: Expose Debug on a unique key to avoid browser collisions
 window.__ParametricDebug__ = Debug;
+
+// [cite: 2026-01-27] DX: Auto-open Feature Flags panel if sticky param is present
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('showFlags') === 'true') {
+  FeatureFlags.listFlags();
+}
 
 // Render the application
 ReactDOM.render(<App />, document.getElementById('root'));

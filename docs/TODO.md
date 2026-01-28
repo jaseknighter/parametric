@@ -34,6 +34,7 @@
 - [ ] Intelligent Result Analysis: Add logic to generate a summary paragraph in the README that "reads" the coverage numbers and provides a status insight (e.g., "Gold Standard" vs "At Risk").
 - [ ] Contextual Deep-Links: Include a link in the README to an 'ABOUT_COVERAGE.md' that explains the mathematical importance of high coverage in a 3D environment.
 
+
 ### 2. Drift Exorcism (Mathematical Fidelity)
 - [ ] Synchronize Global Math Scope: Verify that both the Main Thread and Web Worker have access to identical constants (π, e, etc.) to eliminate precision deltas.
 - [ ] Math.js Precision Alignment: Standardize the mathjs configuration across both "brains" to ensure floating-point entropy is handled identically.
@@ -58,6 +59,7 @@
 - [ ] Git-Based Issue Lifecycle: Develop a script or workflow that allows creating, labeling, and closing issues directly from Git commit messages (e.g., "resolves #123").
 - [ ] Pull Request Automation: Implement a PR template that automatically runs the "Numerical Drift" audit and requires a "Green" status before allowing a merge.
 - [ ] Project Board Sync: Configure a GitHub Project to automatically move issues to "Done" when the corresponding branch is merged into main.
+- [ ] Dev Test Results in README: Update the coverage table generator to include local development test results in the README.md report, providing visibility into pre-commit validation status.
 
 ### 6. Architectural Integrity & Heritage
 - [ ] Issue Externalization: Move all items from this scratchpad into individual GitHub Issues with labels for debt, feature, and stability.
@@ -65,3 +67,10 @@
 - [ ] The DOM Purge: Remove remaining non-React direct DOM manipulations hidden in legacy helpers.
 - [ ] Framework Decoupling: Define a strict API between the React UI and the Vanilla 3D engine to enable future framework-agnostic usage.
 - [ ] Documentation Restructuring: Reorganize `/docs` into the Quad-Pillar structure (`architecture`, `dev`, `ops`, `testing`) as defined in the manifest.
+
+### 7. Instructional Refinement (Future)
+- [x] Keyboard / focus-triggered tooltips: Ensure tooltips appear when focusing on controls via keyboard.
+- [x] `role="tooltip"` + `aria-hidden`: Enhance accessibility compliance for custom tooltips.
+- [ ] Centralized TooltipManager (single portal): Move tooltip rendering to a top-level portal to avoid z-index and overflow issues.
+- [ ] HUD math tooltip parity: Implement the same KaTeX tooltip system for the HUD formula editor variables.
+- [ ] Tooltip Math Visualizer: Implement interactive, visual explanations of mathematical formulas in tooltips. See [Draft Spec](./drafts/TOOLTIP_MATH_VISUALIZER.md).

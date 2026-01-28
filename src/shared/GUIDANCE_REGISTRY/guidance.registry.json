@@ -1,0 +1,98 @@
+{
+  "HUD_TITLE": {
+    "title": "Formula Editor: Manual Override",
+    "intent": "Use formulas to directly control the 3D shape.",
+    "proseBehavior": "Provides a live view of GLSL expressions. Edits here override the interface presets. Any formulas you write manually will be erased if you update the interface controls.",
+    "link": "./README.md#formula-editor",
+    "docScope": "ui"
+  },
+  "ABOUT_LANDMARK": {
+    "title": "Documentation: About",
+    "intent": "Learn more about the Parametric Engine.",
+    "proseBehavior": "Click to open the README documentation in a new tab. Contains detailed instructions, mathematical references, and keyboard shortcuts.",
+    "link": "./README.md",
+    "docScope": "ui"
+  },
+  "STATUS_LANDMARK": {
+    "title": "Engine Status: Mathematical Integrity",
+    "intent": "Monitor the health of the current 3D calculation.",
+    "proseBehavior": "Interaction: [Green] Formula is valid and rendering. [Red] Formula contains a mathematical or syntax error. Hover for specific error details. The engine will pause updates until the error is resolved.",
+    "link": "./README.md#error-handling",
+    "docScope": "ui"
+  },
+  "SHAPE_DRAWER": {
+    "title": "Shape: Base Topology",
+    "intent": "Choose the starting form for your 3D model.",
+    "tableBehavior": "Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation.",
+    "link": "./README.md#shaping",
+    "docScope": "table"
+  },
+  "PROJECT_DRAWER": {
+    "title": "Project: Vector Mapping",
+    "intent": "Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D.",
+    "tableBehavior": "Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates.",
+    "link": "./README.md#projecting",
+    "docScope": "table"
+  },
+  "BEND_DRAWER": {
+    "title": "Bend: Curvature & Arching",
+    "intent": "Curve the shape along its main axes.",
+    "tableBehavior": "Calculates an angular arc based on vertex position.",
+    "mathExpression": "theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta)",
+    "link": "./README.md#bending",
+    "math": true,
+    "docScope": "table"
+  },
+  "PINCH_DRAWER": {
+    "title": "Pinch: Vertex Concentration",
+    "intent": "Pull points together or spread them along an axis.",
+    "tableBehavior": "Concentrates points toward an axis origin or tapers them toward the poles.",
+    "mathExpression": "v' = sgn(v) * |v|^(1.0 + (amt * scalar)) * n",
+    "link": "./README.md#pinching",
+    "math": true,
+    "docScope": "table"
+  },
+  "TEXTURE_DRAWER": {
+    "title": "Texture: Surface Displacement",
+    "intent": "Add fine bumps and waves to the surface.",
+    "tableBehavior": "Displaces vertices along their normal using a composite sine/cosine wave function.",
+    "mathExpression": "1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt)",
+    "link": "./README.md#texturing",
+    "math": true,
+    "docScope": "table"
+  },
+  "SPIRAL_DRAWER": {
+    "title": "Spiral: Coordinate Torsion",
+    "intent": "Twist the shape around its center.",
+    "tableBehavior": "Applies coordinate rotation (winding).",
+    "mathExpression": "theta' = atan2(B, A) + (amt * r * scalar)",
+    "link": "./README.md#spiraling",
+    "math": true,
+    "docScope": "table"
+  },
+  "MODULATE_DRAWER": {
+    "title": "Modulate: Surface Oscillation",
+    "intent": "Overlay gentle ripples or waves on the shape.",
+    "tableBehavior": "Overlays a secondary wave function to create ripples.",
+    "mathExpression": "Delta = sin(u * freq) * cos(v * freq) * amt",
+    "link": "./README.md#modulating",
+    "math": true,
+    "docScope": "table"
+  },
+  "FLATTEN_DRAWER": {
+    "title": "Flatten: Linear Compression",
+    "intent": "Compress the shape along one direction.",
+    "tableBehavior": "Compresses the mesh along the selected vector.",
+    "mathExpression": "v' = v * (1.0 - amt)",
+    "link": "./README.md#flattening",
+    "math": true,
+    "docScope": "table"
+  },
+  "EXPORT3D_DRAWER": {
+    "title": "Export: Geometry Output",
+    "intent": "Save your model for use in other software.",
+    "tableBehavior": "STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting.",
+    "link": "./README.md#exporting",
+    "docScope": "table"
+  }
+}

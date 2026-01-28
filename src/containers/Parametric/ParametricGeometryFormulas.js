@@ -79,7 +79,7 @@ const Pipeline = {
         const width = toPrecise(0.5);
         // [cite: 2026-01-18] ANIMATION INVARIANT: Inject ripple into the base generator.
         // This forces the t-detector to trigger high-frequency updates.
-        const ripple = `(sin(u * 4.0 * PI + t * 3.0) * 0.05)`;
+        const ripple = `(sin(u * 4.0 * PI + t * 0.5) * 0.05)`;
         
         return {
           x: `(((1.0 + ((v * 2.0 - 1.0) * ${width} / 2.0) * cos(u * PI)) * cos(u * 2.0 * PI)) + ${ripple}) * ${s}`,

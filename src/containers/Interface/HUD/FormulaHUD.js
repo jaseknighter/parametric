@@ -17,7 +17,10 @@ const FormulaHUD = ({
   isMathematicalError,
   layoutMode, // [cite: 2026-01-20] FIX: React to layout mode changes
   displayMode, // [cite: 2026-01-27] FIX: Receive feature-flagged display mode
-  isA11yEnabled // [cite: 2026-01-27] A11Y: Gate focus logic
+  isA11yEnabled, // [cite: 2026-01-27] A11Y: Gate focus logic
+  tooltipHandlers, // [cite: 2026-01-27] TOOLTIP: Receive handlers from parent
+  hudGuidance, // [cite: 2026-01-27] TOOLTIP: Receive guidance data
+  statusGuidance // [cite: 2026-01-27] TOOLTIP: Receive status guidance
 }) => {
   const textareaRef = useRef(null);
   const containerRef = useRef(null);
@@ -214,8 +217,71 @@ const FormulaHUD = ({
           aria-expanded={isOpen}
           onKeyDown={handleHeaderKeyDown}
         >
-          <span>FORMULA EDITOR ({activeStatus})</span>
-          <div className={`Status_Dot ${isMathematicalError ? "MathError" : (isFormulaValid ? "Valid" : "Invalid")}`} />
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span>FORMULA EDITOR ({activeStatus})</span>
+            {/* [cite: 2026-01-27] TOOLTIP: Info Icon moved to Header for better visibility */}
+            <div 
+              className="HUD_Info_Icon"
+              role="button"
+              tabIndex={0}
+              aria-label="HUD Info"
+              style={{ 
+                cursor: 'pointer', 
+                fontSize: '11px', 
+                marginLeft: '8px', 
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '14px',
+                height: '14px',
+                border: '1px solid rgba(255, 255, 255, 0.6)',
+                borderRadius: '50%',
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontFamily: 'serif',
+                fontStyle: 'italic'
+              }}
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                tooltipHandlers?.showTooltip({
+                  x: rect.right + 10,
+                  y: rect.top + rect.height / 2,
+                  text: hudGuidance?.proseBehavior || hudGuidance?.tableBehavior,
+                  intent: hudGuidance?.intent,
+                  placement: 'right'
+                });
+              }}
+              onMouseLeave={tooltipHandlers?.hideTooltip}
+              onFocus={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                tooltipHandlers?.showTooltip({
+                  x: rect.right + 10,
+                  y: rect.top + rect.height / 2,
+                  text: hudGuidance?.proseBehavior || hudGuidance?.tableBehavior,
+                  intent: hudGuidance?.intent,
+                  placement: 'right'
+                });
+              }}
+              onBlur={tooltipHandlers?.handleBlur}
+              onPointerDown={(e) => e.stopPropagation()} // Prevent drag start
+              onClick={(e) => e.stopPropagation()} // Prevent toggle
+            >
+              i
+            </div>
+          </div>
+          <div 
+            className={`Status_Dot ${isMathematicalError ? "MathError" : (isFormulaValid ? "Valid" : "Invalid")}`} 
+            onMouseEnter={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              tooltipHandlers?.showTooltip({
+                x: rect.right + 10,
+                y: rect.top + rect.height / 2,
+                text: statusGuidance?.proseBehavior || statusGuidance?.tableBehavior,
+                intent: statusGuidance?.intent,
+                placement: 'right'
+              });
+            }}
+            onMouseLeave={tooltipHandlers?.hideTooltip}
+          />
         </div>
         {isOpen && (
           <div className="HUD_Content_Area" style={{ height: `${size.height}px` }}>

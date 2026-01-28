@@ -67,6 +67,10 @@ export default defineConfig({
     watch: {
       // 🟢 Add these patterns to the ignored list
       ignored: ['**/coverage/**', '**/monocart-report/**']
+    },
+    headers: {
+      // [cite: 2026-01-27] SAFARI FIX: Prevent caching of "null" worker responses on refresh
+      'Cache-Control': 'no-store',
     }
   },
 
