@@ -1,5 +1,5 @@
 ![Parametric 3D Engine](./docs/images/header_banner.png)
-# Parametric 3D Engine  <!-- omit in toc -->
+# Parametric 3D Engine <!-- omit in toc -->
 
 A browser-based environment for exploring complex mathematical surfaces and parametric geometry. Refactored and rearchitected in 2026 with the assistance of LLMs.
 
@@ -13,17 +13,24 @@ A browser-based environment for exploring complex mathematical surfaces and para
 ## Table of Contents <!-- omit in toc -->
 
 - [Current Status](#current-status)
-- [📊 Quality Dashboards](#-quality-dashboards)
+  - [📊 Quality Dashboards](#-quality-dashboards)
 - [Documentation](#documentation)
+  - [Formula Editor: Manual Override](#formula-editor-manual-override)
+  - [Interface Reference](#interface-reference)
+  - [Additional Features \& Formulas](#additional-features--formulas)
+    - [1. Move Multiple Sliders at Once](#1-move-multiple-sliders-at-once)
+    - [2. Animation](#2-animation)
+    - [Additional Formulas](#additional-formulas)
   - [Background](#background)
-  - [Release Manifest v0.5: The Unified Engine Baseline](#release-manifest-v05-the-unified-engine-baseline)
-  - [DRAFT Technical Documentation (LLM Generated)](#draft-technical-documentation-llm-generated)
+  - [Recent Releases](#recent-releases)
+    - [Release Manifest v0.5: The Unified Engine Baseline](#release-manifest-v05-the-unified-engine-baseline)
+  - [Technical Documentation (DRAFT - LLM Generated)](#technical-documentation-draft---llm-generated)
 - [Post-v0.5 Priorities: Transparency \& Test Depth](#post-v05-priorities-transparency--test-depth)
 - [Reporting Issues \& Feature Requests](#reporting-issues--feature-requests)
 - [Installation for Local Development](#installation-for-local-development)
 - [Credits](#credits)
 
-### Current Status
+## Current Status
 **v0.5 rearchitecture release live (20260119)** 
 The engine has transitioned to a multi-threaded, JIT-compiled model. Coverage: >80%.
 CI logic and coverage validated via Chromium (V8). Full cross-browser parity (WebKit/Firefox) verified in local development tier.
@@ -56,25 +63,105 @@ CI logic and coverage validated via Chromium (V8). Full cross-browser parity (We
 
 ---
 
-### Documentation
+## Documentation
 
 ![Instructions](./docs/images/instructions_banner.png)
 
-1. **Explore:** Interact with the shape.  
-   - Click or move to rotate the geometry.  
-   - Swipe or pinch to zoom (device-dependent).
-2. **Shape:** Select a *shape* from the sidebar to load its preset parameters.
-3. **Project:** Use the buttons in the *project* sidebar to change the ordering of dimensions.
-4. **Morph:** Adjust variables like $resolution$, $bending$, or $scale$ oscillations using the sliders.
-5. **Edit:** Modify the underlying GLSL-style formulas in real time using the **HUD (Heads-Up Display)**.
-6. **Animate:** Automatically toggle the animation loop if a formula contains a $t$ variable to visualize temporal changes.
-7. **Export:** Generate an .STL file for use in a 3D viewer, printer, or modeler.
+* **Schema Compatibility:** JSON configuration files remain fully backward-compatible with existing shape definitions.
+
+---
+
+<!-- START_UI_REFERENCE -->
+### Formula Editor: Manual Override
+
+> **Use formulas to directly control the 3D shape.**
+
+Provides a live view of GLSL expressions. Edits here override the interface presets. Any formulas you write manually will be erased if you update the interface controls.
+
+---
+
+### Interface Reference
+
+| Interface Element | What does it do? | How does it work? |
+| :--- | :--- | :--- |
+| **Shape: Base Topology** | Choose the starting form for your 3D model. | Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation. |
+| **Project: Vector Mapping** | Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D. | Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates. |
+| **Bend: Curvature & Arching** | Curve the shape along its main axes. | theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta) |
+| **Pinch: Vertex Concentration** | Pull points together or spread them along an axis. | v' = sgn(v) * \|v\|^(1.0 + (amt * scalar)) * n |
+| **Texture: Surface Displacement** | Add fine bumps and waves to the surface. | 1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt) |
+| **Spiral: Coordinate Torsion** | Twist the shape around its center. | theta' = atan2(B, A) + (amt * r * scalar) |
+| **Modulate: Surface Oscillation** | Overlay gentle ripples or waves on the shape. | Delta = sin(u * freq) * cos(v * freq) * amt |
+| **Flatten: Linear Compression** | Compress the shape along one direction. | v' = v * (1.0 - amt) |
+| **Export: Geometry Output** | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
+
+<!-- END_UI_REFERENCE -->
+
+### Additional Features & Formulas
+
+#### 1. Move Multiple Sliders at Once
+Holding **Shift** while dragging any interface slider reduces the parameter's movement sensitivity by a factor of 10. This is used for fine-tuning high-frequency textures or minor rotational adjustments.
+
+#### 2. Animation
+The engine supports the `t` variable (elapsed time in seconds). This is used to drive periodic movement or surface oscillations.
+
+**Simple Animation Example:** 
+*Copy and paste this into the Formula Editor (HUD) to replace the existing logic:*
+```glsl
+// A simple oscillating sphere
+x = cos(u * 2 * PI) * sin(v * PI) * (1.0 + sin(t) * 0.2);
+y = sin(u * 2 * PI) * sin(v * PI) * (1.0 + sin(t) * 0.2);
+z = cos(v * PI) * (1.0 + sin(t) * 0.2);
+```
+---
+#### Additional Formulas 
+
+**Formula A**
+
+```text
+x = cos(u * 2π) * sin(v * 4π)
+y = sin(u * 2π) * sin(v * π)
+z = cos(v * π)
+```
+
+* Generates a **parametric 3D surface** based on spherical coordinates.
+* The `u` parameter wraps around the horizontal axis (azimuth), and `v` wraps vertically (polar).
+* Produces a smooth **rippling or “flower-like” pattern** along the surface due to the `sin(v * 4π)` in `x`.
+* Essentially a **warped sphere** with repeating vertical folds.
+
+**Formula B** 
+
+```text
+x = sign(...) * abs(...)^3
+y = sin(u * 2π) * sin(v * π) + ...
+z = cos(v * π) + ...
+```
+
+* Builds on a base spherical surface like Formula A.
+* Adds **complex modulation and twisting**, including higher-frequency oscillations (`cos(u * 0.2556 * 12π)` and `sin(u * 0.2556 * 12π)`).
+* The `sign` and `pow(..., 3)` in `x` **amplify or flatten regions**, creating sharp peaks and valleys.
+* Result is a **highly sculpted, almost fractal-like 3D shape** with folds, spikes, and distortions.
+
+**Formula C**
+
+```text
+let pulse = sin(t * 0.5) * 1.6;
+x = cos(u * 2π) * sin(v * π) + cos(v * pulse * 12π) * 0.6
+y = sin(u * 2π * pulse) * sin(v * π)
+z = cos(v * π)
+```
+
+* Introduces **temporal animation** using the `pulse` variable (`t` is time).
+* The `pulse` modulates the horizontal rotation (`u`) and adds a **dynamic rippling effect** in `x`.
+* Produces a **breathing, twisting 3D surface** that continuously evolves.
+* Essentially a **living, animated variant of Formula A**, where the shape “pulses” over time.
+
+
 
 ---
 
 ![Background](./docs/images/background_banner.png)
 
-#### Background 
+### Background 
 
 When I was a kid I got a computer. It had a single 5.25" floppy drive and a monochrome monitor that displayed green text on a black background. I played lots of Zork on it ("go west...you bump into a wall...go west...you bump into a wall...") Not too long after, I received a graphics card for the computer that came with a manual explaining how to program simple shapes and display them up on the monitor. That magical experience of seeing how a computer can take a few lines of code and turn them into an image has never left me. 
 
@@ -98,7 +185,7 @@ I hope you enjoy exploring the application as much as I have enjoyed building it
 
 ---
 
-#### Recent Releases
+### Recent Releases
 
 * **[v0.5.0.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.0.1)** (2026-01-27): Infrastructure Baseline. Established resilient Feature Flag system, Self-Healing tests, and neutralized UI styling invariants.
 
@@ -127,18 +214,18 @@ The v0.5 release represents a core transplant to enable modern performance and m
 
 ![Lessons Learned](./docs/images/lessons_banner.png)
 
-#### Lessons Learned <!-- omit in toc -->
+### Lessons Learned <!-- omit in toc -->
 
 **Draft:** under review
 
 ---
 
-#### Guidelines for Working with LLMs <!-- omit in toc -->
+### Guidelines for Working with LLMs <!-- omit in toc -->
 * Triangulating for Truthiness: Effective Engagement with LLMs for Software Engineering (**Draft:** under review)
 
 ---
 
-#### DRAFT Technical Documentation (LLM Generated)
+### Technical Documentation (DRAFT - LLM Generated)
 
 The following sections are under active development and subject to change.
 
@@ -158,7 +245,7 @@ The following sections are under active development and subject to change.
 
 ---
 
-### Post-v0.5 Priorities: Transparency & Test Depth
+## Post-v0.5 Priorities: Transparency & Test Depth
 1. **Accessibility (System Universalization):** Ensure the HUD and Sidebar states are announced correctly for screen readers, allowing the engine's mathematical state to be understood non-visually.
 2. **Performance:** Determine maximum vertex ceilings per device and monitor garbage collection pressure during animations.
 3. **Observability:** Implement a "Black Box" flight recorder to capture math failures in the wild.
@@ -166,7 +253,7 @@ The following sections are under active development and subject to change.
 
 ---
 
-### Reporting Issues & Feature Requests
+## Reporting Issues & Feature Requests
 
 * **Bug Reports:** Please include steps to replicate the issue and a copy of the console log (enabled by adding `?debug=true` to the URL).
 * **Feature Requests:** Open an issue to discuss new parametric presets or UI enhancements.
@@ -175,7 +262,7 @@ Note: the roadmap is pretty well set for the near future and I have not yet begu
 
 ---
 
-### Installation for Local Development
+## Installation for Local Development
 
 To set up the environment and the new Worker-based architecture locally:
 
@@ -191,10 +278,10 @@ To set up the environment and the new Worker-based architecture locally:
 
 3. **Start the development server:**
 
-    `npm run dev`
+    `npm start`
 
 ---
 
-### Credits
+## Credits
 * **Mathematical Foundation**: Inspired by the formulas and ideas in the book <a href="https://www.amazon.com/Morphing-Mathematical-Transformations-Architects-Designers/dp/1780674139">Morphing: A Guide to Mathematical Transformations for Architects and Designers (Laurence King Publishing, 2015)</a> by Joseph Choma.
 * **AI Collaboration**: Architectural refinement, "Exorcism" of legacy 2019 logic, and testing pipelines developed through deep engagement with Large Language Models.

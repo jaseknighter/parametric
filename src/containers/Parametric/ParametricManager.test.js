@@ -18,6 +18,15 @@ jest.mock('../../utilities/debug', () => ({
   }
 }));
 
+jest.mock('../../shared/featureFlagUtils', () => ({
+  FeatureFlags: {
+    isEnabled: jest.fn(() => true),
+    setFlag: jest.fn()
+  }
+}));
+
+jest.mock('../../shared/FEATURE_FLAGS', () => ({ FEATURE_FLAGS: { testFlag: 'EXP' } }));
+
 describe('ParametricManager', () => {
   let mockWorker;
   let mockLoader;
@@ -80,5 +89,13 @@ describe('ParametricManager', () => {
     const manager = createParametricManager(mockLoader, {}, onStatus);
     manager.dispose();
     expect(mockWorker.terminate).toHaveBeenCalled();
+  });
+
+  test('Syncs flags to worker on init (Safari Protection)', () => {
+    createParametricManager(mockLoader, {}, onStatus);
+    expect(mockWorker.postMessage).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'UPDATE_FLAGS',
+      flags: { testFlag: true }
+    }));
   });
 });

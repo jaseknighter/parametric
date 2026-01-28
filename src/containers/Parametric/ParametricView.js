@@ -5,12 +5,15 @@
  * FIXED: Stabilized HUD against high-frequency renders using useMemo.
  * [cite: 2026-01-12]
  */
-import React, { forwardRef, useMemo, useState, useEffect, memo } from "react";
+import React, { forwardRef, useMemo, useState, useEffect, memo, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
 import { isFeatureEnabled } from "../../shared/featureFlagUtils";
+import { GUIDANCE_REGISTRY } from "../../shared/GUIDANCE_REGISTRY/GUIDANCE_REGISTRY";
 
 // Safety & Utilities
 import { assertReadOnly } from "../../utilities/assertDiagnosticsBoundary";
+import MathTooltip from "../../components/Common/MathTooltip";
+import { useAdaptiveTooltip } from "../../shared/hooks/useAdaptiveTooltip";
 
 // Components
 import FormulaHUD from "../Interface/HUD/FormulaHUD";
@@ -77,6 +80,30 @@ const ParametricView = forwardRef((props, ref) => {
   // FEATURE_FLAG_START: accessibilityHardening
   const isA11y = isFeatureEnabled('accessibilityHardening');
   // FEATURE_FLAG_END: accessibilityHardening
+
+  // FEATURE_FLAG_START: docsBridge
+  const isDocsBridge = isFeatureEnabled('docsBridge');
+  // FEATURE_FLAG_END: docsBridge
+
+  // [cite: 2026-01-27] TOOLTIP: HUD About Link
+  const { tooltip, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur } = useAdaptiveTooltip();
+  const aboutLinkRef = useRef(null);
+  // [cite: 2026-01-27] FIX: Ensure fallback content exists so tooltip renders
+  const hudGuidance = GUIDANCE_REGISTRY.HUD_TITLE || { 
+    intent: "Formula Editor", 
+    proseBehavior: "Manual Override. Use formulas to directly control the 3D shape." 
+  };
+  const aboutGuidance = GUIDANCE_REGISTRY.ABOUT_LANDMARK || {};
+  const statusGuidance = GUIDANCE_REGISTRY.STATUS_LANDMARK || {};
+
+  // [cite: 2026-01-27] FIX: Remove native title to prevent browser tooltip collision
+  useEffect(() => {
+    const link = aboutLinkRef.current;
+    if (link && isDocsBridge) {
+      link.removeAttribute('title');
+    }
+  }, [isDocsBridge]);
+
 
   // [cite: 2026-01-27] DEBUG: Focus Watcher for A11y
   useEffect(() => {
@@ -175,9 +202,12 @@ const ParametricView = forwardRef((props, ref) => {
         layoutMode={layoutMode} // [cite: 2026-01-20] FIX: Ensure HUD reacts to layout shifts
         displayMode={displayMode} // [cite: 2026-01-27] FIX: Pass feature-flagged display mode
         isA11yEnabled={isA11y} // [cite: 2026-01-27] A11Y: Pass flag for focus management
+        tooltipHandlers={{ showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur }} // [cite: 2026-01-27] TOOLTIP: Pass handlers
+        hudGuidance={hudGuidance}
+        statusGuidance={statusGuidance} // [cite: 2026-01-27] TOOLTIP: Pass status guidance
       />
     );
-  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode, isA11y]);
+  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode, isA11y, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur, hudGuidance, statusGuidance]);
 
   /**
    * Memoized Interface
@@ -266,10 +296,29 @@ const ParametricView = forwardRef((props, ref) => {
     <div className={`Container layout-${layoutMode} ${isMobileHud ? 'feature-mobile-hud' : ''} ${isA11y ? 'flag-a11y-on' : ''}`}>
       <header className="Header">
         Parametric Equations 
-        <span className="worker-pill" aria-live={isA11y ? "polite" : undefined}>
+        {/* <span className="worker-pill" aria-live={isA11y ? "polite" : undefined}>
           {mode ? `${displayMode} | ${avgLat?.toFixed(1)}ms | ${memoryUtilization}% MEM` : "System Idle"}
-        </span>
-        {showOverlay && (
+        </span> */}
+        {isDocsBridge && (
+          <a 
+            href="./README.md" 
+            ref={aboutLinkRef}
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="About_Link_Header"
+            data-testid="about-link"
+            onMouseEnter={(e) => showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' })}
+            onMouseLeave={hideTooltip}
+            onMouseMove={handleMouseMove}
+            onFocus={(e) => handleFocus(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' })}
+            onBlur={handleBlur}
+          >
+            about
+            <span className="external-icon" aria-hidden="true">↗</span>
+            <span className="sr-only">(opens in a new window)</span>
+          </a>
+        )}
+        {/* {showOverlay && (
           <DiagnosticsHUD 
             systemState={{ isBusy, currentRequestId }} 
             logs={logs}
@@ -283,7 +332,7 @@ const ParametricView = forwardRef((props, ref) => {
             onBenchmark={onBenchmark}
             onClose={() => onToggleHUD(false)}
           />
-        )}
+        )} */}
       </header>
 
       <div className="Three_Grid_Area" style={{ gridArea: 'three', position: 'relative' }}>
@@ -291,18 +340,18 @@ const ParametricView = forwardRef((props, ref) => {
           className="Three" 
           id="three" 
           ref={ref} 
-          role={isA11y ? "application" : undefined}
-          tabIndex={isA11y ? 0 : -1}
-          aria-label={isA11y ? canvasLabel : undefined}
+          role="application"
+          tabIndex={0}
+          aria-label={canvasLabel}
         />
         
         {isA11y && semanticDescription}
 
-        <div className="Worker_Status_Indicator">
+        {/* <div className="Worker_Status_Indicator">
           <div className={`status-dot ${isBusy ? 'processing' : (status?.toLowerCase() || 'idle')}`} />
           <span>{isBusy ? 'PROCESSING' : (isBooting ? 'BOOTING...' : (status || "IDLE"))}</span>
           {isTesting && <div className="test-pulse">BENCHMARKING...</div>}
-        </div>
+        </div> */}
 
         {showBreach && (
           <div className="Integrity_Breach_Overlay" data-source="ParametricView">
@@ -320,6 +369,18 @@ const ParametricView = forwardRef((props, ref) => {
       <div className="Interface_Container">
         {memoizedInterface}
       </div>
+
+      {/* [cite: 2026-01-27] TOOLTIP: HUD About Link */}
+      <MathTooltip 
+        intent={tooltip.intent}
+        text={tooltip.text} 
+        visible={tooltip.visible} 
+        x={tooltip.x} 
+        y={tooltip.y} 
+        isA11yEnabled={isA11y}
+        data-testid="math-tooltip-hud"
+        placement={tooltip.placement}
+      />
     </div>
   );
 });

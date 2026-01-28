@@ -1,5 +1,6 @@
-import { DEBUG_THROTTLES } from '../shared/ParametricConstants';
-import { FEATURE_FLAGS } from '../shared/FEATURE_FLAGS';
+import { DEBUG_THROTTLES } from '../shared/ParametricConstants.js';
+import { FeatureFlags } from '../shared/featureFlagUtils.js';
+import { FEATURE_FLAGS } from '../shared/FEATURE_FLAGS.js';
 
 /**
  * @fileoverview debug.js
@@ -17,7 +18,7 @@ export const Debug = {
     this._channels = new Set(channels);
     if (this._enabled) {
       console.log(`%c🛠️ Debug Configured: [${[...this._channels].join(", ")}]`, "color: #2196f3; font-weight: bold;");
-      console.log(`%c💡 Tip: Run Debug.listFlags() to see active features.`, "color: #2196f3; font-style: italic; font-size: 0.8em;");
+      console.log(`%c💡 Tip: Run Debug.listFlags() to manage feature flags.`, "color: #2196f3; font-style: italic;");
     }
   },
 
@@ -25,33 +26,24 @@ export const Debug = {
     return this._enabled && this._channels.has(channel);
   },
 
-  /**
-   * Internal logic to determine if a log should be suppressed
-   * @returns {boolean} True if we should proceed with logging
-   */
   _shouldLog(channel, args) {
     if (!this.isEnabled(channel)) return false;
 
-    // Look specifically at the last argument for our internal debug flag
     const lastArg = args[args.length - 1];
     const isManual = lastArg && typeof lastArg === 'object' && lastArg.__isManual === true;
-
     const throttleMs = this._throttles[channel];
-    
+
     if (throttleMs && !isManual) {
       const now = performance.now();
-      if (this._lastLog[channel] && now - this._lastLog[channel] < throttleMs) {
-        return false; 
-      }
+      if (this._lastLog[channel] && now - this._lastLog[channel] < throttleMs) return false;
       this._lastLog[channel] = now;
-      args.unshift(`[ANIMATION HEARTBEAT ${throttleMs}ms]`);
+      args.unshift(`[THROTTLE ${throttleMs}ms]`);
     }
-    
-    // If we used the metadata argument, pop it so it doesn't show in the console
-    if (isManual) args.pop(); 
 
+    if (isManual) args.pop();
     return true;
   },
+
   log(channel, ...args) {
     if (this._shouldLog(channel, args)) {
       console.log(`%c[${channel}]`, "color: #9e9e9e; font-weight: bold;", ...args);
@@ -59,41 +51,60 @@ export const Debug = {
   },
 
   warn(channel, ...args) {
-    // Warnings follow the same throttle/manual rules to prevent flood during edit errors
     if (this._shouldLog(channel, args)) {
       console.warn(`[${channel}]`, ...args);
     }
   },
 
   error(channel, ...args) {
-    // Errors bypass all filters; they are critical signals
-    console.error(`%c[ ERROR]`, "color: #ff5252; font-weight: bold;", ...args);
+    console.error(`%c[ERROR]`, "color: #ff5252; font-weight: bold;", ...args);
   },
 
-  /**
-   * Manual override for one-off high-frequency logging
-   */
   tlog(channel, ms, ...args) {
     if (!this.isEnabled(channel)) return;
     const now = performance.now();
     const last = this._lastLog[`t_${channel}`] || 0;
-    
     if (now - last > ms) {
       this._lastLog[`t_${channel}`] = now;
       console.log(`%c[${channel} (THROTTLED)]`, "color: #ff9800; font-weight: bold;", ...args);
     }
   },
 
-  /**
-   * Lists all feature flags and their current configuration state.
-   * Useful for verifying environment configuration.
-   */
   listFlags() {
-    if (typeof window !== 'undefined' && window.listFeatureFlags) {
-      window.listFeatureFlags();
-    } else {
-      console.table(FEATURE_FLAGS);
-    }
+    if (typeof window === 'undefined') return;
+
+    // Build flag info
+    const flagData = Object.entries(FEATURE_FLAGS).reduce((acc, [key, config]) => {
+      const isObj = typeof config === 'object' && config !== null;
+      const defaultValue = isObj ? (config.defaultValue ?? config) : config;
+      const version = isObj ? (config.versionTarget || 'v0.0.0') : 'v0.0.0';
+      const stage = isObj ? (config.stage || 'prod') : 'prod';
+      const type = defaultValue === true || defaultValue === 'ON' ? 'ON' :
+                   (defaultValue === false || defaultValue === 'OFF' ? 'OFF' :
+                   (defaultValue || 'EXP'));
+      const isEnabled = FeatureFlags.isEnabled(key);
+
+      acc[key] = {
+        Type: type,
+        State: isEnabled ? "✅ ENABLED" : "❌ DISABLED",
+        Version: `${version} (${stage})`,
+      };
+      return acc;
+    }, {});
+
+    // 1️⃣ Console summary
+    console.group("🛠️ Parametric Feature Flags");
+    console.table(
+      Object.entries(flagData).reduce((acc, [key, data]) => {
+        acc[key] = { Type: data.Type, State: data.State, Version: data.Version };
+        return acc;
+      }, {})
+    );
+
+    // 2️⃣ DOM panel for live toggling (Delegated to FeatureFlags utility)
+    FeatureFlags.listFlags();
+
+    console.groupEnd();
   }
 };
 

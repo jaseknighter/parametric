@@ -9,6 +9,8 @@ import { getWorkerDataPacket } from "./ParametricLogic";
 import { intentService } from "../../services/ParametricIntentService";
 import { FormulaEvents, FormulaMode } from "../../shared/ParametricConstants";
 import { Debug } from "../../utilities/debug";
+import { FeatureFlags } from "../../shared/featureFlagUtils";
+import { FEATURE_FLAGS } from "../../shared/FEATURE_FLAGS";
 
 export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
   const instanceId = Math.random().toString(36).substring(7);
@@ -23,8 +25,48 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
     window.__PARAMETRIC_READY__ = false; // [cite: 2026-01-24] ALIAS: Signal-based testing
   }
 
-  const worker = workerLoader();
+  // [cite: 2026-01-27] SAFARI RESILIENCE: Retry worker load on transient fetch failure
+  let worker;
+  try {
+    worker = workerLoader();
+  } catch (e) {
+    Debug.warn("WORKER", "⚠️ Worker load failed (Safari FetchEvent?). Retrying once...", e);
+    try {
+      worker = workerLoader();
+    } catch (retryErr) {
+      Debug.error("WORKER", "🚨 Fatal Worker Load Failure:", retryErr);
+      throw retryErr;
+    }
+  }
+
   Debug.log("WORKER", `🏗️ [Manager] New Instance Created: ${instanceId}`);
+
+  /**
+   * 🛰️ FLAG SYNC: Authoritative push to worker
+   * [cite: 2026-01-27] v0.5.2: Protect worker from URL-param injection (Safari Safe)
+   */
+  const syncFlagsToWorker = () => {
+    const workerContextFlags = {};
+    // Extract only the logic flags the worker needs to stay lean
+    Object.keys(FEATURE_FLAGS).forEach(key => {
+      workerContextFlags[key] = FeatureFlags.isEnabled(key);
+    });
+    
+    worker.postMessage({ 
+      type: 'UPDATE_FLAGS', 
+      flags: workerContextFlags 
+    });
+  };
+
+  // Initial sync
+  syncFlagsToWorker();
+
+  // Patch FeatureFlags.setFlag to auto-sync the worker
+  const originalSetFlag = FeatureFlags.setFlag.bind(FeatureFlags);
+  FeatureFlags.setFlag = (key, enable) => {
+    originalSetFlag(key, enable);
+    syncFlagsToWorker();
+  };
 
   const thunkScene = () => (typeof sceneRef === 'function' ? sceneRef() : sceneRef);
 
@@ -212,6 +254,8 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
      * Bypasses no-op checks to force the initial render (RID 1).
      */
     bootstrap: (initialState) => {
+      // Ensure flags are synced before the first mathematical crunch
+      syncFlagsToWorker();
       Debug.log("MANAGER", "Bootstrap called with:", initialState);
       const rid = 1;
       lastDispatchedRid = rid;
@@ -230,6 +274,8 @@ export const createParametricManager = (workerLoader, sceneRef, onStatus) => {
     dispose: () => {
       isDisposed = true;
       Debug.log("WORKER", `🗑️ [Manager] Instance Disposed: ${instanceId}`);
+      // Restore original setFlag just in case
+      FeatureFlags.setFlag = originalSetFlag;
       worker.terminate();
     }
   };

@@ -68,6 +68,11 @@
   background: #c27575;
 }
 
+/* [cite: 2026-01-27] UX: Closed hand cursor during drag */
+.HUD_Wrapper.dragging .HUD_Header {
+  cursor: grabbing !important;
+}
+
 /* Content Area with transparency */
 .HUD_Content_Area {
   position: relative;

@@ -6,18 +6,18 @@ export const FLAG_STATE = {
 
 export const FEATURE_FLAGS = {
   // v0.5.1: Accessibility & Semantic Hardening
-  accessibilityHardening: FLAG_STATE.EXP,
+  accessibilityHardening: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.1', stage: 'dev' },
 
   // v0.5.2: Display Domain Optimization
-  mobileHudOptimization: FLAG_STATE.EXP,
-  pinchToZoomDisable: FLAG_STATE.EXP,
+  mobileHudOptimization: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.2', stage: 'dev' },
+  pinchToZoomDisable: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.2', stage: 'dev' },
 
   // v0.5.3: Integrated Documentation Bridge
-  docsBridge: FLAG_STATE.EXP,
+  docsBridge: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.3', stage: 'dev' },
 
   // v0.5.4: Instructional Refinement
-  instructionalRefinement: FLAG_STATE.EXP,
+  instructionalRefinement: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.4', stage: 'dev' },
 
   // MVP / Infrastructure Test
-  hudHeaderLowercase: FLAG_STATE.EXP,
+  hudHeaderLowercase: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.0.1', stage: 'prod' },
 };

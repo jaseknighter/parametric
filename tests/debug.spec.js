@@ -112,7 +112,7 @@ test.describe('Unit: Debug Utility', () => {
       currentTime += 1100;
       Debug.log('THROTTLE', 'msg 3');
       expect(logs.log.length).toBe(2);
-      expect(logs.log[1][2]).toContain('ANIMATION HEARTBEAT');
+      expect(logs.log[1][2]).toContain('THROTTLE');
     } finally {
       performance.now = originalNow;
     }

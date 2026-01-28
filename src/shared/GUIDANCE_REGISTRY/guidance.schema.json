@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": {
+    "$ref": "#/definitions/entry"
+  },
+  "definitions": {
+    "entry": {
+      "type": "object",
+      "required": ["title", "intent", "docScope"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "docScope": {
+          "type": "string",
+          "enum": ["ui", "table", "prose", "hidden"]
+        },
+        "link": {
+          "type": "string"
+        },
+        "tableBehavior": {
+          "type": "string",
+          "pattern": "^[^\\n#<!\\[]+$"
+        },
+        "proseBehavior": {
+          "type": "string"
+        },
+        "mathExpression": {
+          "type": "string",
+          "pattern": "^[^\\n#<!\\[]+$"
+        },
+        "math": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "docScope": { "const": "table" } } },
+          "then": {
+            "required": ["tableBehavior"],
+            "not": { "required": ["proseBehavior"] }
+          }
+        },
+        {
+          "if": { 
+            "required": ["math"],
+            "properties": { "math": { "const": true } } 
+          },
+          "then": { "required": ["mathExpression"] }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

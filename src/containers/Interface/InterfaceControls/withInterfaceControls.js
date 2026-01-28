@@ -7,6 +7,9 @@
  */
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { isFeatureEnabled } from "../../../shared/featureFlagUtils";
+import { GUIDANCE_REGISTRY } from "../../../shared/GUIDANCE_REGISTRY/GUIDANCE_REGISTRY";
+import MathTooltip from "../../../components/Common/MathTooltip";
+import { useAdaptiveTooltip } from "../../../shared/hooks/useAdaptiveTooltip";
 
 /**
  * withInterfaceControls
@@ -36,6 +39,28 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
     // [cite: 2026-01-27] A11Y: Feature Flag check
     const isA11yEnabled = isFeatureEnabled('accessibilityHardening');
     const sectionId = `section-content-${controlID}`;
+    
+    // [cite: 2026-01-27] INSTRUCTIONAL BRIDGE: Lookup guidance
+    const registryKey = `${controlID.toUpperCase()}_DRAWER`;
+    const guidance = GUIDANCE_REGISTRY[registryKey] || {};
+    const intentId = `intent-${controlID}`;
+    
+    // [cite: 2026-01-27] v0.5.2: Classified Content Lookup
+    let behavior = guidance.tableBehavior || guidance.proseBehavior || "";
+    // [cite: 2026-01-27] FIX: Append math expression if present so it appears in tooltip
+    if (guidance.mathExpression) {
+      behavior += ` $${guidance.mathExpression}$`;
+    }
+
+    // [cite: 2026-01-27] DX: Warn if guidance is missing in dev
+    useEffect(() => {
+      if (process.env.NODE_ENV === 'development' && !guidance.intent && !behavior) {
+        console.warn(`[Guidance Missing]: No registry entry found for ${registryKey}`);
+      }
+    }, [registryKey, guidance, behavior]);
+
+    // 🎯 Tooltip State
+    const { tooltip, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur } = useAdaptiveTooltip();
 
     const [isOpen, setIsOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -126,6 +151,41 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
       if (setActiveControlKey) setActiveControlKey(null);
     }, [setActiveControlKey]);
 
+    // [cite: 2026-01-27] INJECT: Apply attributes to children via DOM ref
+    useEffect(() => {
+      const root = controlsRef.current;
+      if (!root) return;
+
+      const button = root.querySelector('.TAreaInterface___TitleButton');
+      if (button && behavior) { // [cite: 2026-01-27] GUARD: Ensure button exists
+        // 🛡️ Remove native title to prevent browser tooltip collision
+        button.removeAttribute('title');
+        
+        const triggerShow = (e) => showTooltip(e, { text: behavior, intent: guidance.intent });
+        const triggerFocus = (e) => handleFocus(e, { text: behavior, intent: guidance.intent });
+
+        button.addEventListener('mouseenter', triggerShow);
+        button.addEventListener('mouseleave', hideTooltip);
+        button.addEventListener('mousemove', handleMouseMove);
+        button.addEventListener('focus', triggerFocus);
+        button.addEventListener('blur', handleBlur);
+        
+        // Cleanup listeners on unmount or re-render
+        return () => {
+          button.removeEventListener('mouseenter', triggerShow);
+          button.removeEventListener('mouseleave', hideTooltip);
+          button.removeEventListener('mousemove', handleMouseMove);
+          button.removeEventListener('focus', triggerFocus);
+          button.removeEventListener('blur', handleBlur);
+        };
+      }
+
+      const container = root.querySelector('.TAreaInterface_controlsContainer');
+      if (container && guidance.intent) {
+        container.setAttribute('aria-describedby', intentId);
+      }
+    }, [behavior, guidance.intent, intentId, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur]);
+
     return (
       <div 
         id={controlID} 
@@ -135,6 +195,9 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
         onMouseEnter={onEnter} 
         onMouseLeave={onLeave}
       >
+        {guidance.intent && (
+          <span id={intentId} className="sr-only">{guidance.intent}</span>
+        )}
         <WrappedComponent
           {...rest}
           controlID={controlID} // SMOKE TESTING: Pass for internal use if needed
@@ -143,6 +206,17 @@ const withInterfaceControls = (WrappedComponent, defaultID, controlClass) => {
           isOpen={isOpen}
           isA11yEnabled={isA11yEnabled}
           sectionId={sectionId}
+        />
+        
+        {/* 🚀 Decoupled MathTooltip with Stable Test ID */}
+        <MathTooltip 
+          intent={tooltip.intent}
+          text={tooltip.text} 
+          visible={tooltip.visible} 
+          x={tooltip.x} 
+          y={tooltip.y} 
+          data-testid={`math-tooltip-${controlID}`} 
+          isA11yEnabled={isA11yEnabled}
         />
       </div>
     );

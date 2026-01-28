@@ -13,6 +13,11 @@ test.describe('HUD Authority Contract', () => {
       window.parametricState &&
       window.parametricState.ready === true
     );
+
+    const wrapper = page.locator('.HUD_Wrapper');
+    if (await wrapper.evaluate(el => el.classList.contains('is-closed'))) {
+      await page.locator('.HUD_Header').click();
+    }
   });
 
   test('Automatic packet generation must stop after manual override', async ({ page }) => {

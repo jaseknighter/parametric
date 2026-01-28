@@ -129,18 +129,43 @@ This flag serves as the "Sanity Check" for the entire pipeline. It verifies that
 ### Console Audit
 Type this in the browser console to see the live state of all "Contractual Invariants":
 ```javascript
-listFeatureFlags()
+Debug.listFlags()
 ```
 
 ---
 
-## 6. Workflow
+## 6. Displaying Flags in console
 
-| Stage                | Flag Value | Behavior                                                |
-| -------------------- | ---------- | ------------------------------------------------------- |
-| Experiment / Testing | EXP        | Feature disabled by default, enabled only via URL param |
-| Production Rollout   | ON         | Feature enabled for all users                           |
-| Disable / Revert     | OFF        | Feature completely disabled                             |
+Use: Debug.listFlags() to show:
+
++---------------------------+------+------------+-----------+
+| Flag                      | Type | State      | Version   |
++---------------------------+------+------------+-----------+
+| accessibilityHardening    | EXP  | ❌ DISABLED | 0.5.1 (dev) |
+| mobileHudOptimization     | EXP  | ✅ ENABLED  | 0.5.2 (dev) |
+| pinchToZoomDisable        | EXP  | ❌ DISABLED | 0.5.2 (dev) |
+| docsBridge                | EXP  | ✅ ENABLED  | 0.5.3 (dev) |
+| instructionalRefinement   | EXP  | ❌ DISABLED | 0.5.4 (dev) |
+| hudHeaderLowercase        | EXP  | ✅ ENABLED  | 0.5.4 (dev) |
++---------------------------+------+------------+-----------+
+
+Links to Toggle Features:
+
+[Experimental Flags]
+────────────────────────────
+Flag: accessibilityHardening
+  Enable: http://localhost:3000/parametric/?flag_on=accessibilityHardening
+  Disable: http://localhost:3000/parametric/?flag_off=accessibilityHardening
+
+Flag: mobileHudOptimization
+  Enable: http://localhost:3000/parametric/?flag_on=mobileHudOptimization
+  Disable: http://localhost:3000/parametric/?flag_off=mobileHudOptimization
+
+[Standard Flags]
+────────────────────────────
+Flag: testFlagOn
+  Enable: http://localhost:3000/parametric/?flag_on=testFlagOn
+  Disable: http://localhost:3000/parametric/?flag_off=testFlagOn
 
 **Notes:**
 
