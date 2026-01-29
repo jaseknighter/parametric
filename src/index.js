@@ -10,13 +10,6 @@ import App from './App';
 import { Debug } from './utilities/debug.js';
 import { FeatureFlags } from './shared/featureFlagUtils.js';
 
-// [cite: 2026-01-27] ROUTING FIX: Enforce trailing slash for base path
-// This ensures that visiting /parametric redirects to /parametric/ to match the Vite base.
-const baseUrl = import.meta.env.BASE_URL;
-if (baseUrl && baseUrl !== '/' && window.location.pathname === baseUrl.replace(/\/$/, '')) {
-  window.location.replace(baseUrl + window.location.search + window.location.hash);
-}
-
 // [cite: 2026-01-24] OBSERVABILITY: Initialize Debug Utility
 // Enables specific channels only when ?debug=true is present in the URL.
 const isDebug = window.location.search.includes('debug=true');
@@ -77,5 +70,13 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
         // 🔴 Always log errors in production for observability
         console.error('❌ Service Worker registration failed:', err);
       });
+  });
+} else if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  // [cite: 2026-01-28] DEV CLEANUP: Unregister any stale service workers to prevent "Failed to fetch" errors
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    for (const registration of registrations) {
+      registration.unregister();
+      if (isDebug) console.log('🧹 [Dev] Unregistered stale Service Worker');
+    }
   });
 }

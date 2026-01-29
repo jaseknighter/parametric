@@ -18,6 +18,10 @@
 
   export default defineConfig({
     testDir: './tests',
+    // [cite: 2026-01-28] SNAPSHOTS: Shared Baseline Strategy (Option B)
+    // We use macOS snapshots as the source of truth. CI (Linux) validates against them
+    // using 'maxDiffPixelRatio' to tolerate rendering differences (fonts/anti-aliasing).
+    snapshotPathTemplate: '{testDir}/__snapshots__/{testFileName}/{snapshotName}-{projectName}{ext}',
     testIgnore: '**/*.test.js', // [cite: 2026-01-18] FIX: Ignore Jest unit tests to prevent runner collision
     workers: is3DHeavy ? 1 : (process.env.CI ? 1 : 3),
       fullyParallel: !is3DHeavy,

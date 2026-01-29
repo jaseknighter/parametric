@@ -212,3 +212,15 @@ export async function shiftDragSlider(page, group, values) {
     }
   }, { group, values });
 }
+
+/**
+ * Verifies that the Interface is visually and interactively collapsed.
+ * Checks pointer-events and opacity.
+ */
+export async function expectInterfaceCollapsed(page) {
+  const interfaceEl = page.locator('.Interface');
+  await expect(interfaceEl).toHaveCSS('pointer-events', 'none');
+  
+  // Visual Check: Interface container itself fades out
+  await expect(interfaceEl).toHaveCSS('opacity', '0');
+}

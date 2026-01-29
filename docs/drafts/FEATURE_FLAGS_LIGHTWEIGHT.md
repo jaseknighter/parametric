@@ -2,6 +2,8 @@
 
 **NOTE: AI generated, still under review.**
 
+> **Related:** [Feature Flags: Testing Strategy](./FEATURE_FLAGS_TESTING.md)
+
 This is a minimal, maintainable approach for controlling experimental and permanent features in the Parametric Engine. It supports **OFF**, **ON**, and **EXP** (experimental) states.
 
 ---

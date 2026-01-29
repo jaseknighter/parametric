@@ -25,6 +25,20 @@ export default defineConfig({
       config: () => {
         console.log('⚠️ [Vite] VITE_COVERAGE:', process.env.VITE_COVERAGE);
       }
+    },
+    // 4. Middleware: Redirect /parametric to /parametric/ to satisfy base config
+    {
+      name: 'redirect-base-slash',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url === '/parametric' || req.url.startsWith('/parametric?')) {
+            res.writeHead(301, { Location: req.url.replace('/parametric', '/parametric/') });
+            res.end();
+          } else {
+            next();
+          }
+        });
+      }
     }
   ],
   

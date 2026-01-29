@@ -24,6 +24,7 @@ const TexturingControl = (props) => {
         className="TAreaInterface___TitleButton"
         aria-expanded={isA11yEnabled ? isOpen : undefined}
         aria-controls={isA11yEnabled ? sectionId : undefined}
+        tabIndex="0" // [cite: 2026-01-28] FIX: Force focusability for Safari
       >
         <h3 className="TAreaInterface___TitleButton_Label">Texture</h3>
       </button>

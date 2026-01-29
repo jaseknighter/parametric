@@ -14,6 +14,7 @@ import { GUIDANCE_REGISTRY } from "../../shared/GUIDANCE_REGISTRY/GUIDANCE_REGIS
 import { assertReadOnly } from "../../utilities/assertDiagnosticsBoundary";
 import MathTooltip from "../../components/Common/MathTooltip";
 import { useAdaptiveTooltip } from "../../shared/hooks/useAdaptiveTooltip";
+import { useOutsideDismiss } from "../../shared/hooks/useOutsideDismiss";
 
 // Components
 import FormulaHUD from "../Interface/HUD/FormulaHUD";
@@ -76,6 +77,28 @@ const ParametricView = forwardRef((props, ref) => {
   // FEATURE_FLAG_START: mobileHudOptimization
   const isMobileHud = isFeatureEnabled('mobileHudOptimization');
   // FEATURE_FLAG_END: mobileHudOptimization
+
+  // [cite: 2026-01-28] MICRO-NAV: State for mobile collapse/expand
+  const [isMicroNavCollapsed, setIsMicroNavCollapsed] = useState(false);
+  
+  // [cite: 2026-01-28] REFS: For outside click detection
+  const interfaceContainerRef = useRef(null);
+  const toggleButtonRef = useRef(null);
+  const debugPanelRef = useRef(null); // Will attach dynamically if needed or assume ID lookup inside hook if ref not possible
+
+  const handleToggleMicroNav = useCallback(() => {
+    setIsMicroNavCollapsed(prev => !prev);
+  }, []);
+
+  // [cite: 2026-01-28] MICRO-NAV: Robust Outside Dismissal (Safari Safe)
+  useOutsideDismiss({
+    enabled: layoutMode === 'mobile' && isMobileHud && !isMicroNavCollapsed,
+    // Note: debugPanel is managed outside React, so we can't easily ref it here. 
+    // Ideally, FeatureFlagUtils would provide a ref or we accept the ID lookup limitation.
+    // For now, we rely on the primary UI elements.
+    refs: [interfaceContainerRef, toggleButtonRef],
+    onDismiss: () => setIsMicroNavCollapsed(true)
+  });
 
   // FEATURE_FLAG_START: accessibilityHardening
   const isA11y = isFeatureEnabled('accessibilityHardening');
@@ -205,9 +228,10 @@ const ParametricView = forwardRef((props, ref) => {
         tooltipHandlers={{ showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur }} // [cite: 2026-01-27] TOOLTIP: Pass handlers
         hudGuidance={hudGuidance}
         statusGuidance={statusGuidance} // [cite: 2026-01-27] TOOLTIP: Pass status guidance
+        isMicroNavCollapsed={isMicroNavCollapsed} // [cite: 2026-01-28] BOUNDARY: React to nav toggle
       />
     );
-  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode, isA11y, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur, hudGuidance, statusGuidance]);
+  }, [formulaCode, isFormulaValid, isMathematicalError, isManualOverride, onFormulaChange, layoutMode, displayMode, isA11y, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur, hudGuidance, statusGuidance, isMicroNavCollapsed]);
 
   /**
    * Memoized Interface
@@ -293,7 +317,11 @@ const ParametricView = forwardRef((props, ref) => {
   );
 
   return (
-    <div className={`Container layout-${layoutMode} ${isMobileHud ? 'feature-mobile-hud' : ''} ${isA11y ? 'flag-a11y-on' : ''}`}>
+    <div className={`Container layout-${layoutMode} 
+      ${isMobileHud ? 'feature-mobile-hud' : ''} 
+      ${isA11y ? 'flag-a11y-on' : ''}
+      ${layoutMode === 'mobile' && isMobileHud ? (isMicroNavCollapsed ? 'micro-nav-collapsed' : 'micro-nav-expanded') : ''}
+    `}>
       <header className="Header">
         Parametric Equations 
         {/* <span className="worker-pill" aria-live={isA11y ? "polite" : undefined}>
@@ -362,13 +390,49 @@ const ParametricView = forwardRef((props, ref) => {
             </div>
           </div>
         )}
-
-        {memoizedHUD}
       </div>
 
-      <div className="Interface_Container">
+      <div 
+        className="Interface_Container"
+        ref={interfaceContainerRef}
+        onClick={() => {
+          if (layoutMode === 'mobile' && isMobileHud && isMicroNavCollapsed) {
+            setIsMicroNavCollapsed(false);
+          }
+        }}
+        onFocus={() => { // [cite: 2026-01-28] FIX: Keep expanded on focus (Safari Tab fix)
+          if (layoutMode === 'mobile' && isMobileHud && isMicroNavCollapsed) {
+            setIsMicroNavCollapsed(false);
+          }
+        }}
+      >
         {memoizedInterface}
       </div>
+
+      {/* [cite: 2026-01-28] LAYOUT: HUD moved to root to ensure z-index layering above Interface in mobile */}
+      {memoizedHUD}
+
+      {/* [cite: 2026-01-28] MICRO-NAV: Toggle Button (Direct child of Container) */}
+      {layoutMode === 'mobile' && isMobileHud && (
+        <button 
+          ref={toggleButtonRef}
+          type="button"
+          className="MicroNav_Toggle" 
+          onClick={handleToggleMicroNav}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleToggleMicroNav();
+            }
+          }}
+          aria-label={isMicroNavCollapsed ? "Expand Menu" : "Collapse Menu"}
+          aria-expanded={!isMicroNavCollapsed}
+          title="Click to access the interface."
+        >
+          {/* [cite: 2026-01-28] VISUAL: Always show hamburger to prevent "X" flash during fade out */}
+          ☰
+        </button>
+      )}
 
       {/* [cite: 2026-01-27] TOOLTIP: HUD About Link */}
       <MathTooltip 
