@@ -14,9 +14,8 @@
 ## 📦 v0.5.x Patch Cycle (In Progress)
 - [x] **v0.5.0.1:** Infrastructure Baseline (Feature Flags, Self-Healing, MVP Test)
 - [ ] **v0.5.1:** Accessibility Hardening (ARIA, Roles, Live Regions) `[Flag: accessibilityHardening]` (Tests Defined)
-- [ ] **v0.5.2:** Mobile HUD & Interaction (Bottom Dock, Micro-HUD, Pinch-Guard) `[Flag: mobileHudOptimization]`
-- [ ] **v0.5.3:** Documentation Bridge (About Link) `[Flag: docsBridge]`
-- [ ] **v0.5.4:** Instructional Refinement (Contextual Guidance) `[Flag: instructionalRefinement]`
+- [x] **v0.5.2:** The Instructional Bridge (Math Tooltips, Registry Sync, KaTeX) `[Flag: docsBridge]`
+- [x] **v0.5.3:** Mobile HUD & Interaction (Bottom Dock, Micro-HUD, Pinch-Guard) `[Flag: mobileHudOptimization]`
 
 ---
 
@@ -28,6 +27,7 @@
 - [ ] Automated CI/Workflow Contract: Update YAML to read folder names directly from environment variables or shared constants rather than hardcoded strings.
 - [ ] Explicit Skipped Test Handling: Standardize the logic that treats "Skipped" as "Passed" across the generator script and the README narrative for 100% transparency.
 - [ ] Preflight Linting: Add a bash/Node preflight check to the workflow that validates folder existence and URL integrity before the final deployment.
+- [ ] Document Snapshot Policy: Explain the "Linux-as-Truth" / Shared Baseline strategy so contributors don't fight rendering differences.
 
 ### 1. Narratives for Test Results (The "Quality Narrative")
 - [ ] Inject Domain Descriptions: Update the coverage table generator to include static "Why this matters" context for Services, Web Workers, and Logic layers.
@@ -67,10 +67,13 @@
 - [ ] The DOM Purge: Remove remaining non-React direct DOM manipulations hidden in legacy helpers.
 - [ ] Framework Decoupling: Define a strict API between the React UI and the Vanilla 3D engine to enable future framework-agnostic usage.
 - [ ] Documentation Restructuring: Reorganize `/docs` into the Quad-Pillar structure (`architecture`, `dev`, `ops`, `testing`) as defined in the manifest.
+- [ ] Clean up CSS and GUI constraint logic: Centralize boundary enforcement (HUD, Feature Flags) and refactor CSS for cleaner layout ownership.
+- [ ] Create `getDockingBounds()` test helper: Standardize boundary verification for FeatureFlag GUI and Formula HUD tests to avoid duplicated logic.
+- [x] Create `expectInterfaceCollapsed()` test helper: Standardize assertions for Micro-Nav collapse state (pointer-events, opacity) to avoid brittle visibility checks. (Completed in v0.5.3)
 
 ### 7. Instructional Refinement (Future)
 - [x] Keyboard / focus-triggered tooltips: Ensure tooltips appear when focusing on controls via keyboard.
-- [x] `role="tooltip"` + `aria-hidden`: Enhance accessibility compliance for custom tooltips.
+- [x] `role="tooltip"` + `aria-hidden`: Enhance accessibility compliance for custom tooltips. (Completed in v0.5.2)
 - [ ] Centralized TooltipManager (single portal): Move tooltip rendering to a top-level portal to avoid z-index and overflow issues.
 - [ ] HUD math tooltip parity: Implement the same KaTeX tooltip system for the HUD formula editor variables.
 - [ ] Tooltip Math Visualizer: Implement interactive, visual explanations of mathematical formulas in tooltips. See [Draft Spec](./drafts/TOOLTIP_MATH_VISUALIZER.md).

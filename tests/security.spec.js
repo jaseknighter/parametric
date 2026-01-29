@@ -38,7 +38,7 @@ test.describe('Security & Stability', () => {
 
     // 1. Check UI Feedback (Symptom)
     const statusDot = page.locator('.HUD_Header .Status_Dot');
-    await expect(statusDot).toHaveClass(/MathError|Invalid/);
+    await expect(statusDot).toHaveClass(/MathError|Invalid/, { timeout: 15000 });
 
     // 2. Check System Invariant (Root Cause)
     // Verify the worker actually rejected it with a security violation

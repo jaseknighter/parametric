@@ -20,7 +20,8 @@ const FormulaHUD = ({
   isA11yEnabled, // [cite: 2026-01-27] A11Y: Gate focus logic
   tooltipHandlers, // [cite: 2026-01-27] TOOLTIP: Receive handlers from parent
   hudGuidance, // [cite: 2026-01-27] TOOLTIP: Receive guidance data
-  statusGuidance // [cite: 2026-01-27] TOOLTIP: Receive status guidance
+  statusGuidance, // [cite: 2026-01-27] TOOLTIP: Receive status guidance
+  isMicroNavCollapsed // [cite: 2026-01-28] BOUNDARY: React to nav toggle
 }) => {
   const textareaRef = useRef(null);
   const containerRef = useRef(null);
@@ -66,6 +67,114 @@ const FormulaHUD = ({
     }
   }, [layoutMode]);
 
+  // [cite: 2026-01-28] BOUNDARY GUARD: Ensure HUD stays on screen when opening or resizing
+  const enforceBoundaries = useCallback(() => {
+    if (containerRef.current) {
+      const bounds = containerRef.current.getBoundingClientRect();
+      const headerHeight = 60; // [cite: 2026-01-28] FIX: 6rem = 60px (based on 10px root)
+      const padding = 20;
+      
+      // [cite: 2026-01-28] FIX: Use effective height (closed vs open) for boundary calculations
+      // 2rem = 20px (based on 10px root)
+      const effectiveHeight = isOpen ? size.height : 20; 
+
+      let newY = position.y;
+      let newX = position.x;
+      let newW = size.width;
+      
+      // [cite: 2026-01-28] FIX: Allow flush bottom (remove padding)
+      let maxY = bounds.height - effectiveHeight;
+      let minX = 0;
+
+      // [cite: 2026-01-28] CONSTRAINT: Respect Interface boundaries
+      const interfaceEl = document.querySelector('.Interface_Container');
+      const canvasEl = document.querySelector('.Three_Grid_Area');
+
+      if (layoutMode === 'desktop') {
+        // [cite: 2026-01-28] DESKTOP: Left boundary is Canvas Left (Grey Stripe)
+        if (canvasEl) {
+          minX = canvasEl.getBoundingClientRect().left;
+        }
+        // [cite: 2026-01-28] DESKTOP: Bottom boundary is Interface Top
+        if (interfaceEl) {
+           const iRect = interfaceEl.getBoundingClientRect();
+           // Only constrain if interface is actually at the bottom (visible)
+           if (iRect.top < bounds.height && iRect.top > headerHeight) {
+             maxY = Math.min(maxY, iRect.top - effectiveHeight);
+           }
+        }
+      } else {
+        // [cite: 2026-01-28] MOBILE: Left boundary is Interface Right (Grey Stripe)
+        if (interfaceEl) {
+           const iRect = interfaceEl.getBoundingClientRect();
+           minX = iRect.right; // [cite: 2026-01-28] FIX: Flush against grey bar
+        }
+      }
+
+      // 1. Bottom Guard: If bottom overflows, push up
+      if (newY > maxY) {
+        newY = Math.max(headerHeight, maxY);
+      }
+      // 2. Top Guard: Never go above header
+      if (newY < headerHeight) {
+        newY = headerHeight;
+      }
+      
+      // 3. Right Guard & Width Reduction
+      // [cite: 2026-01-28] FIX: Allow flush right (remove padding)
+      if (newX + newW > bounds.width) {
+         // Push left
+         newX = bounds.width - newW;
+         
+         // If pushed past minX, clamp and shrink
+         if (newX < minX) {
+           newX = minX;
+           newW = bounds.width - minX;
+           // Min width check (300 from onResize)
+           newW = Math.max(300, newW);
+         }
+      }
+
+      // 4. Left Guard
+      if (newX < minX) {
+        newX = minX;
+      }
+
+      if (newY !== position.y || newX !== position.x || newW !== size.width) {
+        setPosition({ x: newX, y: newY });
+        if (newW !== size.width) setSize(prev => ({ ...prev, width: newW }));
+      }
+    }
+  }, [position.x, position.y, size.width, size.height, layoutMode, isMicroNavCollapsed, isOpen]);
+
+  // [cite: 2026-01-28] ANIMATION SYNC: Keep HUD outside expanding nav bar
+  const enforceBoundariesRef = useRef(enforceBoundaries);
+  useEffect(() => { enforceBoundariesRef.current = enforceBoundaries; }, [enforceBoundaries]);
+
+  useEffect(() => {
+    let animationFrameId;
+    const startTime = performance.now();
+    const duration = 1000; // [cite: 2026-01-28] SYNC: Cover CSS transition (0.3s delay + 0.5s duration)
+
+    const tick = () => {
+      if (enforceBoundariesRef.current) enforceBoundariesRef.current();
+      if (performance.now() - startTime < duration) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
+    };
+    tick();
+    return () => { if (animationFrameId) cancelAnimationFrame(animationFrameId); };
+  }, [isMicroNavCollapsed]);
+
+  useEffect(() => {
+    enforceBoundaries();
+  }, [enforceBoundaries]);
+
+  useEffect(() => {
+    window.addEventListener('resize', enforceBoundaries);
+    return () => window.removeEventListener('resize', enforceBoundaries);
+  }, [enforceBoundaries]);
+
   const handleFocus = () => {
     if (!isManualOverride) {
       // [cite: 2026-01-19] AUTHORITY: Signal start of edit session.
@@ -98,11 +207,38 @@ const FormulaHUD = ({
     hasMoved.current = true;
     const h = wrapperRef.current.offsetHeight;
     const bounds = containerRef.current.getBoundingClientRect();
+    const headerHeight = 60; // [cite: 2026-01-28] FIX: Match CSS 6rem (60px)
+    
+    let minX = 0;
+    let maxY = bounds.height - h;
+    const padding = 20;
+
+    // [cite: 2026-01-28] CONSTRAINT: Respect Interface boundaries during drag
+    const interfaceEl = document.querySelector('.Interface_Container');
+    const canvasEl = document.querySelector('.Three_Grid_Area');
+
+    if (layoutMode === 'desktop') {
+      if (canvasEl) minX = canvasEl.getBoundingClientRect().left;
+      if (interfaceEl) {
+        const iRect = interfaceEl.getBoundingClientRect();
+        if (iRect.top < bounds.height && iRect.top > headerHeight) {
+          maxY = Math.min(maxY, iRect.top - h);
+        }
+      }
+    } else {
+      if (interfaceEl) {
+        minX = interfaceEl.getBoundingClientRect().right; // [cite: 2026-01-28] FIX: Flush against grey bar
+      }
+    }
+    
+    // Ensure maxY doesn't go below headerHeight
+    maxY = Math.max(headerHeight, maxY);
+
     setPosition({ 
-      x: clamp(e.clientX - dragStartPos.current.x, 0, bounds.width - w), 
-      y: clamp(e.clientY - dragStartPos.current.y, 0, bounds.height - h) 
+      x: clamp(e.clientX - dragStartPos.current.x, minX, bounds.width - w), 
+      y: clamp(e.clientY - dragStartPos.current.y, headerHeight, maxY) 
     });
-  }, [isDragging]);
+  }, [isDragging, layoutMode]);
 
   const startResize = (e) => {
     e.preventDefault(); // [cite: 2026-01-14] FIX: Prevent native image dragging
@@ -204,7 +340,8 @@ const FormulaHUD = ({
           transform: `translate(${position.x}px, ${position.y}px)`, 
           width: `${size.width}px`,
           maxWidth: '90vw', // [cite: 2026-01-19] MOBILE: Prevent HUD from overflowing screen width
-          backgroundColor: "rgba(198, 137, 137, 0.4)", // Pinkish transparent
+          // [cite: 2026-01-28] VISUAL: Increased opacity and z-index to sit above Micro-Nav
+          zIndex: 200, 
         }}
       >
         <div 

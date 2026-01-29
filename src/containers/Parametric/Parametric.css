@@ -291,6 +291,10 @@ html {
   height: 100%;
   display: block; /* Prevents tiny scrollbars */
   outline: none;
+  /* [cite: 2026-01-28] MOBILE: Context-Aware Zoom. Block browser zoom on canvas only. */
+  /* This tells the browser: 'Don't zoom or pan when the user touches THIS element.' */
+  touch-action: none;
+  /* Ensures internal 3D zoom (OrbitControls) gets the raw pinch data. */
 }
 
 .Interface_Container {
@@ -316,18 +320,32 @@ html {
   position: relative;
   height: 100vh;
   width: 100vw;
+
+
   /* ===============================
      MOBILE OVERFLOW INVARIANT
      =============================== */
   overflow: visible !important;
 }
 
+/* [cite: 2026-01-28] MOBILE: Safe Area Insets (Flagged) */
+.Container.layout-mobile.feature-mobile-hud {
+  /* [cite: 2026-01-28] MOBILE: Safe Area Insets for notched devices */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.Container.layout-mobile.feature-mobile-hud .Interface_Container {
+  /* [cite: 2026-01-28] FIX: Remove base transition to prevent animation on initial layout switch */
+}
+
 .Container.layout-mobile .Three_Grid_Area {
   position: absolute;
-  left: 11rem; /* [cite: 2026-01-20] VIEWPORT AUTHORITY: Start after label stripe */
-  width: calc(100vw - 11rem);
-  height: calc(100vh - 10rem); /* Stable area between header and footer */
-  z-index: 1;
+  left: 0 !important; /* [cite: 2026-01-28] FIX: Full screen canvas behind interface */
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
 }
 
 /* [cite: 2026-01-27] FIX: Ensure canvas focus ring is visible above interface overlay */
@@ -338,14 +356,31 @@ html {
 
 .Container.layout-mobile .Interface_Container {
   position: absolute;
-  top: 6rem;
   left: 0;
-  width: fit-content !important; /* [cite: 2026-01-20] FIX: Shrink to content width */
-  height: calc(100vh - 6rem); /* [cite: 2026-01-20] FIX: Extend to bottom of window */
-  max-height: none; /* Remove previous constraint */
+  /* [cite: 2026-01-28] LAYOUT: Enforce strict width contract to prevent "flash" */
+  width: 11rem !important;
+  max-width: 11rem !important;
+  min-width: 4rem !important;
   z-index: 100;    /* Float ABOVE the canvas */
   background: transparent !important;
   overflow: visible !important;
+  /* Default Mobile (Flag OFF): Top Aligned */
+  top: 6rem;
+  height: calc(100vh - 6rem);
+}
+
+/* [cite: 2026-01-28] MOBILE: Bottom-Docking Logic (Flagged) */
+.Container.layout-mobile.feature-mobile-hud .Interface_Container {
+  /* [cite: 2026-01-28] MOBILE: Bottom-Docking Logic */
+  z-index: 0;
+  bottom: 0;
+  top: auto;
+  /* [cite: 2026-01-28] FIX: Full height vertical bar */
+  height: calc(100vh - 6rem) !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* width: 11rem !important; -- Redundant, handled by base rule above */
 }
 
 /* [cite: 2026-01-20] MOBILE STRIPE INVARIANT: Grey stripe behind labels only */
@@ -354,12 +389,17 @@ html {
   position: absolute;
   top: 0;
   left: 0;
-  width: 11rem;     /* Width of control labels */
+  width: 100% !important; /* [cite: 2026-01-28] FIX: Track container width */
   height: 100%;
   /* background-color: #777; */
-  background-color: rgba(119, 119, 119, 0.5);
+  background-color: rgba(60, 60, 60, 0.6); /* [cite: 2026-01-28] VISUAL: Darker transparent overlay */
   z-index: -1;
   pointer-events: auto; /* The stripe blocks clicks */
+  backdrop-filter: none !important; /* [cite: 2026-01-28] VISUAL: No blur on stripe */
+}
+
+.Container.layout-mobile.feature-mobile-hud .Interface_Container::before {
+  /* [cite: 2026-01-28] VISUAL: Glassmorphism for mobile headers */
 }
 
 /* ===============================
@@ -368,10 +408,12 @@ html {
 .Container.layout-mobile .Interface {
   pointer-events: none;
   overflow: visible !important;
+  width: 100%; /* [cite: 2026-01-28] FIX: Constrain to parent width */
+  max-width: 100%;
 }
 
 .Container.layout-mobile .TAreaInterface {
-  width: fit-content;
+  width: 100%; /* [cite: 2026-01-28] FIX: Fill the 11rem stripe */
   pointer-events: auto;
   position: relative; /* anchor for popouts */
 }
@@ -391,15 +433,16 @@ html {
   top: 0;      /* align with label top */
 
   transform: none !important;
-
   margin: 0;
   /* [cite: 2026-01-20] FIX: Content-Aware Widths based on column count */
-  width: fit-content !important;
-  min-width: unset !important;
-  display: grid;
-  padding-right: 1.5rem;
+  width: 5rem;          /* explicit base width */
+  max-width: 5rem;      /* hard ceiling */
+  min-width: 4rem;       /* collapsed stripe */
 
-  z-index: 1000;
+  z-index: 100;
+  background: transparent;
+  overflow: visible;
+
 }
 
 /* 0.5 Column (Export) */
@@ -427,6 +470,106 @@ html {
   top: auto;
   bottom: 0;
   transform: none !important;
+}
+
+/* ===============================
+   MICRO-NAV TOGGLE (Mobile Only)
+   =============================== */
+/* [cite: 2026-01-28] MICRO-NAV: Collapsed State */
+.Container.layout-mobile.micro-nav-collapsed .Interface_Container {
+  width: 4.0rem !important;  /* [cite: 2026-01-28] VISUAL: Wider stripe for centered hamburger */
+  overflow: hidden !important;
+  pointer-events: auto; /* [cite: 2026-01-28] FIX: Allow clicking stripe to expand */
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s; /* [cite: 2026-01-28] SEQ: Shrink AFTER fade out (0.3s delay) */
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Prevent reflow by removing Interface from flow */
+.Container.layout-mobile.micro-nav-collapsed .Interface {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: auto; /* [cite: 2026-01-28] FIX: Auto height prevents jump to top */
+  pointer-events: none;
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Fade out controls when collapsed */
+.Container.layout-mobile.micro-nav-collapsed .Interface {
+  opacity: 0 !important;
+  pointer-events: none;
+  visibility: hidden; /* [cite: 2026-01-28] FIX: Prevent tabbing into collapsed nav */
+  /* [cite: 2026-01-28] SEQ: Fade out immediately, hide visibility after fade */
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Disable interaction on controls when collapsed */
+.Container.layout-mobile.micro-nav-collapsed .TAreaInterface_controlsContainer,
+.Container.layout-mobile.micro-nav-collapsed .TAreaInterface___TitleButton {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Expanded State */
+.Container.layout-mobile.micro-nav-expanded .Interface_Container {
+  /* Height calculation handled by JS or default calc */
+  width: 11rem !important; /* [cite: 2026-01-28] FIX: Restore full stripe width */
+  pointer-events: auto; /* [cite: 2026-01-28] FIX: Enable interaction when expanded */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* [cite: 2026-01-28] SEQ: Grow immediately */
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Fade in controls with delay */
+.Container.layout-mobile.micro-nav-expanded .Interface {
+  opacity: 1;
+  visibility: visible;
+  /* [cite: 2026-01-28] SEQ: Fade in AFTER grow (0.3s delay), show visibility immediately */
+  transition: opacity 0.3s ease 0.3s, visibility 0s linear 0s;
+}
+
+/* [cite: 2026-01-28] VISUAL: Semi-transparent Header on Mobile */
+.Container.layout-mobile.feature-mobile-hud .Header {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  /* Ensure header doesn't block touch events on canvas below it */
+  pointer-events: none; 
+}
+.Container.layout-mobile.feature-mobile-hud .Header > * {
+  pointer-events: auto;
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Toggle Button */
+.MicroNav_Toggle {
+  position: absolute;
+  bottom: env(safe-area-inset-bottom, 0.5rem); /* [cite: 2026-01-28] FIX: Safe area with fallback */
+  left: calc(env(safe-area-inset-left) + 0.5rem); /* [cite: 2026-01-28] VISUAL: Center in 4rem stripe */
+  margin-bottom: 1rem; /* [cite: 2026-01-28] VISUAL: Push up from bottom */
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0,0,0,0.6); /* [cite: 2026-01-28] VISUAL: Slightly darker for contrast */
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer !important; /* [cite: 2026-01-28] UX: Ensure pointer cursor */
+  z-index: 1001; /* Above Interface_Container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  pointer-events: auto !important;
+  border-radius: 0; /* [cite: 2026-01-28] VISUAL: Remove border radius */
+  transition: opacity 0.2s ease;
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Ensure toggle stays visible when collapsed */
+.Container.layout-mobile.micro-nav-collapsed .MicroNav_Toggle {
+  opacity: 1 !important;
+  transition-delay: 0.8s; /* [cite: 2026-01-28] SEQ: Fade in AFTER shrink completes (0.3s fade + 0.5s shrink) */
+}
+
+/* [cite: 2026-01-28] MICRO-NAV: Hide toggle when expanded (Click outside to close) */
+.Container.layout-mobile.micro-nav-expanded .MicroNav_Toggle {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition-delay: 0s; /* [cite: 2026-01-28] SEQ: Hide immediately on expand */
 }
 
 /* [cite: 2026-01-20] LAYOUT MODE: Desktop (Bottom Interface) */
