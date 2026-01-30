@@ -1,5 +1,5 @@
 
-> parametric-geometry-explorer@0.5.0 test:audit
+> parametric-geometry-explorer@0.5.4.1 test:audit
 > node scripts/analyze-tests.cjs --table
 
 Starting Test Audit...

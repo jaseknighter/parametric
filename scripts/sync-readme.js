@@ -28,11 +28,16 @@ function generateTable() {
     output += `\n### ${hud.title}\n\n`;
     output += `> **${hud.intent}**\n\n`;
     output += `${hud.proseBehavior || hud.tableBehavior}\n\n`;
+    output += `### Math Reference\n\n`;
+    output += `The following math functions and constants are supported in the Formula Editor:\n\n`;
+    output += `\`sin\`, \`cos\`, \`tan\`, \`atan2\`, \`abs\`, \`sqrt\`, \`pow\`, \`exp\`, \`log\`, \`min\`, \`max\`, \`sign\`, \`floor\`, \`ceil\`, \`round\`, \`PI\` (or \`π\`), \`E\`.\n\n`;
     output += `---\n\n`;
   }
 
+  output += `!Interface Reference\n\n`;
+
   // 2. Interface Reference Table
-  output += `## Interface Reference\n\n`;
+  output += `### Interface Reference\n\n`;
   output += `| Interface Element | What does it do? | How does it work? |\n`;
   output += `| :--- | :--- | :--- |\n`;
 
@@ -41,7 +46,13 @@ function generateTable() {
       // [cite: 2026-01-27] FIX: Use dedicated mathExpression field, fallback to tableBehavior. No regex.
       const rawContent = entry.math ? entry.mathExpression : entry.tableBehavior;
       const howItWorks = rawContent ? rawContent.replace(/\|/g, '\\|') : '';
-      output += `| **${entry.title}** | ${entry.intent} | ${howItWorks} |\n`;
+      
+      let title = `**${entry.title}**`;
+      const colonIndex = entry.title.indexOf(':');
+      if (colonIndex !== -1) {
+        title = `**${entry.title.substring(0, colonIndex)}:**${entry.title.substring(colonIndex + 1)}`;
+      }
+      output += `| ${title} | ${entry.intent} | ${howItWorks} |\n`;
     }
   });
 

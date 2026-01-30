@@ -10,6 +10,14 @@ import { loadGuidanceRegistry } from '../src/shared/GUIDANCE_REGISTRY/loadGuidan
  * [cite: 2026-01-27] Phase 1: Shared Content Contract
  */
 
+// [cite: 2026-01-30] FIX: Normalize markdown formatting for semantic comparison
+function normalizeTitle(str) {
+  return str
+    .replace(/\*\*/g, '')   // remove bold markers
+    .replace(/\s+/g, ' ')   // normalize whitespace
+    .trim();
+}
+
 test.describe('Documentation Synchronization', () => {
   const readmePath = path.join(process.cwd(), 'README.md');
   let readmeContent;
@@ -95,7 +103,7 @@ test.describe('Documentation Synchronization', () => {
       .map(([_, e]) => e);
     
     documentedEntries.forEach(entry => {
-      expect(readmeContent).toContain(entry.title);
+      expect(normalizeTitle(readmeContent)).toContain(normalizeTitle(entry.title));
     });
   });
 
@@ -111,7 +119,7 @@ test.describe('Documentation Synchronization', () => {
       .filter(line => line.trim().startsWith('| **') && !line.includes('Section'));
 
     tableRows.forEach(row => {
-      const matches = documentedEntries.some(entry => row.includes(entry.title));
+      const matches = documentedEntries.some(entry => normalizeTitle(row).includes(normalizeTitle(entry.title)));
       expect(matches, `Found undocumented row in README: ${row}`).toBe(true);
     });
   });

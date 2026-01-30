@@ -90,6 +90,14 @@ test.describe('HUD & Formula System Invariants', () => {
     const textarea = page.locator('.HUD_Textarea');
     await textarea.fill('x = u; y = v; z = 2.0;');
     
+    // [cite: 2026-01-30] FIX: Open Shape drawer before interaction
+    const stripe = page.getByTestId('control-stripe-shape');
+    const container = stripe.locator('.TAreaInterface_controlsContainer');
+    if (!(await container.isVisible())) {
+      await stripe.locator('button.TAreaInterface___TitleButton').click();
+      await expect(container).toHaveClass(/Controls_Show/);
+    }
+
     await page.locator('button[data-shape="SINE"]').click({ force: true });
     await expect(page.locator('.HUD_Wrapper')).toHaveClass(/is-manual/);
     expect(await textarea.inputValue()).toContain('z = 2.0;');

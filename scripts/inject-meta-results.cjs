@@ -19,8 +19,8 @@ try {
   const newContent = `
 ### Meta-Testing Report (Experimental Quality Signals - POC)
 
-> Meta-testing was introduced in v0.5.4 as a **diagnostic experiment**, not a gate.
-> Results are informational and are not used to fail CI.
+> A "Meta-testing" POC project was introduced in v0.5.4 as a **diagnostic experiment** (not a gate).
+> Results are informational and are not used to fail CI at this time.
 
 This project evaluates quality at three distinct levels:
 
@@ -54,9 +54,7 @@ ${auditTable}
 
 These serve as self-validation for the quality pipeline.
 
-${metaTable}
-
-> **Note:** As these metrics were generated from a POC, metrics are for demonstration purposes only as part of the POC.`;
+${metaTable}`;
 
   const regex = new RegExp(`${START_MARKER}[\\s\\S]*?${END_MARKER}`);
   const updatedReadme = readme.replace(regex, `${START_MARKER}${newContent}\n${END_MARKER}`);

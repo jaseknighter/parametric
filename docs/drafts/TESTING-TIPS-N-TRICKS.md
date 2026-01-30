@@ -6,6 +6,7 @@
 
 Testing is an investment in stability. To ensure high returns, we follow these core philosophies:
 
+* **Positive Test Results are Signals, Not Signs:** Use tests to illuminate behavior, not just support assumptions or "prove" a release is ready for deployment.
 * **Test Decisions, Not Paths:** Coverage is a proxy, not the goal. Improve coverage by validating the logic behind a decision. If a test doesn’t validate a **behavior contract**, a **policy decision** (i.e. architecture or business rule), or a **failure mode**, it is likely "fake coverage" (execution without assertion).
 * **Fail Early, Fail Loudly:** Use guards like `process.stderr` and explicit timeouts to ensure that failures are immediately obvious and descriptive.
 * **Deterministic Environments:** A test that passes only on your machine is a bug in the test. Always enforce specific viewports, states, and mocks to ensure consistency across CI (e.g. Linux) and Local (e.g. macOS).

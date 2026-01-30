@@ -1,6 +1,6 @@
 {
   "name": "parametric-geometry-explorer",
-  "version": "0.5.0",
+  "version": "0.5.4.1",
   "type": "module",
   "homepage": "https://jaseknighter.github.io/parametric",
   "private": true,

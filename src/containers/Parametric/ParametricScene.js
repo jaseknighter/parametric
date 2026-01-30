@@ -29,6 +29,9 @@ export const createSceneManager = (canvas, options = {}) => {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap pixel ratio for performance
 
+  // [cite: 2026-01-30] UX: Set initial cursor for grab interaction
+  canvas.style.cursor = 'grab';
+
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xdddddd);
 
@@ -238,6 +241,10 @@ export const createSceneManager = (canvas, options = {}) => {
 
   const onPointerDown = (e) => {
     if (e.button !== 0 || e.target !== canvas) return;
+
+    // [cite: 2026-01-30] UX: Visual feedback for active grab
+    canvas.style.cursor = 'grabbing';
+
     stopMotion(); isDragging = true; 
     lastX = e.clientX; lastY = e.clientY; dragDistance = 0;
     window.addEventListener("pointermove", onPointerMove);
@@ -260,6 +267,10 @@ export const createSceneManager = (canvas, options = {}) => {
 
   const onPointerUp = () => {
     isDragging = false;
+    
+    // [cite: 2026-01-30] UX: Revert cursor on release
+    canvas.style.cursor = 'grab';
+
     window.removeEventListener("pointermove", onPointerMove);
     window.removeEventListener("pointerup", onPointerUp);
     if (dragDistance > DRAG_THRESHOLD) {
