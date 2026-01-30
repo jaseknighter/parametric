@@ -73,6 +73,7 @@
 - [ ] Create `getDockingBounds()` test helper: Standardize boundary verification for FeatureFlag GUI and Formula HUD tests to avoid duplicated logic.
 - [x] Create `expectInterfaceCollapsed()` test helper: Standardize assertions for Micro-Nav collapse state (pointer-events, opacity) to avoid brittle visibility checks. (Completed in v0.5.3)
 - [x] **Manual Mode Invariance:** Implement an "Inertial Authority" guard at the shape-change emitter level to prevent generated formulas from overwriting user-authored manual overrides.
+- [x] **Geometry Explosion Guard:** Implemented asymptotic bounding for Pinch and a global viewport safety clamp to prevent vertices from exceeding the camera frustum.
 - [ ] **Memory Leak Cleanup:** Fix "Can't perform a React state update on an unmounted component" warning in `Parametric.js` by clearing `debouncedLayoutRef` in the effect cleanup.
 
 ### 7. Instructional Refinement (Future)
@@ -81,3 +82,4 @@
 - [ ] Centralized TooltipManager (single portal): Move tooltip rendering to a top-level portal to avoid z-index and overflow issues.
 - [ ] HUD math tooltip parity: Implement the same KaTeX tooltip system for the HUD formula editor variables.
 - [ ] Tooltip Math Visualizer: Implement interactive, visual explanations of mathematical formulas in tooltips. See [Draft Spec](./drafts/TOOLTIP_MATH_VISUALIZER.md).
+- [ ] **Mobile Tooltips:** Re-enable tooltips on mobile once a robust dismissal strategy (tap-to-dismiss or timeout) is implemented.

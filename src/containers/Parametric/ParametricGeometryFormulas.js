@@ -168,7 +168,9 @@ const Pipeline = {
           if (abs(nv) <= 1.0) {
             return sign(nv) * pow(abs(nv), k) * n;
           } else {
-            return sign(nv) * (k * abs(nv) - k + 1.0) * n;
+            // [cite: 2026-01-30] FIX: Asymptotic Bounding.
+            // Replace linear explosion with logarithmic decay for out-of-bounds values.
+            return sign(v) * (n + log(1.0 + abs(v) - n) * (n / max(0.1, k)));
           }
         })(${vStr}, ${norm}, pinchAmt${axis}))`;
       }
@@ -352,7 +354,10 @@ const Formulas = {
         if (Math.abs(pinchAmt) > 0.001) {
           const vName = `pinchAmt${axis}`;
           vars[vName] = pinchAmt;
-          math = `sign(${math}) * pow(abs(${math}), (1.0 + (${vName} * ${SCALARS.PINCH})))`;
+          const kStr = `(1.0 + (${vName} * ${SCALARS.PINCH}))`;
+          // [cite: 2026-01-30] FIX: Safe Pinch (Logarithmic Fallback)
+          // Matches the robust logic in Pipeline.postProcess.pinch
+          math = `(abs(${math}) <= 1.0 ? sign(${math}) * pow(abs(${math}), ${kStr}) : sign(${math}) * (1.0 + log(abs(${math})) / max(0.1, ${kStr})))`;
         }
         if (Math.abs(flatAmt) > 0.001) {
           const vName = `flattenAmt${axis}`;
@@ -417,6 +422,14 @@ const Formulas = {
         _z = ${Pipeline.postProcess.flatten.str('_z', 'Z')};
 
         let resVal = ${component === 'u' ? '_x' : (component === 'v' ? '_y' : '_z')};
+        
+        // [cite: 2026-01-30] FIX: Global Safety Boundary (The "Andon Cord").
+        // Ensure that no matter how extreme the deformation, the vertex stays within a viewable envelope.
+        const VIEWPORT_MAX = _radius * 4.0;
+        if (abs(resVal) > VIEWPORT_MAX) {
+          resVal = sign(resVal) * (VIEWPORT_MAX + log(1.0 + abs(resVal) - VIEWPORT_MAX));
+        }
+
         return (resVal === undefined || isNaN(resVal)) ? 0.0 : resVal;
       })()
     `;
