@@ -535,6 +535,16 @@ const Parametric = () => {
       Debug.log("PIPELINE", `Swarm Intent: ${baseKey}[XYZ] -> ${val}`);
     }
 
+    // [cite: 2026-01-30] FIX: Manual Mode Invariance (Option A).
+    // If in Manual Mode, do not allow 'formula' updates from the UI (e.g. Shape buttons) to overwrite the ledger.
+    // We allow 'shape' updates to persist so the system knows the "Background Shape", but the formula remains manual.
+    if (isEditingHUD) {
+      finalUpdates = finalUpdates.filter(u => {
+        const key = u.intentKey || u.paramToUpdate;
+        return key !== 'formula';
+      });
+    }
+
     // 2. Update the Ledger (Reducer) so Playwright sees it
     dispatch({ type: 'INTENT_UPDATE', batch: finalUpdates, rid });
 
@@ -548,7 +558,8 @@ const Parametric = () => {
     const category = first?.category || ParametricRegistry[first?.paramToUpdate]?.category;
     
     // [cite: 2026-01-18] FIX: Shape buttons must also break Manual Mode to apply immediately
-    if (['deform', 'project', 'postProcess', 'shape', 'displace'].includes(category)) {
+    // [cite: 2026-01-30] UPDATE: Removed 'shape' from this list to enforce Manual Mode Invariance.
+    if (['deform', 'project', 'postProcess', 'displace'].includes(category)) {
         // [cite: 2026-01-17] MVA: Only flush if breaking a manual lock
         if (isEditingHUD) {
             Debug.log("PIPELINE", "Switching Authority: HUD -> Slider. Flushing.");

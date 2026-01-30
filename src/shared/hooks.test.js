@@ -17,6 +17,15 @@ const TestOutsideDismissComponent = ({ onDismiss }) => {
 };
 
 describe('Shared Hooks', () => {
+  beforeAll(() => {
+    // [cite: 2026-01-30] NOISE CONTROL: Suppress verbose hook lifecycle logs
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   describe('useAdaptiveTooltip', () => {
     beforeEach(() => {
       jest.useFakeTimers();

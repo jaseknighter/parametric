@@ -18,10 +18,34 @@ const isDebug = window.location.search.includes('debug=true');
 if (!isDebug) {
   const originalError = console.error;
   console.error = (...args) => {
-    if (args.length > 0 && typeof args[0] === 'string' && args[0].includes('THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN')) {
-      return;
+    if (args.length > 0) {
+      const shouldSuppress = args.some(arg => {
+        if (typeof arg === 'string') {
+          return arg.includes('THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN') ||
+                 arg.includes('Testing error channel');
+        }
+        if (arg && typeof arg === 'object' && arg.message) {
+          return arg.message.includes('Testing error channel');
+        }
+        return false;
+      });
+      if (shouldSuppress) return;
     }
     originalError.apply(console, args);
+  };
+
+  // [cite: 2026-01-30] NOISE CONTROL: Suppress Debug utility initialization logs
+  const originalLog = console.log;
+  console.log = (...args) => {
+    if (args.length > 0) {
+      const shouldSuppress = args.some(arg => typeof arg === 'string' && (
+        arg.includes('Debug Configured:') || 
+        arg.includes('Tip: Run Debug.listFlags()') || 
+        arg.includes('Forced Log')
+      ));
+      if (shouldSuppress) return;
+    }
+    originalLog.apply(console, args);
   };
 }
 

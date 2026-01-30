@@ -6,17 +6,17 @@ export const FLAG_STATE = {
 
 export const FEATURE_FLAGS = {
   // v0.5.1: Accessibility & Semantic Hardening
-  accessibilityHardening: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.1', stage: 'dev' },
+  accessibilityHardening: { defaultValue: FLAG_STATE.ON, versionTarget: '0.5.1', stage: 'prod' },
 
   // v0.5.2: Display Domain Optimization
-  mobileHudOptimization: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.2', stage: 'dev' },
-  pinchToZoomDisable: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.2', stage: 'dev' },
+  mobileHudOptimization: { defaultValue: FLAG_STATE.ON, versionTarget: '0.5.2', stage: 'prod' },
+  pinchToZoomDisable: { defaultValue: FLAG_STATE.ON, versionTarget: '0.5.2', stage: 'prod' },
 
   // v0.5.3: Integrated Documentation Bridge
-  docsBridge: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.3', stage: 'dev' },
+  docsBridge: { defaultValue: FLAG_STATE.ON, versionTarget: '0.5.3', stage: 'prod' },
 
   // v0.5.4: Instructional Refinement
-  instructionalRefinement: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.4', stage: 'dev' },
+  instructionalRefinement: { defaultValue: FLAG_STATE.ON, versionTarget: '0.5.4', stage: 'prod' },
 
   // MVP / Infrastructure Test
   hudHeaderLowercase: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.0.1', stage: 'prod' },

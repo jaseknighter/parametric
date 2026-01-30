@@ -253,7 +253,9 @@ export const FeatureFlags = {
         font-size: 12px;
         margin-right: 8px;
       `;
-      label.innerHTML = `<span style="${iconStyle}">${runtimeEnabled ? '+' : '-'}</span> ${key}`;
+      // [cite: 2026-01-30] UX: Display version target for context
+      const versionInfo = config.versionTarget ? ` <span style="color:#888; font-size:11px;">(v${config.versionTarget})</span>` : '';
+      label.innerHTML = `<span style="${iconStyle}">${runtimeEnabled ? '+' : '-'}</span> ${key}${versionInfo}`;
 
       if (runtimeEnabled) {
         const disableBtn = document.createElement('button');

@@ -6,7 +6,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 **[https://jaseknighter.github.io/parametric](https://jaseknighter.github.io/parametric)** 
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg?style=for-the-badge)](https://jaseknighter.github.io/parametric)
-[![Version](https://img.shields.io/badge/version-v0.5-blue.svg?style=for-the-badge)](https://github.com/jaseknighter/parametric)
+[![Version](https://img.shields.io/badge/version-v0.5.4.1-blue.svg?style=for-the-badge)](https://github.com/jaseknighter/parametric)
 
 ---
 
@@ -20,8 +20,8 @@ A browser-based environment for exploring complex mathematical surfaces and para
   - [Quality Pipeline Self-Validation](#quality-pipeline-self-validation)
 - [Documentation](#documentation)
   - [Formula Editor: Manual Override](#formula-editor-manual-override)
-  - [Interface Reference](#interface-reference)
   - [Math Reference](#math-reference)
+  - [Interface Reference](#interface-reference)
   - [Additional Features \& Formulas](#additional-features--formulas)
     - [1. Move Multiple Sliders at Once](#1-move-multiple-sliders-at-once)
     - [2. Animation](#2-animation)
@@ -33,12 +33,13 @@ A browser-based environment for exploring complex mathematical surfaces and para
 - [Post-v0.5 Priorities: Transparency \& Test Depth](#post-v05-priorities-transparency--test-depth)
 - [Reporting Issues \& Feature Requests](#reporting-issues--feature-requests)
 - [Development and Testing](#development-and-testing)
-  - [Feature Flags (v0.5.0.1)](#feature-flags-v0501)
   - [Installation](#installation)
+  - [Testing Commands](#testing-commands)
+  - [Feature Flags (v0.5.4.1)](#feature-flags-v0541)
 - [Credits](#credits)
 
 ## Current Status
-**v0.5 rearchitecture release live (20260119)** 
+**v0.5.4.1 maintenance release live (20260130)** 
 The engine has transitioned to a multi-threaded, JIT-compiled model. Coverage: >80%.
 CI logic and coverage validated via Chromium (V8). Full cross-browser parity (WebKit/Firefox) verified in local development tier.
 
@@ -68,8 +69,8 @@ CI logic and coverage validated via Chromium (V8). Full cross-browser parity (We
 <!-- START_META_REPORT -->
 ### Meta-Testing Report (Experimental Quality Signals - POC)
 
-> Meta-testing was introduced in v0.5.4 as a **diagnostic experiment**, not a gate.
-> Results are informational and are not used to fail CI.
+> A "Meta-testing" POC project was introduced in v0.5.4 as a **diagnostic experiment** (not a gate).
+> Results are informational and are not used to fail CI at this time.
 
 This project evaluates quality at three distinct levels:
 
@@ -118,8 +119,6 @@ These serve as self-validation for the quality pipeline.
 | **Fail** | 0 |
 | **High-Value Areas Covered** | GeometryBuilder, Worker |
 
-
-> **Note:** As these metrics were generated from a POC, metrics are for demonstration purposes only as part of the POC.
 <!-- END_META_REPORT -->
 
 ---
@@ -128,9 +127,6 @@ These serve as self-validation for the quality pipeline.
 
 ![Instructions](./docs/images/instructions_banner.png)
 
-* **Schema Compatibility:** JSON configuration files remain fully backward-compatible with existing shape definitions.
-
----
 
 <!-- START_UI_REFERENCE -->
 ### Formula Editor: Manual Override
@@ -139,29 +135,31 @@ These serve as self-validation for the quality pipeline.
 
 Provides a live view of GLSL expressions. Edits here override the interface presets. Any formulas you write manually will be erased if you update the interface controls.
 
----
-
-### Interface Reference
-
-| Interface Element | What does it do? | How does it work? |
-| :--- | :--- | :--- |
-| **Shape: Base Topology** | Choose the starting form for your 3D model. | Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation. |
-| **Project: Vector Mapping** | Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D. | Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates. |
-| **Bend: Curvature & Arching** | Curve the shape along its main axes. | theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta) |
-| **Pinch: Vertex Concentration** | Pull points together or spread them along an axis. | v' = sgn(v) * \|v\|^(1.0 + (amt * scalar)) * n |
-| **Texture: Surface Displacement** | Add fine bumps and waves to the surface. | 1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt) |
-| **Spiral: Coordinate Torsion** | Twist the shape around its center. | theta' = atan2(B, A) + (amt * r * scalar) |
-| **Modulate: Surface Oscillation** | Overlay gentle ripples or waves on the shape. | Delta = sin(u * freq) * cos(v * freq) * amt |
-| **Flatten: Linear Compression** | Compress the shape along one direction. | v' = v * (1.0 - amt) |
-| **Export: Geometry Output** | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
-
-<!-- END_UI_REFERENCE -->
-
 ### Math Reference
 
 The following math functions and constants are supported in the Formula Editor:
 
 `sin`, `cos`, `tan`, `atan2`, `abs`, `sqrt`, `pow`, `exp`, `log`, `min`, `max`, `sign`, `floor`, `ceil`, `round`, `PI` (or `π`), `E`.
+
+---
+
+![Interface Reference](./docs/images/instructions_interface_banner.png)
+
+### Interface Reference
+
+| Interface Element | What does it do? | How does it work? |
+| :--- | :--- | :--- |
+| **Shape:** Base Topology | Choose the starting form for your 3D model. | Selects the starting vertex distribution (e.g., Sphere, Klein Bottle, Romanesco Broccoli Floret). Initial state is a circle morphed by temporal oscillation. |
+| **Project:** Vector Mapping | Select which internal values control the X, Y, and Z axes. Changing these rotates the shape. Deselecting an axis flattens the shape to 2D. | Determines which internal calculation (x, y, or z) drives the physical X, Y, and Z coordinates. |
+| **Bend:** Curvature & Arching | Curve the shape along its main axes. | theta = (v - 0.5) * amt * scalar; x' = dist * cos(theta) |
+| **Pinch:** Vertex Concentration | Pull points together or spread them along an axis. | v' = sgn(v) * \|v\|^(1.0 + (amt * scalar)) * n |
+| **Texture:** Surface Displacement | Add fine bumps and waves to the surface. | 1.0 + (sin(u) * cos(v) * outerAmt) + (sin(u) * sin(v) * innerAmt) |
+| **Spiral:** Coordinate Torsion | Twist the shape around its center. | theta' = atan2(B, A) + (amt * r * scalar) |
+| **Modulate:** Surface Oscillation | Overlay gentle ripples or waves on the shape. | Delta = sin(u * freq) * cos(v * freq) * amt |
+| **Flatten:** Linear Compression | Compress the shape along one direction. | v' = v * (1.0 - amt) |
+| **Export:** Geometry Output | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
+
+<!-- END_UI_REFERENCE -->
 
 ### Additional Features & Formulas
 
@@ -254,7 +252,9 @@ I hope you enjoy exploring the application as much as I have enjoyed building it
 
 ### Recent Releases
 
-* **[v0.5.0.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.0.1)** (2026-01-27): Infrastructure Baseline. Established resilient Feature Flag system, Self-Healing tests, and neutralized UI styling invariants.
+* **[v0.5.4.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.4.1)** (2026-01-30): Mobile UX hardening. Fixed iPhone container alignment, optimized tooltip persistence, and established Social Math serialization requirements.
+* **[v0.5.4](https://github.com/jaseknighter/parametric/releases/tag/v0.5.4)** (2026-01-29): Meta-Testing PoC. Introduced semantic intent auditing and SVG vector export pipeline.
+* **[v0.5.2](https://github.com/jaseknighter/parametric/releases/tag/v0.5.2)** (2026-01-28): Guidance Bridge. Integrated the instructional registry with adaptive tooltips and documentation syncing.
 
 The Feature Flag UI is accessed by adding `?showFlags=true` to the URL.
 
@@ -302,6 +302,8 @@ The following sections are under active development and subject to change.
    * [Architecture](./docs/drafts/ARCHITECTURE.md)
    * [Manifest v0.5](./docs/drafts/MANIFESTS/MANIFEST_VERSION_0.5.md)
    * [Parametric Authority (v0.5 Baseline)](./docs/drafts/PARAMETRIC_AUTHORITY.md)
+   * [Accessibility Hardening (v0.5.1 Spec)](./docs/drafts/ACCESSIBILITY.md)
+   * [Guidance Bridge (v0.5.2 Spec)](./docs/drafts/GUIDANCE_BRIDGE.md)
 * **Design Patterns**
    * [Design Patterns: Core vs. Supporting Invariants](./docs/drafts/DESIGN_PATTERNS.md)
 * **Implementation**
@@ -309,22 +311,31 @@ The following sections are under active development and subject to change.
    * [Formula Authority State Machine](./docs/drafts/FORMULA_AUTHORITY_STATE_MACHINE.md)
    * [Observability](./docs/drafts/OBSERVABILITY.md)
    * [Feature Flags (Lightweight Spec)](./docs/drafts/development/FEATURE_FLAGS_LIGHTWEIGHT.md)
+   * [Feature Flags (Testing Strategy)](./docs/drafts/FEATURE_FLAGS_TESTING.md)
+   * [Instructional Registry (v0.5.2)](./docs/drafts/USER_INSTRUCTIONS.md)
+* **Testing**
+   * [Meta-Testing Specs (v0.5.4)](./docs/drafts/METATESTING.md)
+   * [Testing Tips-N-Tricks](./docs/drafts/TESTING-TIPS-N-TRICKS.md)
 * **Reference**
    * [Glossary](./docs/drafts/GLOSSARY.md)
+* **Future Concepts**
+   * [Tooltip Math Visualizer](./docs/drafts/TOOLTIP_MATH_VISUALIZER.md)
 
 ---
 
 ## Post-v0.5 Priorities: Transparency & Test Depth
-1. **Accessibility (System Universalization):** Ensure the HUD and Sidebar states are announced correctly for screen readers, allowing the engine's mathematical state to be understood non-visually.
-2. **Performance:** Determine maximum vertex ceilings per device and monitor garbage collection pressure during animations.
-3. **Observability:** Implement a "Black Box" flight recorder to capture math failures in the wild.
-4. **Fidelity:** Shift from "existence" testing to "accuracy" testing via predicate-based numerical validation.
+1. **Accessibility (System Universalization):** Ensure the HUD and Sidebar states are announced correctly for screen readers, allowing the engine's mathematical state to be understood non-visually. (Aria tagging completed with 0.5.1. Acceptance testing not completed.)
+2. **Fidelity:** Shift from "existence" testing to "accuracy" testing via predicate-based numerical validation. (POC live with 0.5.4. Evaluation Underway.)
+3. **State Serialization (Social Math):** Implement URL-based state persistence. By injecting interface parameters (rotation, zoom, HUD formulas) into the URL, users can bookmark specific geometric states, share designs via a single link, and contribute to a community gallery of mathematical forms.
+4. **Observability:** Implement a "Black Box" flight recorder to capture math failures in the wild.
+5. **Performance:** Determine maximum vertex ceilings per device and monitor garbage collection pressure during animations.
+6. **Retrospective Issue Generation:** Scripted creation of resolved GitHub issues based on analysis of the repository's commit history to backfill the project board.
 
 ---
 
 ## Reporting Issues & Feature Requests
 
-* **Bug Reports:** Please include steps to replicate the issue and a copy of the console log (enabled by adding `?debug=true` to the URL).
+* **Bug Reports:** Please include steps to replicate the issue and a copy of the console log (enabled by adding `?debug=true` to the URL before going through the steps that result in the issue being reported).
 * **Feature Requests:** Open an issue to discuss new parametric presets or UI enhancements.
 
 Note: the roadmap is pretty well set for the near future and I have not yet begun to think about how I want this experiment to evolve over time.
@@ -332,16 +343,6 @@ Note: the roadmap is pretty well set for the near future and I have not yet begu
 ---
 
 ## Development and Testing
-
-### Feature Flags (v0.5.0.1)
-The application uses a lightweight, URL-based feature flag system to safely deploy experimental features. Flags support three states: `OFF`, `ON`, and `EXP` (Experimental).
-
-*   **Enable a flag:** `?flag_on=featureName`
-*   **Disable a flag:** `?flag_off=featureName`
-
-For detailed specifications, see:
-*   Feature Flags: [Lightweight Spec](./docs/drafts/FEATURE_FLAGS_LIGHTWEIGHT.md)
-*   Feature Flags: (Testing Strategy)[./docs/drafts/FEATURE_FLAGS_TESTING.md]
 
 ---
 
@@ -360,6 +361,26 @@ For detailed specifications, see:
 3. **Start the development server:**
 
     `npm start`
+
+### Testing Commands
+Run the following commands to verify system integrity:
+
+*   `npm test`: Runs all unit tests (Jest).
+*   `npm run test:full-baseline:ci`: Runs the full E2E suite (Playwright).
+*   `npm run test:audit`: Executes the Meta-Testing diagnostic scan.
+*   `npm run test:complete`: Orchestrates the full CI pipeline, including unified coverage and meta-reports.
+
+### Feature Flags (v0.5.4.1)
+The application uses a lightweight, URL-based feature flag system. As of v0.5.4.1, all core optimizations are enabled by default.
+
+*   **Enable a flag:** `?flag_on=featureName`
+*   **Disable a flag:** `?flag_off=featureName`
+
+To display the feature flag UI, add `?showFlags=true` to the URL.
+
+For detailed specifications, see:
+*   Feature Flags: Lightweight Spec
+*   Feature Flags: (Testing Strategy)[./docs/drafts/FEATURE_FLAGS_TESTING.md]
 
 ---
 

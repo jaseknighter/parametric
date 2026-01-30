@@ -53,9 +53,11 @@
 - [ ] Focus Management: Ensure that opening/closing drawers and HUD windows moves focus correctly to prevent "Focus Traps" for keyboard-only users.
 - [ ] Semantic Math: Explore the use of MathML or hidden descriptive text for formulas to describe the geometric transformations to assistive technology.
 - [ ] High-Contrast Canvas Guard: Implement a feature to toggle high-contrast vertex colors to improve visibility for users with visual impairments.
+- [ ] State Serialization (Social Math): Inject interface and HUD custom formulas into the URL to enable sharing and saving of shapes.
 
 ### 5. Git Automation & Migration
 - [ ] Templated Issue Creation: Establish GitHub Issue Templates (.github/ISSUE_TEMPLATE/) for Bug Reports and Feature Requests to ensure consistent data collection.
+- [ ] Retrospective Issue Generation: Scripted creation of resolved GitHub issues based on analysis of the repository's commit history to backfill the project board.
 - [ ] Git-Based Issue Lifecycle: Develop a script or workflow that allows creating, labeling, and closing issues directly from Git commit messages (e.g., "resolves #123").
 - [ ] Pull Request Automation: Implement a PR template that automatically runs the "Numerical Drift" audit and requires a "Green" status before allowing a merge.
 - [ ] Project Board Sync: Configure a GitHub Project to automatically move issues to "Done" when the corresponding branch is merged into main.
@@ -70,6 +72,8 @@
 - [ ] Clean up CSS and GUI constraint logic: Centralize boundary enforcement (HUD, Feature Flags) and refactor CSS for cleaner layout ownership.
 - [ ] Create `getDockingBounds()` test helper: Standardize boundary verification for FeatureFlag GUI and Formula HUD tests to avoid duplicated logic.
 - [x] Create `expectInterfaceCollapsed()` test helper: Standardize assertions for Micro-Nav collapse state (pointer-events, opacity) to avoid brittle visibility checks. (Completed in v0.5.3)
+- [x] **Manual Mode Invariance:** Implement an "Inertial Authority" guard at the shape-change emitter level to prevent generated formulas from overwriting user-authored manual overrides.
+- [ ] **Memory Leak Cleanup:** Fix "Can't perform a React state update on an unmounted component" warning in `Parametric.js` by clearing `debouncedLayoutRef` in the effect cleanup.
 
 ### 7. Instructional Refinement (Future)
 - [x] Keyboard / focus-triggered tooltips: Ensure tooltips appear when focusing on controls via keyboard.

@@ -23,7 +23,6 @@ export function useOutsideDismiss({
   refs = [],
   onDismiss,
 }) {
-  console.log('[useOutsideDismiss] Start of useOutsideDismiss hook');
   useEffect(() => {
     // [cite: 2026-01-29] DEBUG: Trace disabled state in tests
     if (!enabled && process.env.NODE_ENV === 'test') {

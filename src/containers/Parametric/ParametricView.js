@@ -208,6 +208,13 @@ const ParametricView = forwardRef((props, ref) => {
     return () => window.removeEventListener('keydown', handleA11yKeys);
   }, [isA11y, onRotate, onZoom]);
 
+  // [cite: 2026-01-30] UX: Force-hide tooltips when mobile nav collapses (Item 2)
+  useEffect(() => {
+    if (isMicroNavCollapsed) {
+      hideTooltip();
+    }
+  }, [isMicroNavCollapsed, hideTooltip]);
+
   // --- 🧊 RENDER STABILIZATION ---
   /**
    * Memoized FormulaHUD
@@ -335,10 +342,14 @@ const ParametricView = forwardRef((props, ref) => {
             rel="noopener noreferrer" 
             className="About_Link_Header"
             data-testid="about-link"
-            onMouseEnter={(e) => showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' })}
+            onMouseEnter={(e) => {
+              if (layoutMode !== 'mobile') showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
+            }}
             onMouseLeave={hideTooltip}
             onMouseMove={handleMouseMove}
-            onFocus={(e) => handleFocus(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' })}
+            onFocus={(e) => {
+              if (layoutMode !== 'mobile') handleFocus(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
+            }}
             onBlur={handleBlur}
           >
             about
@@ -395,6 +406,8 @@ const ParametricView = forwardRef((props, ref) => {
       <div 
         className="Interface_Container"
         ref={interfaceContainerRef}
+        // [cite: 2026-01-30] UX: Prevent text selection (Chrome white box) and drag-shifts (Safari)
+        style={{ userSelect: 'none', WebkitUserSelect: 'none', touchAction: 'pan-y' }}
         onClick={() => {
           if (layoutMode === 'mobile' && isMobileHud && isMicroNavCollapsed) {
             setIsMicroNavCollapsed(false);
