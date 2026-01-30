@@ -15,9 +15,9 @@ test.describe('v0.5.2 Documentation Bridge', () => {
     await expect(aboutLink).toContainText('about');
   });
 
-  test('About link points to README.md', async ({ page }) => {
+  test('About link points to GitHub repository', async ({ page }) => {
     const aboutLink = page.locator('.About_Link_Header');
-    await expect(aboutLink).toHaveAttribute('href', './README.md');
+    await expect(aboutLink).toHaveAttribute('href', 'https://github.com/jaseknighter/parametric');
     await expect(aboutLink).toHaveAttribute('target', '_blank');
   });
 

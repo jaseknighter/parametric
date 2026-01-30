@@ -23,8 +23,6 @@ jest.mock('../shared/featureFlagUtils', () => ({
 }));
 
 describe('Debug Utility', () => {
-  const originalLocation = window.location;
-
   let mockConsoleTable;
   let mockConsoleGroup;
   let mockConsoleGroupCollapsed;
@@ -40,24 +38,11 @@ describe('Debug Utility', () => {
     mockConsoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     // Mock URL environment with extra query param
-    const mockUrl = new URL('https://parametric.test/parametric?existing=param&flag_on=testFlagOff');
-    delete window.location;
-    const mockReplaceState = jest.fn();
-    window.location = { 
-      href: mockUrl.href,
-      origin: mockUrl.origin,
-      pathname: mockUrl.pathname,
-      search: mockUrl.search,
-      assign: jest.fn(),
-      replace: jest.fn(),
-      reload: jest.fn()
-    };
-    window.history.replaceState = mockReplaceState;
+    window.history.replaceState({}, '', '/parametric?existing=param&flag_on=testFlagOff');
   });
 
   afterAll(() => {
     jest.restoreAllMocks();
-    window.location = originalLocation;
   });
 
   test('listFlags generates console table and delegates DOM panel', () => {

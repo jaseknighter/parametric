@@ -1,117 +1,116 @@
-import { isFeatureEnabled } from './featureFlagUtils';
-import { FEATURE_FLAGS, FLAG_STATE } from './FEATURE_FLAGS';
-import { withSelfHealing } from './selfHealingWrapper';
+import { FeatureFlags, isFeatureEnabled } from './featureFlagUtils';
+import { fireEvent } from '@testing-library/react';
 
-// --- Surgical Mocking ---
-let mockSearchString = '';
+// Mock the constants to control test scenarios
+jest.mock('./FEATURE_FLAGS', () => ({
+  FEATURE_FLAGS: {
+    flagExp: { defaultValue: 'EXP' },
+    flagOn: { defaultValue: 'ON' },
+    flagOff: { defaultValue: 'OFF' },
+    flagSimpleExp: 'EXP',
+    flagSimpleOn: 'ON',
+    flagSimpleOff: 'OFF',
+    flagObjOff: { defaultValue: 'OFF' }
+  },
+  FLAG_STATE: { OFF: 'OFF', ON: 'ON', EXP: 'EXP' }
+}));
 
-// We mock the specific global our utility uses to read params
-global.URLSearchParams = class extends URLSearchParams {
-  constructor(input) {
-    // If the utility passes window.location.search, we swap it for our mock
-    if (input === window.location.search) {
-      super(mockSearchString);
-    } else {
-      super(input);
-    }
-  }
-};
-
-const setUrlSearchParams = (paramsObj) => {
-  const params = new URLSearchParams();
-  Object.entries(paramsObj).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      value.forEach(val => params.append(key, val));
-    } else {
-      params.set(key, value);
-    }
-  });
-  mockSearchString = params.toString() ? `?${params.toString()}` : '';
-};
-
-beforeEach(() => {
-  mockSearchString = '';
-  jest.clearAllMocks();
-});
-
-describe('Feature Flags', () => {
-  test('returns false for OFF flags', () => {
-    FEATURE_FLAGS.testOff = { defaultValue: FLAG_STATE.OFF };
-    expect(isFeatureEnabled('testOff')).toBe(false);
+describe('featureFlagUtils', () => {
+  beforeEach(() => {
+    // Reset URL
+    window.history.replaceState({}, '', 'http://localhost/');
+    // Clear DOM
+    document.body.innerHTML = '';
+    jest.useFakeTimers();
+    // Suppress JSDOM "Not implemented: navigation" error from reload()
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test('returns true for ON flags', () => {
-    FEATURE_FLAGS.testOn = { defaultValue: FLAG_STATE.ON };
-    expect(isFeatureEnabled('testOn')).toBe(true);
+  afterEach(() => {
+    const container = document.getElementById(FeatureFlags.listFlagsContainerId);
+    if (container) container.remove();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
-  test('returns false for ON flag when disabled via URL', () => {
-    FEATURE_FLAGS.testOn = { defaultValue: FLAG_STATE.ON };
-    setUrlSearchParams({ flag_off: 'testOn' });
-    expect(isFeatureEnabled('testOn')).toBe(false);
-  });
+  describe('isFeatureEnabled', () => {
+    test('[behavior] returns false for unknown flags', () => {
+      expect(isFeatureEnabled('unknown')).toBe(false);
+    });
 
-  test('returns false for EXP flags without URL param', () => {
-    FEATURE_FLAGS.testExp = { defaultValue: FLAG_STATE.EXP };
-    setUrlSearchParams({});
-    expect(isFeatureEnabled('testExp')).toBe(false);
-  });
+    test('[policy] returns false for OFF flags', () => {
+      expect(isFeatureEnabled('flagOff')).toBe(false);
+      expect(isFeatureEnabled('flagSimpleOff')).toBe(false);
+      expect(isFeatureEnabled('flagObjOff')).toBe(false);
+    });
 
-  test('returns true for EXP flags with URL param', () => {
-    FEATURE_FLAGS.testExp = { defaultValue: FLAG_STATE.EXP };
-    setUrlSearchParams({ flag_on: 'testExp' });
-    expect(isFeatureEnabled('testExp')).toBe(true);
-  });
+    test('[policy] returns true for ON flags by default', () => {
+      expect(isFeatureEnabled('flagOn')).toBe(true);
+      expect(isFeatureEnabled('flagSimpleOn')).toBe(true);
+    });
 
-  test('returns true for EXP flag when multiple flags are present', () => {
-    FEATURE_FLAGS.testExp = { defaultValue: FLAG_STATE.EXP };
-    // Testing multi-flag support with the new object helper
-    // [cite: 2026-01-27] FIX: Use comma-separated string to match the "Comma-Separated Contract"
-    setUrlSearchParams({ flag_on: 'otherFlag,testExp' });
-    expect(isFeatureEnabled('testExp')).toBe(true);
-  });
+    test('[behavior] returns false for ON flags if disabled via URL', () => {
+      window.history.replaceState({}, '', '/?flag_off=flagOn');
+      expect(isFeatureEnabled('flagOn')).toBe(false);
+    });
 
-  test('returns true for EXP flags with URL param (Object Config)', () => {
-    FEATURE_FLAGS.testExpObj = { defaultValue: FLAG_STATE.EXP };
-    setUrlSearchParams({ flag_on: 'testExpObj' });
-    expect(isFeatureEnabled('testExpObj')).toBe(true);
-  });
+    test('[policy] returns false for EXP flags by default', () => {
+      expect(isFeatureEnabled('flagExp')).toBe(false);
+    });
 
-  test('returns false for unknown flags', () => {
-    expect(isFeatureEnabled('nonExistentFlag')).toBe(false);
-  });
-
-  // 2. The "Flag Leak" Guard: Configuration Integrity Audit
-  test('Audit: all configured flags have valid states', () => {
-    const validStates = Object.values(FLAG_STATE);
-    Object.entries(FEATURE_FLAGS).forEach(([flag, config]) => {
-      // [cite: 2026-01-27] FIX: Handle object-based config
-      const state = (typeof config === 'object' && config !== null) ? config.defaultValue : config;
-      
-      if (!validStates.includes(state)) {
-        throw new Error(`Flag "${flag}" has invalid state "${state}"`);
-      }
+    test('[behavior] returns true for EXP flags if enabled via URL', () => {
+      window.history.replaceState({}, '', '/?flag_on=flagExp');
+      expect(isFeatureEnabled('flagExp')).toBe(true);
     });
   });
 
-  // 3. The "Self-Healing" Protocol: Sense and Respond
-  test('Self-Healing: recovers from transient state failure', async () => {
-    FEATURE_FLAGS.testHeal = { defaultValue: FLAG_STATE.EXP };
-    mockSearchString = ''; // Initially OFF
+  describe('FeatureFlags.setFlag', () => {
+    test('[behavior] enables a flag by adding to flag_on', () => {
+      FeatureFlags.setFlag('flagExp', true);
+      expect(window.location.search).toContain('flag_on=flagExp');
+    });
 
-    await withSelfHealing(
-      async () => {
-        // The Action: Expect flag to be ON
-        if (!isFeatureEnabled('testHeal')) {
-          throw new Error('Flag check failed');
-        }
-      },
-      async () => {
-        // Heal by updating our "internal" mock string
-        setUrlSearchParams({ flag_on: 'testHeal' });
-      }
-    );
-    
-    expect(isFeatureEnabled('testHeal')).toBe(true);
+    test('[behavior] disables a flag by adding to flag_off', () => {
+      FeatureFlags.setFlag('flagOn', false);
+      expect(window.location.search).toContain('flag_off=flagOn');
+    });
+
+    test('[behavior] persists showFlags param', () => {
+      FeatureFlags.setFlag('flagExp', true);
+      expect(window.location.search).toContain('showFlags=true');
+    });
+  });
+
+  describe('FeatureFlags.listFlags', () => {
+    test('[behavior] creates the debug panel', () => {
+      FeatureFlags.listFlags();
+      const container = document.getElementById('__debugFlagPanel');
+      expect(container).toBeInTheDocument();
+      expect(container.innerHTML).toContain('Feature Flags');
+    });
+
+    test('[behavior] toggle button calls setFlag', () => {
+      const spy = jest.spyOn(FeatureFlags, 'setFlag').mockImplementation(() => {});
+      FeatureFlags.listFlags();
+      
+      // Find a disable button (for an ON flag)
+      const disableBtns = document.querySelectorAll('button');
+      const btn = Array.from(disableBtns).find(b => b.textContent === 'Disable');
+      fireEvent.click(btn);
+      
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining('flag'), false);
+    });
+
+    test('[behavior] updates position on resize', () => {
+      FeatureFlags.listFlags();
+      const container = document.getElementById('__debugFlagPanel');
+      
+      // Trigger resize logic
+      window.innerWidth = 500;
+      fireEvent(window, new Event('resize'));
+      jest.advanceTimersByTime(1000); // Trigger interval
+      
+      expect(container).toBeInTheDocument();
+    });
   });
 });

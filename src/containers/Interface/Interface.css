@@ -362,6 +362,7 @@ select {
 /* [cite: 2026-01-20] FIX: Constrain pink strip width in mobile */
 .Interface.layout-mobile .TAreaInterface_controlsContainer.Controls_Show {
   width: auto !important;
+  height: 10rem !important;
   max-width: calc(100vw - 12rem); /* Prevent overflow off right edge */
 }
 
