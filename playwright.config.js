@@ -89,7 +89,8 @@
       // 🟠 ALIGNMENT: Ensure the port matches your Vite 'npm start' (3000)
       baseURL: 'http://localhost:3000/parametric/', 
       navigationTimeout: process.env.CI ? 120000 : 60000,
-      actionTimeout: 0,
+      // [cite: 2026-01-29] FIX: Give WebGL 15s to boot before failing selectors (prevents .Container timeout)
+      actionTimeout: 15000,
       trace: 'on-first-retry',
       onConsole: (msg) => console.log(`[BROWSER] ${msg.text()}`),
       collectCoverage: true, // 🟢 Harvest the data from the browser

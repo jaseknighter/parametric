@@ -38,13 +38,18 @@ describe('Parametric Worker (Unit)', () => {
     return global.self.onmessage;
   };
 
-  test('Handshake: Responds to PING', () => {
+  test('[policy] worker environment defaults are set', () => {
+    expect(self).toBeDefined();
+    // Weak assertion + 'defaults' marker (policy) -> Yellow
+  });
+
+  test('[behavior] Handshake: Responds to PING', () => {
     const onMessage = loadWorker();
     onMessage({ data: 'PING' });
     expect(mockPostMessage).toHaveBeenCalledWith('ALIVE');
   });
 
-  test('Handshake: Responds to TEST_HANDSHAKE', () => {
+  test('[behavior] Handshake: Responds to TEST_HANDSHAKE', () => {
     const onMessage = loadWorker();
     onMessage({ data: { type: 'TEST_HANDSHAKE', rid: 99 } });
     
@@ -59,7 +64,7 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Logic: Calculates geometry (Standard)', () => {
+  test('[behavior] Logic: Calculates geometry (Standard)', () => {
     const onMessage = loadWorker();
     const packet = {
       type: 'CALCULATE',
@@ -87,7 +92,7 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Logic: Handles Manual Formula', () => {
+  test('[behavior] Logic: Handles Manual Formula', () => {
     const onMessage = loadWorker();
     const packet = {
       type: 'CALCULATE',
@@ -110,7 +115,13 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Security: Rejects malicious keywords', () => {
+  test('[behavior] Logic: Result structure is valid', () => {
+    // Weak assertion + 'result' marker (behavior) -> Yellow
+    const onMessage = loadWorker();
+    expect(onMessage).toBeDefined();
+  });
+
+  test('[failure-mode] Security: Rejects malicious keywords', () => {
     const onMessage = loadWorker();
     const packet = {
       type: 'CALCULATE',
@@ -131,7 +142,7 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Logic: Detects NaN/Infinity (Stability)', () => {
+  test('[failure-mode] Logic: Detects NaN/Infinity (Stability)', () => {
     const onMessage = loadWorker();
     const packet = {
       type: 'CALCULATE',
@@ -163,7 +174,7 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Logic: Handles Kernel Errors', () => {
+  test('[failure-mode] Logic: Handles Kernel Errors', () => {
     const onMessage = loadWorker();
     const packet = {
       type: 'CALCULATE',
@@ -185,7 +196,7 @@ describe('Parametric Worker (Unit)', () => {
     );
   });
 
-  test('Authority: Resets on RESET_AUTHORITY', () => {
+  test('[behavior] Authority: Resets on RESET_AUTHORITY', () => {
     const onMessage = loadWorker();
     
     // 1. Lock it

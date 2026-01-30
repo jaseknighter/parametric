@@ -1,7 +1,7 @@
 import { updateObject } from './utility';
 
 describe('Utility - updateObject', () => {
-  test('correctly merges new properties into an object', () => {
+  test('[behavior] correctly merges new properties into an object', () => {
     const oldObject = { a: 1, b: 2 };
     const updatedProps = { b: 3, c: 4 };
     const result = updateObject(oldObject, updatedProps);

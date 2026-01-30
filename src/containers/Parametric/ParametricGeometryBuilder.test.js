@@ -2,37 +2,43 @@ import { cleanFormula, parameterizeGeometry } from './ParametricGeometryBuilder'
 import Formulas from './ParametricGeometryFormulas';
 
 describe('cleanFormula Sanitization Pipeline', () => {
-  test('converts π to PI and ^ to **', () => {
+  test('[policy] converts π to PI and ^ to **', () => {
     const { sanitized } = cleanFormula("x = u * 2π; y = v^2;");
     expect(sanitized).toContain('PI'); 
     expect(sanitized).toContain('**');
   });
 
-  test('auto-inserts "let" for undeclared variables', () => {
+  test('[policy] auto-inserts "let" for undeclared variables', () => {
     const { sanitized } = cleanFormula("speed = 5; x = u * speed;");
     expect(sanitized).toMatch(/let speed = 5/);
   });
 
-  test('volatility detector identifies "t" for animation', () => {
+  test('[policy] volatility detector identifies "t" for animation', () => {
     const volatilityRegex = /\bt\b/;
     expect(volatilityRegex.test("y = sin(u + t)")).toBe(true);
   });
 
-  test('handles implicit multiplication (2u -> 2 * u)', () => {
+  test('[policy] handles implicit multiplication (2u -> 2 * u)', () => {
     const { sanitized } = cleanFormula("x = 2u + 5v");
     expect(sanitized).toContain('2 * u');
     expect(sanitized).toContain('5 * v');
   });
 
-  test('processes range metadata', () => {
+  test('[policy] processes range metadata', () => {
     const input = "{u: 0 to 2π} x = 2u;";
     const { ranges } = cleanFormula(input);
     expect(ranges.u[1]).toBeCloseTo(Math.PI * 2, 10);
   });
+
+  test('[policy] exports required functions (validate)', () => {
+    expect(cleanFormula).toBeDefined();
+    expect(parameterizeGeometry).toBeDefined();
+    // Weak assertion + 'validate' marker (policy) -> Yellow
+  });
 });
 
 describe('parameterizeGeometry Generation', () => {
-  test('generates valid buffers for a simple plane', () => {
+  test('[behavior] generates valid buffers for a simple plane', () => {
     const config = {
       slices: 2,
       stacks: 2,
@@ -49,7 +55,7 @@ describe('parameterizeGeometry Generation', () => {
     expect(result.indices.length).toBe(24);
   });
 
-  test('handles syntax errors during compilation', () => {
+  test('[failure-mode] handles syntax errors during compilation', () => {
     const config = {
       slices: 2,
       stacks: 2,
@@ -62,7 +68,7 @@ describe('parameterizeGeometry Generation', () => {
     expect(result.error).not.toBe("Runtime error in formula");
   });
 
-  test('handles runtime errors gracefully', () => {
+  test('[failure-mode] handles runtime errors gracefully', () => {
     const config = {
       slices: 2,
       stacks: 2,
@@ -74,7 +80,7 @@ describe('parameterizeGeometry Generation', () => {
     expect(result.error).toBe("Runtime error in formula");
   });
 
-  test('detects numerical instability (NaN/Infinity)', () => {
+  test('[failure-mode] detects numerical instability (NaN/Infinity)', () => {
     const config = {
       slices: 2,
       stacks: 2,
@@ -86,7 +92,7 @@ describe('parameterizeGeometry Generation', () => {
     expect(result.isStable).toBe(false);
   });
 
-  test('respects custom ranges from metadata', () => {
+  test('[behavior] respects custom ranges from metadata', () => {
     const config = {
       slices: 1,
       stacks: 1,
@@ -103,7 +109,7 @@ describe('parameterizeGeometry Generation', () => {
     expect(lastX).toBeCloseTo(10);
   });
 
-  test('returns empty buffers for missing config', () => {
+  test('[failure-mode] returns empty buffers for missing config', () => {
     const result = parameterizeGeometry(null);
     expect(result.isValid).toBe(false);
     expect(result.positions.length).toBe(0);

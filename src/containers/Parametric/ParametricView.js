@@ -329,7 +329,7 @@ const ParametricView = forwardRef((props, ref) => {
         </span> */}
         {isDocsBridge && (
           <a 
-            href="./README.md" 
+            href={aboutGuidance.link || "https://github.com/jaseknighter/parametric"} 
             ref={aboutLinkRef}
             target="_blank" 
             rel="noopener noreferrer" 

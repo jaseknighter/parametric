@@ -26,18 +26,34 @@ const Export3dControl = ((props) => {
         aria-hidden={isA11yEnabled ? !isOpen : undefined}
         role={isA11yEnabled ? "region" : undefined}
       >
-        <label className="VectorLabel">.STL</label>
-        <button
-          id="iconButton___export"
-          data-vector="x"
-          data-group="1"
-          className="IconButton IconButton___export"
-          onClick={handleExportChange}
-          aria-label={isA11yEnabled ? "Export geometry to STL file" : undefined}
-          title={isA11yEnabled ? "Export STL" : undefined}
-        >
-          {isA11yEnabled && <span className="sr-only">Export STL</span>}
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <label className="VectorLabel">.SVG</label>
+            <button
+              id="iconButton___export_svg"
+              className="IconButton IconButton___export"
+              onClick={() => handleExport('svg')}
+              aria-label={isA11yEnabled ? "Export geometry to SVG file" : undefined}
+              title={isA11yEnabled ? "Export SVG" : undefined}
+            >
+              {isA11yEnabled && <span className="sr-only">Export SVG</span>}
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <label className="VectorLabel">.STL</label>
+            <button
+              id="iconButton___export"
+              data-vector="x"
+              data-group="1"
+              className="IconButton IconButton___export"
+              onClick={() => handleExport('stl')}
+              aria-label={isA11yEnabled ? "Export geometry to STL file" : undefined}
+              title={isA11yEnabled ? "Export STL" : undefined}
+            >
+              {isA11yEnabled && <span className="sr-only">Export STL</span>}
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );

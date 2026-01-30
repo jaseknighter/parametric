@@ -320,6 +320,7 @@ export const createSceneManager = (canvas, options = {}) => {
   const manager = {
     ready: readyPromise,
     scene: scene, 
+    getCamera: () => camera, // [cite: 2026-01-29] EXPORT: Expose camera for SVG renderer
     stopMotion,
     rotate: (dx, dy) => {
       applyScreenSpaceRotation(dx, dy);

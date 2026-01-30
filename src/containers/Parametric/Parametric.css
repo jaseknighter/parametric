@@ -410,6 +410,7 @@ html {
   overflow: visible !important;
   width: 100%; /* [cite: 2026-01-28] FIX: Constrain to parent width */
   max-width: 100%;
+  padding-bottom: env(safe-area-inset-bottom); /* [cite: 2026-01-28] FIX: Respect iPhone Home Bar */
 }
 
 .Container.layout-mobile .TAreaInterface {
@@ -435,14 +436,17 @@ html {
   transform: none !important;
   margin: 0;
   /* [cite: 2026-01-20] FIX: Content-Aware Widths based on column count */
-  width: 5rem;          /* explicit base width */
-  max-width: 5rem;      /* hard ceiling */
-  min-width: 4rem;       /* collapsed stripe */
+  /* Width is handled by specific column rules below */
+  max-width: 90vw !important;
 
   z-index: 100;
-  background: transparent;
-  overflow: visible;
-
+  /* [cite: 2026-01-28] VISUAL: Match Desktop Styling (Reddish Tint) */
+  background-color: rgba(202, 117, 117, 0.95) !important;
+  border: 0.5rem solid rgba(202, 117, 117, 0.95) !important;
+  border-radius: 0 !important;
+  padding: 0.5rem !important;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); */
+  /* display: grid; -- Inherited from Interface.css */
 }
 
 /* 0.5 Column (Export) */
@@ -452,17 +456,17 @@ html {
 
 /* 1 Column (Single sliders) */
 .Container.layout-mobile .Controls___Container_1column_Open .TAreaInterface_controlsContainer.Controls_Show {
-  width: 6rem !important;
+  width: 4rem !important;
 }
 
 /* 2 Columns (Shape, Texture) */
 .Container.layout-mobile .Controls___Container_2column_Open .TAreaInterface_controlsContainer.Controls_Show {
-  width: 10rem !important;
+  width: 9rem !important;
 }
 
 /* 3 Columns (Project, Bend, Pinch, etc.) */
 .Container.layout-mobile .Controls___Container_3column_Open .TAreaInterface_controlsContainer.Controls_Show {
-  width: 14rem !important;
+  width: 12rem !important;
 }
 
 /* [cite: 2026-01-20] FIX: Bottom Group aligns bottom-to-bottom to stay on screen */
@@ -470,6 +474,21 @@ html {
   top: auto;
   bottom: 0;
   transform: none !important;
+}
+
+/* [cite: 2026-01-28] FIX: Hardening Sliders for Mobile */
+.Container.layout-mobile .MySlider_sliderTrack {
+  height: 40px !important; /* Larger touch targets for mobile */
+  margin: 10px 0 0 0;
+  /* display: block; */
+  /* width: 100%; */
+}
+
+.Container.layout-mobile .MySlider_container {
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* align-items: stretch; */
+  height: auto;
 }
 
 /* ===============================
