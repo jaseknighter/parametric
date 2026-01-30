@@ -59,10 +59,13 @@
     "test:full-baseline": "cross-env VITE_COVERAGE=true start-server-and-test 'npm run start -- --force' http://localhost:3000/parametric/ 'cross-env PLAYWRIGHT_JSON_OUTPUT_NAME=playwright-report.json npx playwright test --project=chromium --project=firefox --project=webkit'",
     "test:full-baseline:ci": "cross-env VITE_COVERAGE=true npx playwright test tests/ --project=chromium",
     "test:run-all-suites": "cross-env VITE_COVERAGE=true npm run clean:artifacts && npm run test && npm run test:e2e && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
-    "test:run-all-suites:ci": "cross-env VITE_COVERAGE=true npm run test && npm run test:full-baseline:ci && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
+    "test:run-all-suites:ci": "cross-env VITE_COVERAGE=true npm run test && npm run test:full-baseline:ci && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs && npm run test:audit",
     "coverage:merge": "node scripts/merge-coverage.cjs",
+    "coverage:shards": "node scripts/summarizeShards.js --details",
     "docs:sync": "node scripts/sync-readme.js",
+    "test:complete": "npm run test:run-all-suites:ci && ./scripts/run-meta-poc.sh",
     "coverage-table": "node scripts/generate-coverage-table.cjs",
+    "test:audit": "node scripts/analyze-tests.cjs",
     "prepare": "husky install"
   },
   "eslintConfig": {
@@ -114,7 +117,8 @@
       "<rootDir>/backups/"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/tests/"
+      "<rootDir>/tests/",
+      "<rootDir>/scripts/"
     ]
   }
 }

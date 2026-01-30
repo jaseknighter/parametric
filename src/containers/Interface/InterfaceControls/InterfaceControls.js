@@ -6,10 +6,10 @@
 import React, { useCallback, useMemo } from "react";
 import withInterfaceControls from './withInterfaceControls';
 import { SHAPE_KEYS } from '../../../shared/ParametricConstants';
-import { validateAxisSelection } from "../../Parametric/ParametricLogic";
+// import { validateAxisSelection } from "../../Parametric/ParametricLogic";
 import { getFeaturePath } from "../../../services/ParametricRegistry";
 
-const AXES_LABELS = ['X', 'Y', 'Z'];
+const AXES_LABELS = ['1', '2', '3'];
 const AXES_VECTORS = ['x', 'y', 'z'];
 
 /**

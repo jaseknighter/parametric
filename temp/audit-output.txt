@@ -1,0 +1,70 @@
+
+> parametric-geometry-explorer@0.5.0 test:audit
+> node scripts/analyze-tests.cjs --table
+
+Starting Test Audit...
+
+--- Active Heuristics ---
+  [behavior] requires markers: fireEvent, userEvent, click, fill, press, page., postMessage, onMessage, result
+  [policy] requires markers: toThrow, ReadOnly, frozen, Boundary, expect.extend, sanitize, validate, defaults
+  [failure-mode] requires markers: error, NaN, terminate, Infinity, invalid, spyOn
+  [Intent Visibility Gap] if only weak assertions found (toBeDefined, toBeTruthy, etc.)
+Scanning directories: src, tests
+
+--- Audit Summary ---
+Total Tests: 300
+Tagged:      22
+Dynamic:     7 (Templates generating multiple runtime tests)
+Intent Visibility Gaps: 278
+  ├── Unclassified:       257
+  ├── Intent Mismatches:  18
+  └── Weak Assertions:    3
+Coverage:    N/A
+
+--- By Tag ---
+[behavior]     : 14
+[policy]       : 3
+[failure-mode] : 5
+
+--- Meta Testing Assessment ---
+Intent Signal Coverage: 🟡 YELLOW (51% of tagged tests meet declared intent)
+
+Values represent the number of tests per grade:
+[behavior]     : 🟢 14  | 🟡 1  | 🔴 9
+[policy]       : 🟢 3  | 🟡 2  | 🔴 5
+[failure-mode] : 🟢 5  | 🟡 0  | 🔴 4
+
+Criteria:
+🟢 Strong: Tag + Marker + Strong Assertion
+🟡 Weak:   Tag + Marker + Existence-only Assertion
+🔴 Miss:   Tag exists but implementation doesn't match intent
+
+--- Tagged Test Summary ---
+| File                                     | Total | 🟢 Strong | 🟡 Weak | 🔴 Miss |
+| :--------------------------------------- | :---: | :-------: | :-----: | :-----: |
+| Parametric.worker.test.js                |    10 |         8 |       2 |       0 |
+| ParametricGeometryBuilder.test.js        |    12 |         7 |       1 |       4 |
+| featureFlagUtils.test.js                 |    12 |         2 |       0 |      10 |
+| hooks.test.js                            |     4 |         3 |       0 |       1 |
+| selfHealingWrapper.test.js               |     3 |         1 |       0 |       2 |
+| utility.test.js                          |     1 |         1 |       0 |       0 |
+| meta-audit.test.js                       |     1 |         0 |       0 |       1 |
+
+To list detailed tagged test results, run: npm run test:audit -- --list-tagged
+
+--- Markdown Table ---
+| Metric | Result |
+| :--- | :--- |
+| **Total Tests (Static)** | 300 (+7 Dynamic Templates) |
+| **Tagged** | 22 |
+| **Intent Alignment** | 🚨 18 Mismatches |
+| **Strong Assertion Ratio** | ⚠️ 3 Weak |
+| **Intent Visibility Gaps** | 278 <br> *(tests not yet semantically classified)* |
+| **Coverage** | N/A |
+
+--- Command Summary ---
+View Unified Report       : npx monocart show-report monocart-report/index.html
+View Playwright Report    : npx playwright show-report
+View Coverage Shards      : npm run coverage:shards
+List Suspect Tests        : npm run test:audit -- --list-suspects
+List Tagged Details       : npm run test:audit -- --list-tagged

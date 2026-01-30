@@ -3,6 +3,7 @@
  * Returns null if the key is not a projection vector key.
  */
 export function parseVectorIntentKey(intentKey) {
+  if (!intentKey) return null;
   const match = intentKey.match(/vectorCol(\d)Row(\d)/i);
   if (!match) return null;
 
@@ -20,6 +21,7 @@ export function parseVectorIntentKey(intentKey) {
  * Does NOT clamp, validate, or normalize.
  */
 export function setByPath(obj, path, value) {
+  if (!path) return;
   const keys = Array.isArray(path) ? path : path.split('.');
   let cursor = obj;
   for (let i = 0; i < keys.length - 1; i++) {
