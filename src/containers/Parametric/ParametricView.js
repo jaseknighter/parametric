@@ -109,7 +109,17 @@ const ParametricView = forwardRef((props, ref) => {
   // FEATURE_FLAG_END: docsBridge
 
   // [cite: 2026-01-27] TOOLTIP: HUD About Link
-  const { tooltip, showTooltip, hideTooltip, handleMouseMove, handleFocus, handleBlur } = useAdaptiveTooltip();
+  const { tooltip, showTooltip: _showTooltip, hideTooltip, handleMouseMove, handleFocus: _handleFocus, handleBlur } = useAdaptiveTooltip();
+
+  // [cite: 2026-01-30] UX: Disable tooltips in mobile mode until robust dismissal is implemented
+  const showTooltip = useCallback((e, content) => {
+    if (layoutMode !== 'mobile') _showTooltip(e, content);
+  }, [layoutMode, _showTooltip]);
+
+  const handleFocus = useCallback((e, content) => {
+    if (layoutMode !== 'mobile') _handleFocus(e, content);
+  }, [layoutMode, _handleFocus]);
+
   const aboutLinkRef = useRef(null);
   // [cite: 2026-01-27] FIX: Ensure fallback content exists so tooltip renders
   const hudGuidance = GUIDANCE_REGISTRY.HUD_TITLE || { 
@@ -343,12 +353,12 @@ const ParametricView = forwardRef((props, ref) => {
             className="About_Link_Header"
             data-testid="about-link"
             onMouseEnter={(e) => {
-              if (layoutMode !== 'mobile') showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
+              showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
             }}
             onMouseLeave={hideTooltip}
             onMouseMove={handleMouseMove}
             onFocus={(e) => {
-              if (layoutMode !== 'mobile') handleFocus(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
+              handleFocus(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
             }}
             onBlur={handleBlur}
           >

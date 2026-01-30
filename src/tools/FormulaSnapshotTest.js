@@ -34,6 +34,7 @@ export const runFormulaAudit = (settings) => {
         u, v, 
         PI: Math.PI, E: Math.E, 
         abs: Math.abs, sin: Math.sin, cos: Math.cos, pow: Math.pow, sqrt: Math.sqrt, atan2: Math.atan2, sign: Math.sign,
+        log: Math.log, max: Math.max, min: Math.min, floor: Math.floor, ceil: Math.ceil, round: Math.round, exp: Math.exp, tan: Math.tan,
         ...getFormulaExecutionScope(vp)
     };
 
