@@ -33,6 +33,13 @@ This project evaluates quality at three distinct levels:
 
 Only Level 1 tests affect CI pass/fail. Levels 2 and 3 are observability layers.
 
+#### Heuristic Definitions
+| Tag | Interpreted Intent | Required Markers (Regex) |
+| :--- | :--- | :--- |
+| **\`[behavior]\`** | User-facing interaction | \`fireEvent\`, \`userEvent\`, \`click\`, \`postMessage\` |
+| **\`[policy]\`** | Architectural invariant | \`toThrow\`, \`ReadOnly\`, \`frozen\`, \`Boundary\` |
+| **\`[failure-mode]\`** | Error handling | \`error\`, \`NaN\`, \`Infinity\`, \`invalid\` |
+
 #### How to read this report
 Meta-testing does not measure whether tests pass. It measures whether tests clearly express their intent.
 

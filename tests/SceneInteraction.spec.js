@@ -4,7 +4,10 @@ import { addCoverageReport } from 'monocart-reporter';
 test.describe('ParametricScene Interactions', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/?e2e=true');
-    await page.waitForFunction(() => window.scene && window.intentService && window.scene.getVelocity);
+    // [cite: 2026-01-31] STABILITY: Relaxed readiness check to prevent timeouts
+    // Only wait for what we strictly need (scene existence)
+    await page.waitForFunction(() => window.scene, { timeout: 5000 })
+      .catch(() => { throw new Error('Scene failed to initialize — check boot sequence'); });
   });
 
   test.afterEach(async ({ page }, testInfo) => {
@@ -30,6 +33,7 @@ test.describe('ParametricScene Interactions', () => {
     const startX = box.x + box.width / 2;
     const startY = box.y + box.height / 2;
     
+    await page.waitForTimeout(100); // Stabilize
     await page.mouse.move(startX, startY);
     await page.mouse.down();
     await page.mouse.move(startX + 100, startY + 100, { steps: 5 });

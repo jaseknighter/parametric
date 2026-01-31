@@ -129,14 +129,6 @@ const ParametricView = forwardRef((props, ref) => {
   const aboutGuidance = GUIDANCE_REGISTRY.ABOUT_LANDMARK || {};
   const statusGuidance = GUIDANCE_REGISTRY.STATUS_LANDMARK || {};
 
-  // [cite: 2026-01-27] FIX: Remove native title to prevent browser tooltip collision
-  useEffect(() => {
-    const link = aboutLinkRef.current;
-    if (link && isDocsBridge) {
-      link.removeAttribute('title');
-    }
-  }, [isDocsBridge]);
-
 
   // [cite: 2026-01-27] DEBUG: Focus Watcher for A11y
   useEffect(() => {
@@ -391,6 +383,18 @@ const ParametricView = forwardRef((props, ref) => {
           visibility: hidden;
           pointer-events: none;
         }
+        /* [cite: 2026-01-31] SAFARI HARDENING: Eliminate reflow-drift and callouts */
+        .About_Link_Header {
+          -webkit-touch-callout: none;
+          touch-action: manipulation;
+          user-select: none;
+        }
+        /* Guard the transform to mobile only to prevent desktop regressions */
+        .Container.layout-mobile .TAreaInterface_controlsContainer.Controls_Show {
+          left: 0 !important;
+          transform: translateX(-1rem) !important; 
+          will-change: transform;
+        }
       `}</style>
       <header className="Header">
         Parametric Equations 
@@ -405,6 +409,7 @@ const ParametricView = forwardRef((props, ref) => {
             rel="noopener noreferrer" 
             className="About_Link_Header"
             data-testid="about-link"
+            title={undefined} // [cite: 2026-01-31] FIX: Kill hydration race by removing title at render-time
             onMouseEnter={(e) => {
               showTooltip(e, { text: aboutGuidance.proseBehavior || aboutGuidance.tableBehavior, intent: aboutGuidance.intent, placement: 'bottom-left' });
             }}
@@ -502,7 +507,7 @@ const ParametricView = forwardRef((props, ref) => {
             }
           }}
           // [cite: 2026-01-30] LAYOUT: Ensure toggle clears Safari URL bar
-          style={{ bottom: 'calc(30px + env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'calc(30px + env(safe-area-inset-bottom))', zIndex: 2000 }}
           aria-label={isMicroNavCollapsed ? "Expand Menu" : "Collapse Menu"}
           aria-expanded={!isMicroNavCollapsed}
           title="Click to access the interface."
