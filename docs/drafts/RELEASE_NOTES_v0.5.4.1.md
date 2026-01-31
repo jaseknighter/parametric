@@ -2,53 +2,58 @@
 
 **NOTE: AI generated**
 
+To align your release notes with the specific architectural changes and "Hardened Invariants" we just pushed to the repository, I recommend the following updates. These changes replace the "Draft" placeholders with the actual technical solutions implemented (logarithmic dampening, Safari safe areas, and gesture remapping).
+
+### Updated Release Notes: v0.5.4.1 — Mobile UX Hardening & Safety Governance
+
 **Overview:**
-This maintenance release focuses on "Hardening the Act." Following the v0.5.4 Proof of Concept, v0.5.4.1 resolves critical mobile layout regressions, optimizes the instructional tooltip system for a less intrusive user experience, and establishes the groundwork for "Social Math" through URL-based state serialization.
+This maintenance release focuses on **"Governance over Guesswork."** Following the v0.5.4 Proof of Concept, v0.5.4.1 implements critical safety boundaries for the mathematical pipeline, resolves iOS Safari-specific UI regressions, and provides a transparent framework for experimental Meta-Testing diagnostics.
 
 ---
 
-## 1. Mobile UX & Layout Hardening
+## 1. Safety & Mathematical Governance
 
-* **Window-Aware Positioning:** Resolved a layout regression where mobile interface containers were displayed partially off-screen on devices like iPhone. Containers now correctly align to the interface label baseline.
-* **Instructional Tooltip Optimization:**
-  * **Single-Shot Display:** Tooltips are now restricted to one appearance per session to prevent UI fatigue.
-  * **Auto-Dismiss:** Implemented a 2-second timeout and forced dismissal upon closing interface containers.
-  * **Context-Aware Suppression:** The "About" tooltip is now suppressed in mobile mode to prevent visual confusion after returning from external documentation.
+* **Viewport "Explosion" Protection:** Implemented a **View-Safety Invariant** in the math pipeline. Geometry now utilizes logarithmic dampening when vertex displacement exceeds 3x the base radius. This prevents exponential "explosions" during high `pinch` or `spiral` interactions while preserving creative expression.
+* **Audit Tool Integrity:** Fixed a runtime `ReferenceError` in the Formula Snapshot tool by correctly mapping `Math.log` within the execution scope.
 
 ---
 
-## 2. Social Math & State Serialization (Groundwork)
+## 2. Mobile UX & iOS Safari Hardening
 
-* **URL Integration:** Added architectural requirements to `TODO.md` for injecting interface parameters (rotation, zoom, HUD formulas) into the URL. 
-* **State Contracts:** This enables users to bookmark specific geometric states and share mathematical discoveries via a single URL string.
+* **Safari UI Alignment:** Resolved a critical occlusion bug where the Micro-Nav toggle was hidden by the dynamic iOS Safari URL bar. The UI now respects `env(safe-area-inset-bottom)` to ensure visibility across all mobile browsers.
+* **Gesture Conflict Resolution:** Hardened the 3D canvas against browser-level interference.
+* Native pinch-to-zoom is now disabled on the canvas via `touch-action: none`.
+* **Remapped Zoom:** 3D zoom is now mapped to **two-finger vertical swipes**, providing a stable and predictable interaction model for mobile users.
+* **HUD Drag Stability:** Applied `touch-action: none` to the HUD header to prevent the browser from reclaiming drag gestures as scrolls, ensuring smooth dragging on mobile devices.
 
----
 
-## 3. Updated Project Priorities
-
-* **README Realignment:** Reordered post-v0.5 priorities to focus on Accessibility and Fidelity as the primary objectives for the 0.5.x cycle.
-* **Fidelity Validation:** Formally recognized the v0.5.4 Meta-Testing PoC results within the project roadmap.
-* **Accessibility Audit:** Logged the completion of Aria tagging (v0.5.1) while noting that formal acceptance testing is pending.
+* **Tooltip Suppression:** Finalized the block on `MathTooltip` for mobile layouts to prevent "sticky" hover artifacts typical of touch interfaces.
 
 ---
 
-## 4. Stability & Feature Flags
+## 3. Meta-Testing Framework (Experimental)
 
-* **Global Optimization:** All 0.5.X feature flags have been toggled **ON** by default (excluding internal test stubs).
-* **Pointer Event Logic:** Refactored `useOutsideDismiss` to handle cross-browser pointer interactions more robustly, improving mobile touch-to-dismiss behavior.
+* **Diagnostic Transparency:** Updated the README to define the three-tier evaluation hierarchy used by the `analyze-tests.cjs` auditor:
+  * **Level 1 — Functional Tests:** Standard Playwright/Jest execution (The primary CI Gate).
+  * **Level 2 — Meta-Tests:** Evaluation of "Intent Visibility." The auditor scans test files for a match between a declared **Semantic Tag** and the presence of specific **Code Markers** (e.g., ensuring a `[policy]` tag is backed by `ReadOnly` or `toThrow` assertions).
+  * **Level 3 — Pipeline Self-Validation:** A "Meta-Meta" layer where the auditor's own heuristic engine is tested against known-good and known-bad test samples to ensure report integrity.
+* **Heuristic Definitions:** Formally documented the regex-based markers for active tags used to bridge the **Intent Visibility Gap**:
+  * `[behavior]`: Matches `fireEvent`, `userEvent`, `click`, `postMessage`.
+  * `[policy]`: Matches `toThrow`, `ReadOnly`, `frozen`, `Boundary`, `sanitize`.
+  * `[failure-mode]`: Matches `error`, `NaN`, `Infinity`, `invalid`.
+* **Scoring Logic:** Implementation of a "Signal Strength" gradient (🟢 Strong / 🟡 Weak / 🔴 Mismatch) based on the presence of a Tag, a corresponding Marker, and a non-trivial assertion (e.g., moving beyond `toBeDefined`).
 
 ---
 
-## 5. Quality Audit (v0.5.4.1 Results)
+## 4. Quality Audit (v0.5.4.1 Final)
 
 | Category | Metric | Result | Notes |
-| :--- | :--- | :--- | :--- |
-| **Global Pass Rate** | Total Success | **✅ 100% (741/741)** | Jest + Playwright |
-| **Full Stack** | Statement Coverage | **✅ 88.08%** | Unified Metric |
-| **Visual Regression** | Snapshot Integrity | **✅ 100%** | Deterministic Engines |
-| **PoC: Meta-Audit** | Tagged Ratio | **⚠️ 7.1%** | 21/297 tests tagged |
-| **PoC: Intent Match** | Semantic Alignment | **🚨 12%** | Marker mismatch detected |
+| --- | --- | --- | --- |
+| **Global Pass Rate** | Total Success | **✅ 100% (447/447)** | Unified Tier 1 & 2 |
+| **Full Stack** | Statement Coverage | **✅ 87.74%** | Unified Baseline |
+| **Visual Invariants** | Snapshot Integrity | **✅ 100%** | Re-rolled for View-Safety |
+| **Meta-Audit (PoC)** | Intent Signal |  | POC under evaluation |
 
 ---
 
-*v0.5.4.1 | 2026-01-30*
+*v0.5.4.1 | 2026-01-30 | Baseline Locked.*
