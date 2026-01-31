@@ -76,6 +76,16 @@
 - [x] **Geometry Explosion Guard:** Implemented asymptotic bounding for Pinch and a global viewport safety clamp to prevent vertices from exceeding the camera frustum.
 - [ ] **Memory Leak Cleanup:** Fix "Can't perform a React state update on an unmounted component" warning in `Parametric.js` by clearing `debouncedLayoutRef` in the effect cleanup.
 - [ ] **CSS Architecture Audit:** Identify which JS-injected styles are hydration-critical (Safari / initial load) vs. candidates for migration back to `Parametric.css`. Also perform a more general review of the architecture.
+- [ ] **Meta-Testing Formalization:** Transition the Meta-Testing PoC into a production-grade "Quality Autopilot" by integrating AST-based analysis (ESLint) and expanding heuristic definitions.
+- [ ] **Meta-Testing (AUTOMATED) Governance (Post-Implementation):**
+    - [ ] Enforce: No checkins > X lines of code without new/updated test cases.
+    - [ ] Enforce: No checkins > X lines of code without new/updated meta-testing tags.
+    - [ ] Enforce: No checkins > X lines of code AND no testing updates > X lines without a testing/meta-testing requirements spec created/updated.
+    - [ ] Enhance: Update meta-testing/meta-meta-testing to evaluate test adequacy (are intents fully covered? are Jest/Playwright tests sufficient for the complexity?).
+- [ ] **Mobile Test Refactoring:**
+    - [ ] Refactor `verifyPosition()` in `mobile-hud.spec.js` into a semantic geometry helper.
+    - [ ] Tag mobile tests as **UX invariants**.
+    - [ ] Split mobile HUD tests into layout vs interaction layers.
 
 ### 7. Instructional Refinement (Future)
 - [x] Keyboard / focus-triggered tooltips: Ensure tooltips appear when focusing on controls via keyboard.

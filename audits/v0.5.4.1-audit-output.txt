@@ -12,11 +12,11 @@ Starting Test Audit...
 Scanning directories: src, tests
 
 --- Audit Summary ---
-Total Tests: 300
+Total Tests: 301
 Tagged:      22
 Dynamic:     7 (Templates generating multiple runtime tests)
-Intent Visibility Gaps: 278
-  ├── Unclassified:       257
+Intent Visibility Gaps: 279
+  ├── Unclassified:       258
   ├── Intent Mismatches:  18
   └── Weak Assertions:    3
 Coverage:    N/A
@@ -55,11 +55,11 @@ To list detailed tagged test results, run: npm run test:audit -- --list-tagged
 --- Markdown Table ---
 | Metric | Result |
 | :--- | :--- |
-| **Total Tests (Static)** | 300 (+7 Dynamic Templates) |
+| **Total Tests (Static)** | 301 (+7 Dynamic Templates) |
 | **Tagged** | 22 |
 | **Intent Alignment** | 🚨 18 Mismatches |
 | **Strong Assertion Ratio** | ⚠️ 3 Weak |
-| **Intent Visibility Gaps** | 278 <br> *(tests not yet semantically classified)* |
+| **Intent Visibility Gaps** | 279 <br> *(tests not yet semantically classified)* |
 | **Coverage** | N/A |
 
 --- Command Summary ---

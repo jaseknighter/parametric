@@ -27,3 +27,4 @@ test-results/
 # CI / Local Bundle Workspace
 holding-area/
 scripts/temp/
+temp/
