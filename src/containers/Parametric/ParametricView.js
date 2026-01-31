@@ -225,6 +225,13 @@ const ParametricView = forwardRef((props, ref) => {
     }
   }, [isMicroNavCollapsed, hideTooltip]);
 
+  // [cite: 2026-01-30] UX: Force-hide tooltips on layout switch to mobile (Persistence Guard)
+  useEffect(() => {
+    if (layoutMode === 'mobile') {
+      hideTooltip();
+    }
+  }, [layoutMode, hideTooltip]);
+
   // --- 🧊 RENDER STABILIZATION ---
   /**
    * Memoized FormulaHUD
@@ -448,6 +455,8 @@ const ParametricView = forwardRef((props, ref) => {
               handleToggleMicroNav();
             }
           }}
+          // [cite: 2026-01-30] LAYOUT: Ensure toggle clears Safari URL bar
+          style={{ bottom: 'calc(20px + env(safe-area-inset-bottom))' }}
           aria-label={isMicroNavCollapsed ? "Expand Menu" : "Collapse Menu"}
           aria-expanded={!isMicroNavCollapsed}
           title="Click to access the interface."

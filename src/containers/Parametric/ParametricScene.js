@@ -31,6 +31,9 @@ export const createSceneManager = (canvas, options = {}) => {
 
   // [cite: 2026-01-30] UX: Set initial cursor for grab interaction
   canvas.style.cursor = 'grab';
+  
+  // [cite: 2026-01-30] MOBILE: Prevent browser zoom/pan interference
+  canvas.style.touchAction = 'none';
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xdddddd);
@@ -240,6 +243,9 @@ export const createSceneManager = (canvas, options = {}) => {
   init();
 
   const onPointerDown = (e) => {
+    // [cite: 2026-01-30] MOBILE: Ignore multi-touch start to prevent rotation jump
+    if (!e.isPrimary) return;
+
     if (e.button !== 0 || e.target !== canvas) return;
 
     // [cite: 2026-01-30] UX: Visual feedback for active grab
@@ -250,6 +256,34 @@ export const createSceneManager = (canvas, options = {}) => {
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
   };
+
+  // [cite: 2026-01-30] MOBILE: Two-finger swipe for zoom
+  let lastTouchY = null;
+  const onTouchMove = (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault(); // Block browser zoom
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentY = (touch1.clientY + touch2.clientY) / 2;
+      
+      if (lastTouchY !== null) {
+        const deltaY = lastTouchY - currentY;
+        if (Math.abs(deltaY) > 2) { // Jitter threshold
+          manager.zoom(deltaY > 0 ? 1 : -1);
+        }
+      }
+      lastTouchY = currentY;
+    } else {
+      lastTouchY = null;
+    }
+  };
+  
+  const onTouchEnd = () => {
+    lastTouchY = null;
+  };
+
+  canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+  canvas.addEventListener('touchend', onTouchEnd);
 
   const onPointerMove = (e) => {
     // [cite: 2026-01-21] FIX: If multiple pointers are active (pinching), don't apply custom rotation
@@ -382,6 +416,8 @@ export const createSceneManager = (canvas, options = {}) => {
       renderer.dispose(); 
       mesh.geometry.dispose(); 
       material.dispose();
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
     }
   };
 

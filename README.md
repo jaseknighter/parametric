@@ -35,7 +35,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 - [Development and Testing](#development-and-testing)
   - [Installation](#installation)
   - [Testing Commands](#testing-commands)
-  - [Feature Flags (v0.5.4.1)](#feature-flags-v0541)
+  - [Feature Flags (v0.5.0.1)](#feature-flags-v0501)
 - [Credits](#credits)
 
 ## Current Status
@@ -252,11 +252,12 @@ I hope you enjoy exploring the application as much as I have enjoyed building it
 
 ### Recent Releases
 
-* **[v0.5.4.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.4.1)** (2026-01-30): Mobile UX hardening. Fixed iPhone container alignment, optimized tooltip persistence, and established Social Math serialization requirements.
+* **[v0.5.4.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.4.1)** (2026-01-30): Mobile UX hardening. Fixed iPhone container alignment, optimized tooltip persistence, and established Social Math serialization requirements. Flipped feature flags for prior 0.5.X optimizations to enable them by default.
 * **[v0.5.4](https://github.com/jaseknighter/parametric/releases/tag/v0.5.4)** (2026-01-29): Meta-Testing PoC. Introduced semantic intent auditing and SVG vector export pipeline.
+* **[v0.5.3](https://github.com/jaseknighter/parametric/releases/tag/v0.5.3)** (2026-01-28): Display Domain Optimization. Mobile ergonomics, bottom-docked HUD, and unified coverage integration.
 * **[v0.5.2](https://github.com/jaseknighter/parametric/releases/tag/v0.5.2)** (2026-01-28): Guidance Bridge. Integrated the instructional registry with adaptive tooltips and documentation syncing.
-
-The Feature Flag UI is accessed by adding `?showFlags=true` to the URL.
+* **[v0.5.1](https://github.com/jaseknighter/parametric/releases/tag/v0.5.1)** (2026-01-27): The Accessible Cockpit. Semantic parallelism, ARIA landmarks, and keyboard navigation for 3D space.
+* **[v0.5.0](https://github.com/jaseknighter/parametric/releases/tag/v0.5.0)** (2026-01-24): The Unified Engine Baseline. Core transplant to multi-threaded worker architecture and JIT formula compilation.
 
 #### Release Manifest v0.5: The Unified Engine Baseline
 
@@ -370,8 +371,8 @@ Run the following commands to verify system integrity:
 *   `npm run test:audit`: Executes the Meta-Testing diagnostic scan.
 *   `npm run test:complete`: Orchestrates the full CI pipeline, including unified coverage and meta-reports.
 
-### Feature Flags (v0.5.4.1)
-The application uses a lightweight, URL-based feature flag system. As of v0.5.4.1, all core optimizations are enabled by default.
+### Feature Flags (v0.5.0.1)
+First implemented in v0.5.0.1, the application uses a lightweight, URL-based feature flag system.
 
 *   **Enable a flag:** `?flag_on=featureName`
 *   **Disable a flag:** `?flag_off=featureName`
