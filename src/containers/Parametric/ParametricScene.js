@@ -259,7 +259,11 @@ export const createSceneManager = (canvas, options = {}) => {
 
   // [cite: 2026-01-30] MOBILE: Two-finger swipe for zoom
   let lastTouchY = null;
+  let isMultiTouch = false; // [cite: 2026-01-30] STATE: Track multi-touch to gate rotation
+
   const onTouchMove = (e) => {
+    isMultiTouch = e.touches.length > 1;
+
     if (e.touches.length === 2) {
       e.preventDefault(); // Block browser zoom
       const touch1 = e.touches[0];
@@ -280,6 +284,7 @@ export const createSceneManager = (canvas, options = {}) => {
   
   const onTouchEnd = () => {
     lastTouchY = null;
+    isMultiTouch = false;
   };
 
   canvas.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -287,7 +292,8 @@ export const createSceneManager = (canvas, options = {}) => {
 
   const onPointerMove = (e) => {
     // [cite: 2026-01-21] FIX: If multiple pointers are active (pinching), don't apply custom rotation
-    if (!isDragging || !e.isPrimary) return;
+    // [cite: 2026-01-30] FIX: Disable rotation if multi-touch is detected (Zooming)
+    if (!isDragging || !e.isPrimary || isMultiTouch) return;
 
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
