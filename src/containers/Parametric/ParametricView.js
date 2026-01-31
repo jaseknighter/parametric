@@ -346,6 +346,14 @@ const ParametricView = forwardRef((props, ref) => {
       ${isA11y ? 'flag-a11y-on' : ''}
       ${layoutMode === 'mobile' && isMobileHud ? (isMicroNavCollapsed ? 'micro-nav-collapsed' : 'micro-nav-expanded') : ''}
     `}>
+      {/* [cite: 2026-01-30] MOBILE: Fix HUD drag stutter by disabling browser gesture arbitration */}
+      <style>{`
+        .HUD_Header {
+          touch-action: none !important;
+          user-select: none;
+          -webkit-user-select: none;
+        }
+      `}</style>
       <header className="Header">
         Parametric Equations 
         {/* <span className="worker-pill" aria-live={isA11y ? "polite" : undefined}>
