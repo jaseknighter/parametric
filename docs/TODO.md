@@ -75,6 +75,7 @@
 - [x] **Manual Mode Invariance:** Implement an "Inertial Authority" guard at the shape-change emitter level to prevent generated formulas from overwriting user-authored manual overrides.
 - [x] **Geometry Explosion Guard:** Implemented asymptotic bounding for Pinch and a global viewport safety clamp to prevent vertices from exceeding the camera frustum.
 - [ ] **Memory Leak Cleanup:** Fix "Can't perform a React state update on an unmounted component" warning in `Parametric.js` by clearing `debouncedLayoutRef` in the effect cleanup.
+- [ ] **CSS Architecture Audit:** Identify which JS-injected styles are hydration-critical (Safari / initial load) vs. candidates for migration back to `Parametric.css`. Also perform a more general review of the architecture.
 
 ### 7. Instructional Refinement (Future)
 - [x] Keyboard / focus-triggered tooltips: Ensure tooltips appear when focusing on controls via keyboard.
