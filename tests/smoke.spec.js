@@ -16,9 +16,14 @@ test.afterEach(async ({ page }, testInfo) => {
 
   // [cite: 2026-01-24] WEBKIT FIX: Graceful Settle
   // Give the browser event loop a moment to breathe before grabbing heavy coverage data
-  await page.waitForTimeout(500); 
+  try { await page.waitForTimeout(500); } catch (e) {}
   
-  const coverage = await page.evaluate(() => window.__coverage__);
+  // [cite: 2026-01-31] STABILITY: Safe coverage collection
+  const coverage = await page.evaluate(() => {
+    try { return window.__coverage__; } 
+    catch (e) { return null; }
+  }).catch(() => null);
+
   if (coverage) {
     await addCoverageReport(coverage, testInfo);
   }
@@ -536,6 +541,8 @@ const clickProjectionButton = async (page, { col, row }) => {
   const container = stripe.locator('.TAreaInterface_controlsContainer');
   if (!(await container.isVisible())) {
     await stripe.locator('button.TAreaInterface___TitleButton').click();
+    // [cite: 2026-01-31] FIREFOX STABILITY: Wait for interaction to settle via ARIA
+    await expect(stripe.locator('button.TAreaInterface___TitleButton')).toHaveAttribute('aria-expanded', 'true');
     await expect(container).toHaveClass(/Controls_Show/);
   }
   
@@ -647,9 +654,12 @@ test.describe('Architectural Integrity', () => {
 
         // Ensure drawer is open
         const stripe = page.getByTestId(`control-stripe-${group.toLowerCase()}`);
-        if (!(await stripe.locator('.TAreaInterface_controlsContainer').isVisible())) {
+        const container = stripe.locator('.TAreaInterface_controlsContainer');
+        if (!(await container.isVisible())) {
           await stripe.locator('button.TAreaInterface___TitleButton').click();
-          await expect(stripe.locator('.TAreaInterface_controlsContainer')).toHaveClass(/Controls_Show/);
+          // [cite: 2026-01-31] FIREFOX STABILITY: Wait for interaction to settle via ARIA
+          await expect(stripe.locator('button.TAreaInterface___TitleButton')).toHaveAttribute('aria-expanded', 'true');
+          await expect(container).toHaveClass(/Controls_Show/);
         }
 
         await page.keyboard.down('Shift');

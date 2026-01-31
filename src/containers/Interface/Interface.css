@@ -55,20 +55,26 @@ select {
   outline: none;
   cursor: pointer;
   border: 0;
-  background-color: rgba(202, 117, 117, 0.5) !important;
+  /* [cite: 2026-01-31] PERSISTENCE LOCK: Prevents background drop during Shift-key events */
+  background-color: rgba(202, 117, 117, 0.5); /* Fallback */
+  background-color: rgba(40, 40, 40, 1) !important;
+  transition: background-color 0.2s ease;
   z-index: 2;
 }
 
-.Controls_Opened .TAreaInterface___TitleButton {
-  background-color: rgba(100, 100, 100, 20%);
+/* Hardened Open State - The "is-active" class provides the extra specificity needed */
+.TAreaInterface.Controls_Opened .TAreaInterface___TitleButton,
+.TAreaInterface___TitleButton.is-active {
+  background-color: rgba(100, 100, 100, 0.2) !important;
+  opacity: 1 !important; /* Ensure no opacity flickering */
+  visibility: visible !important;
 }
 
-.TAreaInterface___TitleButton:hover {
-  background-color: rgba(100, 100, 100, 30%);
-}
-
-.TAreaInterface___TitleButton:active {
-  background-color: rgba(100, 100, 100, 10%);
+/* Shift Key / Multi-Interaction Guard */
+.TAreaInterface___TitleButton:focus,
+.TAreaInterface___TitleButton:focus-visible {
+  outline: none;
+  background-color: rgba(100, 100, 100, 0.2) !important;
 }
 
 .TAreaInterface___TitleButton_Label {
@@ -109,11 +115,8 @@ select {
 
 .TAreaInterface_controlsContainer.Controls_Show {
   width: calc(100% - 1rem);
-  background-color: rgba(202, 117, 117, 0.8);
-  border: 1rem solid rgba(152, 126, 125, 0.4);
   position: relative;
   margin-top: 0;
-  /* padding-left: 1rem; */
   height: auto; 
   min-height: 12rem;
 }
@@ -209,19 +212,6 @@ select {
   padding: 1.5rem 1rem 0.5rem 1rem;
   justify-items: center; 
 }
-/* .ProjectingColumn {
-  display: flex;
-  flex-direction: column;
-  width: 0rem;
-  align-items: center;
-} */
-
-/* .IconBtnGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin-top: 0;
-} */
 
 /* //////////////////////////////////////////////////////
 // Buttons & Icon Assignments
@@ -312,23 +302,9 @@ select {
   flex-direction: column;
   align-items: center; /* This centers the children... */
   width: 0rem;
-  margin-top: 1rem;
+  margin-top: 0.25rem;
   margin-left: 1rem;
 }
-
-/* 🟢 FIX: Force the Slider root to center itself and its children */
-/* .UISliderContainer > div {
-  display: flex;
-  justify-content: center;
-  width: 100% !important;
-} */
-
-/* 🟢 Ensure the Rail and Tracks are centered */
-/* .slider-rail, 
-.slider-tracks {
-  left: 50% !important;
-  transform: translateX(-50%);
-} */
 
 .SliderLabel {
   text-align: center; /* 🟢 Now this will line up perfectly */
@@ -362,7 +338,7 @@ select {
 /* [cite: 2026-01-20] FIX: Constrain pink strip width in mobile */
 .Interface.layout-mobile .TAreaInterface_controlsContainer.Controls_Show {
   width: auto !important;
-  height: 10rem !important;
+  height: 14rem !important;
   max-width: calc(100vw - 12rem); /* Prevent overflow off right edge */
 }
 
@@ -404,9 +380,10 @@ select {
     border: none;
     margin-top: 0rem;
     top: 0rem;
-    padding-left: 1rem;
-    width: calc(100% - 2rem);
+    padding: 1rem;
+    width: calc(100% - 3rem);
     height: calc(100% - 3rem);
+    justify-content:space-between;
 }
 
   /* --- Animation Logic --- */

@@ -20,4 +20,7 @@ export const FEATURE_FLAGS = {
 
   // MVP / Infrastructure Test
   hudHeaderLowercase: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.0.1', stage: 'prod' },
+
+  // v0.5.4.2: Layout Hardening (Gap, Tooltips, Shift-Stability)
+  mobileHardening: { defaultValue: FLAG_STATE.EXP, versionTarget: '0.5.4.2', stage: 'alpha' },
 };

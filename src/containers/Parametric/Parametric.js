@@ -80,7 +80,13 @@ const Parametric = () => {
   const [diagStats, setDiagStats] = useState({ status: "INIT", rid: 0, error: null });
   const diagStatsRef = useRef(diagStats); // [cite: 2026-01-17] PERF: Ref for high-freq stats
   const [isHUDActive, setIsHUDActive] = useState(true);
-  const [layoutMode, setLayoutMode] = useState('desktop'); // [cite: 2026-01-20] LAYOUT AUTHORITY
+  // [cite: 2026-01-31] LAYOUT: Lazy init to prevent FOUC on mobile refresh
+  const [layoutMode, setLayoutMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < LAYOUT_THRESHOLDS.DESKTOP_TO_MOBILE ? 'mobile' : 'desktop';
+    }
+    return 'desktop';
+  });
   const [isMathStable, setIsMathStable] = useState(true);
 
   // Testing harness states (Restored)

@@ -27,4 +27,11 @@ test-results/
 # CI / Local Bundle Workspace
 holding-area/
 scripts/temp/
+audits/
 temp/
+
+# Draft Documentation
+docs/drafts/FRONT-END-TESTING-TIPS-N-TRICKS.md
+
+# Draft Documentation
+docs/drafts/FRONT-END-TESTING-TIPS-N-TRICKS.md

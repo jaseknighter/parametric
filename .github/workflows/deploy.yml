@@ -37,11 +37,7 @@ jobs:
         env:
           VITE_COVERAGE: "true"
         continue-on-error: true 
-        run: |
-          npm test -- --coverage --watchAll=false
-          VITE_COVERAGE=true npx playwright test
-          node scripts/merge-coverage.cjs
-          node scripts/generate-coverage-table.cjs
+        run: npm run test:complete:ci
 
       - name: Upload Test Reports
         if: always() 

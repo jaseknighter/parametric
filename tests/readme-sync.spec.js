@@ -113,10 +113,11 @@ test.describe('Documentation Synchronization', () => {
       .map(([_, e]) => e);
     
     // [cite: 2026-01-27] FIX: Scope parsing to the Math Reference section only
-    const mathSection = readmeContent.split('## Interface Reference')[1] || '';
+    const mathSection = (readmeContent.split('## Interface Reference')[1] || '').split('<!-- END_UI_REFERENCE -->')[0];
     
     const tableRows = mathSection.split('\n')
-      .filter(line => line.trim().startsWith('| **') && !line.includes('Section'));
+      // [cite: 2026-01-31] FIX: Exclude dynamic coverage rows from static doc check
+      .filter(line => line.trim().startsWith('| **') && !line.includes('Section') && !line.includes('Statement Coverage') && !line.includes('Branch Coverage') && !line.includes('Pass Rate'));
 
     tableRows.forEach(row => {
       const matches = documentedEntries.some(entry => normalizeTitle(row).includes(normalizeTitle(entry.title)));
