@@ -52,7 +52,7 @@ CI logic and coverage validated via Chromium (V8). Full cross-browser parity (We
 | **Security Layer** | Statement Coverage | ✅ 94% (15/16) | Jest / Node v20 |
 | **Logic Layer** | Statement Coverage | ✅ 83% (50/60) | Jest / Node v20 |
 | **Web Worker** | Branch Coverage | ✅ 86% (60/70) | Jest / Node v20 |
-| **Display Layer** | Statement Coverage | ⚠️ 77.54% (404/521) | Playwright |
+| **Display Layer** | Statement Coverage | ⚠️ 73.98% (418/565) | Playwright |
 | **Smoke Suite** | Pass Rate (Chrome) | ✅ 100% (154/154) | Playwright |
 | **Smoke Suite** | Pass Rate (Firefox) | N/A | Playwright |
 | **Smoke Suite** | Pass Rate (WebKit) | N/A | Playwright |
@@ -72,7 +72,7 @@ CI logic and coverage validated via Chromium (V8). Full cross-browser parity (We
 > A "Meta-testing" POC project was introduced in v0.5.4 as a **diagnostic experiment** (not a gate).
 > Results are informational and are not used to fail CI at this time.
 
-This project evaluates quality at three distinct levels:
+This project uses "semantic tagging" and evaluates quality at three distinct levels:
 
 *   **Level 1 — Tests**
     Do features behave correctly?
@@ -83,6 +83,15 @@ This project evaluates quality at three distinct levels:
 
 Only Level 1 tests affect CI pass/fail. Levels 2 and 3 are observability layers.
 
+**Active Heuristics (tags)**
+  [behavior] requires markers: fireEvent, userEvent, click, fill, press, page., postMessage, onMessage, result
+  [policy] requires markers: toThrow, ReadOnly, frozen, Boundary, expect.extend, sanitize, validate, defaults
+  [failure-mode] requires markers: error, NaN, terminate, Infinity, invalid, spyOn
+
+Intent Visibility Gap: if only weak assertions found (toBeDefined, toBeTruthy, etc.)
+
+Scanned directories: src, tests
+
 #### How to read this report
 Meta-testing does not measure whether tests pass. It measures whether tests clearly express their intent.
 
@@ -92,7 +101,7 @@ Meta-testing does not measure whether tests pass. It measures whether tests clea
 
 Untagged tests are not considered failures. They represent areas not yet evaluated by this experimental system.
 
-*Last Audit: 2026-01-30*
+*Last Audit: 2026-01-31*
 
 | Metric | Result |
 | :--- | :--- |
