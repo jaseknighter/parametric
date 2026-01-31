@@ -5,7 +5,7 @@
  * FIXED: Stabilized HUD against high-frequency renders using useMemo.
  * [cite: 2026-01-12]
  */
-import React, { forwardRef, useMemo, useState, useEffect, memo, useRef, useCallback } from "react";
+import React, { forwardRef, useMemo, useState, useEffect, useLayoutEffect, memo, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
 import { isFeatureEnabled } from "../../shared/featureFlagUtils";
 import { GUIDANCE_REGISTRY } from "../../shared/GUIDANCE_REGISTRY/GUIDANCE_REGISTRY";
@@ -232,6 +232,28 @@ const ParametricView = forwardRef((props, ref) => {
     }
   }, [layoutMode, hideTooltip]);
 
+  // [cite: 2026-01-30] LAYOUT: Hydration Gate to prevent FOUC
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  useLayoutEffect(() => {
+    // Unlock visibility after first paint/layout calculation
+    requestAnimationFrame(() => setIsInitialLoad(false));
+  }, []);
+
+  // [cite: 2026-01-30] SAFARI: Visual Viewport Sync
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+    
+    const updateHeight = () => {
+      document.documentElement.style.setProperty('--vvh', `${window.visualViewport.height}px`);
+    };
+    
+    window.visualViewport.addEventListener('resize', updateHeight);
+    updateHeight(); // Initial set
+    
+    return () => window.visualViewport.removeEventListener('resize', updateHeight);
+  }, []);
+
   // --- 🧊 RENDER STABILIZATION ---
   /**
    * Memoized FormulaHUD
@@ -345,6 +367,7 @@ const ParametricView = forwardRef((props, ref) => {
       ${isMobileHud ? 'feature-mobile-hud' : ''} 
       ${isA11y ? 'flag-a11y-on' : ''}
       ${layoutMode === 'mobile' && isMobileHud ? (isMicroNavCollapsed ? 'micro-nav-collapsed' : 'micro-nav-expanded') : ''}
+      ${isInitialLoad ? 'is-loading' : ''}
     `}>
       {/* [cite: 2026-01-30] MOBILE: Fix HUD drag stutter by disabling browser gesture arbitration */}
       <style>{`
@@ -352,6 +375,21 @@ const ParametricView = forwardRef((props, ref) => {
           touch-action: none !important;
           user-select: none;
           -webkit-user-select: none;
+        }
+        /* [cite: 2026-01-30] SAFARI: Hardened Viewport Contract */
+        .Container.layout-mobile {
+          height: 100svh;
+          height: -webkit-fill-available;
+          height: var(--vvh, 100svh);
+          min-height: 100%;
+        }
+        /* [cite: 2026-01-30] FOUC: Hide UI until layout authority is established */
+        .Container.is-loading .Interface_Container,
+        .Container.is-loading .HUD_Wrapper,
+        .Container.is-loading .Header {
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
         }
       `}</style>
       <header className="Header">
@@ -464,7 +502,7 @@ const ParametricView = forwardRef((props, ref) => {
             }
           }}
           // [cite: 2026-01-30] LAYOUT: Ensure toggle clears Safari URL bar
-          style={{ bottom: 'calc(20px + env(safe-area-inset-bottom))' }}
+          style={{ bottom: 'calc(30px + env(safe-area-inset-bottom))' }}
           aria-label={isMicroNavCollapsed ? "Expand Menu" : "Collapse Menu"}
           aria-expanded={!isMicroNavCollapsed}
           title="Click to access the interface."
