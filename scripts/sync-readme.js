@@ -34,7 +34,7 @@ function generateTable() {
     output += `---\n\n`;
   }
 
-  output += `!Interface Reference\n\n`;
+  output += `![Interface Reference](./docs/images/instructions_interface_banner.png)\n\n`;
 
   // 2. Interface Reference Table
   output += `### Interface Reference\n\n`;
