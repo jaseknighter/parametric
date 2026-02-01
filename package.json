@@ -68,6 +68,7 @@
     "coverage-table": "node scripts/generate-coverage-table.cjs",
     "coverage:shards": "node scripts/summarizeShards.js --details",
     "/* 6. INTEGRATED PIPELINES [PROD/CI] - PACKAGES many of the preceding scripts (JEST + CHROMIUM + META-AUDIT) for production deployment. */": "",
+    "test:coverage": "npm run test:complete:ci",
     "test:complete:ci": "cross-env VITE_COVERAGE=true npm run clean && npm run test && npx playwright test tests/ --project=chromium && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs && npm run test:audit"
   },
   "eslintConfig": {
