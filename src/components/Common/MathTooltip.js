@@ -6,6 +6,10 @@ import 'katex/dist/katex.min.css';
 import katex from 'katex';
 
 const MathTooltip = ({ intent, text, visible, x, y, isA11yEnabled, placement, ...rest }) => {
+  // [cite: 2026-01-31] RUTHLESS: Absolute suppression on mobile devices.
+  // We check window width directly to bypass any state/prop lag.
+  if (typeof window !== 'undefined' && window.innerWidth < 800) return null;
+
   if (!visible || (!text && !intent)) return null;
 
   const renderedContent = useMemo(() => {

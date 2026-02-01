@@ -25,7 +25,11 @@ test.describe('Display Layer Coverage', () => {
     }
     
     // Click a shape button (e.g., KLEIN) to force execution of display logic
-    await stripe.locator('button[data-shape="KLEIN"]').click({ force: true });
+    // [cite: 2026-01-31] WEBKIT FIX: Ensure drawer is open before clicking contents
+    await stripe.click(); 
+    const kleinButton = stripe.locator('button[data-shape="KLEIN"]');
+    await expect(kleinButton).toBeVisible(); // Wait for animation
+    await kleinButton.click({ force: true });
     
     // Wait for render to settle
     await page.waitForTimeout(1000);

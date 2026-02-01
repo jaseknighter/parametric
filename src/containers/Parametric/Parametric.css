@@ -188,7 +188,7 @@ html {
 /* [cite: 2026-01-27] FIX: Scope pink links to content areas only */
 .Interface_Container a:link,
 .Footer a:link {
-  color: rgba(202, 117, 117);
+  color: rgba(202, 117, 117,0.75);
   text-decoration: none;
 }
 
@@ -321,7 +321,6 @@ html {
   height: 100vh;
   width: 100vw;
 
-
   /* ===============================
      MOBILE OVERFLOW INVARIANT
      =============================== */
@@ -334,10 +333,6 @@ html {
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
-}
-
-.Container.layout-mobile.feature-mobile-hud .Interface_Container {
-  /* [cite: 2026-01-28] FIX: Remove base transition to prevent animation on initial layout switch */
 }
 
 .Container.layout-mobile .Three_Grid_Area {
@@ -371,16 +366,13 @@ html {
 
 /* [cite: 2026-01-28] MOBILE: Bottom-Docking Logic (Flagged) */
 .Container.layout-mobile.feature-mobile-hud .Interface_Container {
-  /* [cite: 2026-01-28] MOBILE: Bottom-Docking Logic */
   z-index: 0;
   bottom: 0;
   top: auto;
-  /* [cite: 2026-01-28] FIX: Full height vertical bar */
   height: calc(100vh - 6rem) !important;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  /* width: 11rem !important; -- Redundant, handled by base rule above */
 }
 
 /* [cite: 2026-01-20] MOBILE STRIPE INVARIANT: Grey stripe behind labels only */
@@ -398,9 +390,6 @@ html {
   backdrop-filter: none !important; /* [cite: 2026-01-28] VISUAL: No blur on stripe */
 }
 
-.Container.layout-mobile.feature-mobile-hud .Interface_Container::before {
-  /* [cite: 2026-01-28] VISUAL: Glassmorphism for mobile headers */
-}
 
 /* ===============================
    MOBILE POINTER EVENTS MODEL
@@ -441,13 +430,8 @@ html {
 
   z-index: 100;
   /* [cite: 2026-01-28] VISUAL: Match Desktop Styling (Reddish Tint) */
-  background-color: rgba(202, 117, 117, 0.95) !important;
-  border: 0.5rem solid rgba(202, 117, 117, 0.95) !important;
-  border-radius: 0 !important;
-  padding: 0.5rem !important;
-  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); */
-  /* display: grid; -- Inherited from Interface.css */
-}
+  background-color: rgba(202, 117, 117, 0.75) !important;
+  }
 
 /* 0.5 Column (Export) */
 .Container.layout-mobile .Controls___Container_0_5column_Open .TAreaInterface_controlsContainer.Controls_Show {
@@ -485,9 +469,6 @@ html {
 }
 
 .Container.layout-mobile .MySlider_container {
-  /* display: flex; */
-  /* flex-direction: column; */
-  /* align-items: stretch; */
   height: auto;
 }
 
@@ -496,7 +477,7 @@ html {
    =============================== */
 /* [cite: 2026-01-28] MICRO-NAV: Collapsed State */
 .Container.layout-mobile.micro-nav-collapsed .Interface_Container {
-  width: 4.0rem !important;  /* [cite: 2026-01-28] VISUAL: Wider stripe for centered hamburger */
+  width: 5.0rem !important;  /* [cite: 2026-01-28] VISUAL: Wider stripe for centered hamburger */
   overflow: hidden !important;
   pointer-events: auto; /* [cite: 2026-01-28] FIX: Allow clicking stripe to expand */
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s; /* [cite: 2026-01-28] SEQ: Shrink AFTER fade out (0.3s delay) */
@@ -509,7 +490,8 @@ html {
   left: 0;
   width: 100vw;
   height: auto; /* [cite: 2026-01-28] FIX: Auto height prevents jump to top */
-  pointer-events: none;
+  pointer-events: none; 
+  align-self: right;
 }
 
 /* [cite: 2026-01-28] MICRO-NAV: Fade out controls when collapsed */
@@ -559,7 +541,7 @@ html {
 .MicroNav_Toggle {
   position: absolute;
   bottom: env(safe-area-inset-bottom, 0.5rem); /* [cite: 2026-01-28] FIX: Safe area with fallback */
-  left: calc(env(safe-area-inset-left) + 0.5rem); /* [cite: 2026-01-28] VISUAL: Center in 4rem stripe */
+  left: calc(env(safe-area-inset-left) + 0.9rem); /* [cite: 2026-01-28] VISUAL: Center in 4rem stripe */
   margin-bottom: 1rem; /* [cite: 2026-01-28] VISUAL: Push up from bottom */
   width: 3rem;
   height: 3rem;

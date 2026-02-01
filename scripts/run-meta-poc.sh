@@ -45,3 +45,7 @@ echo "📝 Injecting results into README.md..."
 node scripts/inject-meta-results.cjs "audits/v${VERSION}-audit-table.md" "audits/v${VERSION}-metameta-table.md"
 
 echo "🎉 PoC complete! README.md has been updated."
+
+# [cite: 2026-01-31] AUDIT: Stage the audit artifacts for commit to ensure history is kept
+echo "💾 Staging audit artifacts..."
+git add "audits/v${VERSION}-"*

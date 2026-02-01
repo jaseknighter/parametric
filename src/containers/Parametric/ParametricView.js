@@ -78,6 +78,9 @@ const ParametricView = forwardRef((props, ref) => {
   const isMobileHud = isFeatureEnabled('mobileHudOptimization');
   // FEATURE_FLAG_END: mobileHudOptimization
 
+  // FEATURE_FLAG_START: mobileHardening
+  const isMobileHardening = isFeatureEnabled('mobileHardening');
+
   // [cite: 2026-01-28] MICRO-NAV: State for mobile collapse/expand
   const [isMicroNavCollapsed, setIsMicroNavCollapsed] = useState(false);
   
@@ -382,6 +385,11 @@ const ParametricView = forwardRef((props, ref) => {
           opacity: 0;
           visibility: hidden;
           pointer-events: none;
+          /* [cite: 2026-01-31] FOUC: Move offscreen as extra safety */
+          transform: translateX(-100vw);
+        }
+        .Container.layout-desktop .MathTooltip {
+          display: block !important;
         }
         /* [cite: 2026-01-31] SAFARI HARDENING: Eliminate reflow-drift and callouts */
         .About_Link_Header {
@@ -389,12 +397,78 @@ const ParametricView = forwardRef((props, ref) => {
           touch-action: manipulation;
           user-select: none;
         }
-        /* Guard the transform to mobile only to prevent desktop regressions */
-        .Container.layout-mobile .TAreaInterface_controlsContainer.Controls_Show {
-          left: 0 !important;
-          transform: translateX(-1rem) !important; 
-          will-change: transform;
-        }
+        ${isMobileHardening ? `
+          /* [cite: 2026-01-31] MOBILE HARDENING (v0.5.4.2) */
+          
+          /* 1. Tooltip Suppression: Kill native callouts */
+          .Container.layout-mobile * {
+            -webkit-touch-callout: none !important;
+            justify-content: space-evenly;
+            
+          }
+
+          /* 2. Gap Fix & Shift Stability: Anchor Parent */
+          .Container.layout-mobile .TAreaInterface {
+            position: relative !important;
+            display: block !important;
+            width: 10rem !important; /* Match button width exactly to kill 1rem gap */
+            min-width: 10rem !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            /* [cite: 2026-01-31] STABILITY: Prevent Shift+Drag reflows without clipping overflow */
+            contain: layout !important; 
+          }
+
+          /* 3. Container Alignment & Texture Background Fix */
+          .Container.layout-mobile .TAreaInterface_controlsContainer {
+            position: absolute !important;
+            
+            left: 100% !important;
+            margin-left: -1px !important; /* Overlap guard */
+            transform: none !important;
+            margin: 0 !important;
+            
+            /* Ensure width is sufficient */
+            width: auto !important;
+            height: auto !important; /* Override Interface.css fixed height */
+            /* min-width: 200px; -- [cite: 2026-01-31] REMOVED: Caused width reflow jitter on iOS */
+            
+            /* [cite: 2026-01-31] LAYOUT: Force vertical stack for mobile controls */
+            display: flex !important;
+            /* flex-direction: column !important; -- [cite: 2026-01-31] REMOVED: Caused height reflow jitter on iOS */
+            gap: 1rem !important;
+            padding: 0.5rem !important;
+            justify-content: center;
+
+            z-index: 1000;
+            /* Enforce solid background to prevent transparency artifacts */
+            background-color: rgba(202, 117, 117, 0.75) !important;
+            // border: 0.5rem solid rgba(202, 117, 117, 0.75) !important;
+          }
+
+          /* [cite: 2026-01-31] ANCHORING: Default Top Anchoring (Bend, Pinch, Texture) */
+          /* Applied globally, then overridden for Bottom Groups */
+          .Container.layout-mobile .TAreaInterface_controlsContainer {
+            top: 0 !important;
+            bottom: auto !important;
+            inset-block-start: 0 !important; /* Logical clamp */
+          }
+
+          /* [cite: 2026-01-31] ANCHORING: Explicit Bottom Anchoring for Bottom Groups (Spiral, Modulate, etc.) */
+          .Container.layout-mobile .Bottom_Group .TAreaInterface_controlsContainer {
+            top: auto !important;
+            bottom: 0 !important;
+            inset-block-end: 0 !important; /* Logical clamp */
+            inset-block-start: auto !important; /* Clear top clamp */
+          }
+
+          /* [cite: 2026-01-31] FIX: Ensure sliders have width in mobile */
+          .Container.layout-mobile .UISliderContainer {
+            width: 100% !important;
+            margin-left: 0 !important;
+          }
+        ` : ''}
       `}</style>
       <header className="Header">
         Parametric Equations 
@@ -507,7 +581,7 @@ const ParametricView = forwardRef((props, ref) => {
             }
           }}
           // [cite: 2026-01-30] LAYOUT: Ensure toggle clears Safari URL bar
-          style={{ bottom: 'calc(30px + env(safe-area-inset-bottom))', zIndex: 2000 }}
+          style={{ justifyContent: 'center', bottom: 'calc(10px + env(safe-area-inset-bottom))', zIndex: 2000 }}
           aria-label={isMicroNavCollapsed ? "Expand Menu" : "Collapse Menu"}
           aria-expanded={!isMicroNavCollapsed}
           title="Click to access the interface."

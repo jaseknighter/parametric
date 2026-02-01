@@ -19,6 +19,7 @@ test.describe('ParametricScene Interactions', () => {
 
   test('Double click toggles spin', async ({ page }) => {
     const canvas = page.locator('canvas.Three');
+    await canvas.waitFor({ state: 'visible' }); // Ensure WebGL is hydrated
     await canvas.dblclick();
     // Wait a bit to ensure code path executes
     await page.waitForTimeout(100);
