@@ -261,6 +261,11 @@ export const createSceneManager = (canvas, options = {}) => {
   let lastTouchY = null;
   let isMultiTouch = false; // [cite: 2026-01-30] STATE: Track multi-touch to gate rotation
 
+  // [cite: 2026-02-01] FIX: Aggressively track multi-touch start to block rotation immediately
+  const onTouchStart = (e) => {
+    if (e.touches.length > 1) isMultiTouch = true;
+  };
+
   const onTouchMove = (e) => {
     isMultiTouch = e.touches.length > 1;
 
@@ -282,25 +287,33 @@ export const createSceneManager = (canvas, options = {}) => {
     }
   };
   
-  const onTouchEnd = () => {
+  const onTouchEnd = (e) => {
     lastTouchY = null;
-    isMultiTouch = false;
+    isMultiTouch = e.touches.length > 1;
   };
 
+  canvas.addEventListener('touchstart', onTouchStart, { passive: false });
   canvas.addEventListener('touchmove', onTouchMove, { passive: false });
   canvas.addEventListener('touchend', onTouchEnd);
 
   const onPointerMove = (e) => {
-    // [cite: 2026-01-21] FIX: If multiple pointers are active (pinching), don't apply custom rotation
-    // [cite: 2026-01-30] FIX: Disable rotation if multi-touch is detected (Zooming)
-    if (!isDragging || !e.isPrimary || isMultiTouch) return;
+    if (!isDragging || !e.isPrimary) return;
 
+    // [cite: 2026-02-01] FIX: Update tracking coords even during multi-touch to prevent jump on release
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+
+    // [cite: 2026-01-30] FIX: Disable rotation if multi-touch is detected (Zooming)
+    if (isMultiTouch) {
+      // [cite: 2026-02-01] FIX: Reset momentum accumulators during multi-touch
+      velocityX = 0; velocityY = 0; dragDistance = 0;
+      return;
+    }
+
     dragDistance += Math.sqrt(dx * dx + dy * dy);
     velocityX = (velocityX * 0.4) + (dx * 0.02 * 0.6);
     velocityY = (velocityY * 0.4) + (dy * 0.02 * 0.6);
-    lastX = e.clientX; lastY = e.clientY;
     applyScreenSpaceRotation(dx, dy);
     needsRender = true;
   };
@@ -422,6 +435,7 @@ export const createSceneManager = (canvas, options = {}) => {
       renderer.dispose(); 
       mesh.geometry.dispose(); 
       material.dispose();
+      canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchmove', onTouchMove);
       canvas.removeEventListener('touchend', onTouchEnd);
     }
