@@ -33,5 +33,12 @@ temp/
 # Draft Documentation
 docs/drafts/FRONT-END-TESTING-TIPS-N-TRICKS.md
 
-# Draft Documentation
-docs/drafts/FRONT-END-TESTING-TIPS-N-TRICKS.md
+# Secret patterns
+*.pem
+*.key
+credentials.json
+
+# Editor Settings
+.vscode/
+.idea/
+*.swp
