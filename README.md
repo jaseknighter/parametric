@@ -14,7 +14,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 
 - [Documentation](#documentation)
   - [Interface Reference](#interface-reference)
-  - [Formula Editor: Manual Override (dekstop version only)](#formula-editor-manual-override-dekstop-version-only)
+  - [Formula Editor: Manual Override](#formula-editor-manual-override)
   - [Math Reference](#math-reference)
   - [Additional Features \& Formulas](#additional-features--formulas)
     - [1. Move Multiple Sliders at Once](#1-move-multiple-sliders-at-once)
@@ -63,7 +63,8 @@ A browser-based environment for exploring complex mathematical surfaces and para
 | **Flatten:** Linear Compression | Compress the shape along one direction. | v' = v * (1.0 - amt) |
 | **Export:** Geometry Output | Save your model for use in other software. | STL produces 3D manifold files. SVG (v0.5.4) projects the 3D view into a 2D vector path for plotting. |
 
-### Formula Editor: Manual Override (dekstop version only)
+### Formula Editor: Manual Override 
+(dekstop version only)
 
 > **Use formulas to directly control the 3D shape.**
 
