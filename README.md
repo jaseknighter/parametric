@@ -147,23 +147,21 @@ z = cos(v * π)
 
 When I was a kid I got a computer. It had a single 5.25" floppy drive and a monochrome monitor that displayed green text on a black background. I played lots of Zork on it ("go west...you bump into a wall...go west...you bump into a wall...") Not too long after, I received a graphics card for the computer that came with a manual explaining how to program simple shapes and display them up on the monitor. That magical experience of seeing how a computer can take a few lines of code and turn them into an image has never left me. 
 
-This project was started in 2019 as part of an effort to learn React.js and return to my coding roots after spending many, many years not coding as an IT Manager. I believe what drew me to this project had something to do with a desire to revisit that early experience working with code to create images, in a (relatively) straightforward manner.
+This project began in 2019 as a way to learn React.js and return to hands-on coding after many years working as an IT Manager who rarely coded. What drew me in was a desire to reconnect with that early sense of play: writing relatively simple code and watching it produce visual form.
 
 The specific form this project took, an exploration of parametric forms, was directly inspired by the formulas and ideas presented in the book <a href="https://www.amazon.com/Morphing-Mathematical-Transformations-Architects-Designers/dp/1780674139">Morphing: A Guide to Mathematical Transformations for Architects and Designers (Laurence King Publishing, 2015)</a> by Joseph Choma.
 
-Not too long after completing the initial Parametric Geometry Explorer code, I encountered the world of [monome](https://monome.org/), their grid and norns sound computer, as well as the [lines](https://llllllll.co/) forum, populated by an amazingly kind and curious group of coders and musicians lovingly established as a way to better engage around monome's amazing works of art and many other topics. 
+Not long after completing the initial Parametric Geometry Explorer, I discovered the world of [monome](https://monome.org/): their grid and norns sound computer, along with the [lines](https://llllllll.co/) forum, a remarkably thoughtful and welcoming community of coders and musicians. Engaging with monome’s devices—defined by simplicity, openness, and a strong culture of shared experimentation—led me to learn Lua and SuperCollider and to author several scripts for norns. Most notably, I created [flora](https://github.com/jaseknighter/flora), a [Lindenmayer-system](https://en.wikipedia.org/wiki/L-system) sequencer and bandpass-filtered sawtooth engine.
 
-My own engagement with the monome devices, fueled by their focus on simplicity of form, completely open approach to freely crafting code in a community setting for other people, led me to learn Lua and SuperCollider, and author a number of scripts for norns. Most notably, I authored [flora](https://github.com/jaseknighter/flora), a [Lindenmayer systems](https://en.wikipedia.org/wiki/L-system) sequencer and bandpass-filtered sawtooth engine. 
+Revisiting the Parametric Geometry Explorer in 2026 initially began as a practical task—using an LLM to help revive a dormant codebase. It quickly turned into an unplanned experiment. Changes accumulated rapidly, and keeping the application functional required evolving it into something far more robust and deliberately architected, through sustained dialogue and collaboration with LLMs.
 
-The Parametric Geometry Explorer project and my work with the monome devices and lines community both connect directly to that formative playful experience I had as a kid, encountering simple graphical forms on a screen, generated from not that many lines of code.
+Throughout this process, I intentionally avoided researching “best practices” for working with LLMs. I wanted to see what would emerge from simply engaging in conversation, letting things grow, break, and grow again.
 
-My purpose in revisiting my 2019 Parametric Geometry Explorer started as a simple attempt to use an LLM to help me get it working again after sitting dormant on my laptop for many years. Soon after starting, I found myself in the middle of an unplanned experiment: changes grew rapidly, and I was forced to evolve the code into something more robust and well-architected just to get it working—through deep engagement and cooperation with LLMs.
+Technically, the Parametric Geometry Explorer serves as an interactive bridge between pure mathematics and real-time 3D visualization. The v0.5 rewrite represents a fundamental architectural shift, moving from a single-threaded bottleneck to a high-performance, worker-based system capable of handling complex topological data.
 
-As the code developed, I purposefully did not investigate any "best practices" for how to work with LLMs to write code. I really wanted to see what I could create by simply jumping into dialog and watching things grow and break and grow some more.
+Both the Parametric Geometry Explorer and my work with the monome community connect back to that same early fascination: generating complex, expressive forms from small, understandable pieces of code.
 
-Technically speaking, the Parametric Geometry Explorer serves as an interactive bridge between pure mathematics and real-time 3D visualization. The 2026 v0.5 rewrite represents a fundamental shift in how the application processes complex topological data, moving from a single-threaded bottleneck to a high-performance worker-based system.
-
-I hope you enjoy exploring the application as much as I have enjoyed building it.
+I hope you enjoy exploring the application as much as I’ve enjoyed building it.
 
 ---
 
