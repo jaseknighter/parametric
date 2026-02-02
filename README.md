@@ -3,7 +3,7 @@
 
 A browser-based environment for exploring complex mathematical surfaces and parametric geometry. Refactored and rearchitected in 2026 with the assistance of LLMs.
 
-**[https://jaseknighter.github.io/parametric](https://jaseknighter.github.io/parametric)** 
+**View the demo:** [https://jaseknighter.github.io/parametric](https://jaseknighter.github.io/parametric)
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg?style=for-the-badge)](https://jaseknighter.github.io/parametric)
 [![Version](https://img.shields.io/badge/version-v0.5.4.1-blue.svg?style=for-the-badge)](https://github.com/jaseknighter/parametric)
