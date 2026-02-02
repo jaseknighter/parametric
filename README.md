@@ -207,7 +207,7 @@ The following sections are under active development and subject to change.
 ---
 
 ## Current Status
-**v0.5.4.1 Hardening Release Live (2026-02-01)** This release completes the post v0.5 release cycle (0.5.1 - 0.5.4.1). All feature flags for this release cycle have been activated. See [Recent Releases](#recent-releases) below for more details.
+**v0.5.4.1 Hardening Release Live (2026-02-02)** This release completes the post v0.5 release cycle (0.5.1 - 0.5.4.1). All feature flags for this release cycle have been activated. See [Recent Releases](#recent-releases) below for more details.
 Pass Rate: ✅ 100% (Chrome/V8). 
 
 ### Test Coverage & Pass Rates
@@ -297,7 +297,7 @@ These serve as self-validation for the quality pipeline.
 
 ## Recent Releases
 
-* **v0.5.4.1** (2026-02-01): Mobile UX hardening. Feature flags for prior 0.5.X optimizations to enable them by default.
+* **v0.5.4.1** (2026-02-02): Mobile UX hardening. Feature flags for prior 0.5.X optimizations to enable them by default.
 * **v0.5.4** (2026-01-29): Meta-Testing PoC. Introduced semantic intent auditing and SVG vector export pipeline.
 * **v0.5.3** (2026-01-28): Display Domain Optimization. Mobile ergonomics, bottom-docked HUD, and unified coverage integration.
 * **v0.5.2** (2026-01-28): Guidance Bridge. Integrated the instructional registry with adaptive tooltips and documentation syncing.
