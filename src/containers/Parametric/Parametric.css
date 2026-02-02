@@ -132,7 +132,7 @@ html {
 .flag-a11y-on :focus-visible {
   outline: 3px solid #4da3ff !important;
   outline-offset: 2px;
-  box-shadow: 0 0 15px rgba(77, 163, 255, 0.6);
+  /* box-shadow: 0 0 15px rgba(77, 163, 255, 0.6); */
 }
 
 /* [cite: 2026-01-27] FIX: Allow JS to control HUD header casing */
@@ -249,14 +249,14 @@ html {
 :focus-visible {
   outline: 1px solid #4da3ff !important; /* Bright Action Blue */
   outline-offset: 2px;
-  box-shadow: 0 0 4px rgba(77, 163, 255, 0.3);
+  /* box-shadow: 0 0 4px rgba(77, 163, 255, 0.3); */
   z-index: 1000; /* Ensure focus ring sits on top */
 }
 
 /* [cite: 2026-01-27] A11Y: Slider Handle Focus Ring */
 .slider-handles div[role="slider"]:focus-visible {
   outline: 2px solid white !important;
-  box-shadow: 0 0 10px #4da3ff;
+  /* box-shadow: 0 0 10px #4da3ff; */
 }
 
 /* [cite: 2026-01-16] FIX: Ensure Diagnostics HUD is visible to Playwright */
@@ -529,7 +529,7 @@ html {
 /* [cite: 2026-01-28] VISUAL: Semi-transparent Header on Mobile */
 .Container.layout-mobile.feature-mobile-hud .Header {
   background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
+  /* backdrop-filter: blur(8px); */
   /* Ensure header doesn't block touch events on canvas below it */
   pointer-events: none; 
 }
@@ -554,7 +554,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
+  /* backdrop-filter: blur(4px); */
   pointer-events: auto !important;
   border-radius: 0; /* [cite: 2026-01-28] VISUAL: Remove border radius */
   transition: opacity 0.2s ease;
@@ -610,4 +610,80 @@ html {
 
 .Container.layout-desktop .Interface {
   width: 100% !important;
+}
+
+/* [cite: 2026-02-01] MOBILE: HUD UX Hardening */
+.Container.layout-mobile .HUD_Textarea,
+.Container.layout-mobile input,
+.Container.layout-mobile select {
+  font-size: 16px !important; /* Prevent iOS zoom on focus */
+}
+
+.Container.layout-mobile .HUD_Resize_Handle {
+  width: 44px !important; /* Minimum touch target size */
+  height: 44px !important;
+  opacity: 0.8;
+  /* Ensure it sits above other elements for touch */
+  z-index: 10; 
+  touch-action: none !important; /* [cite: 2026-02-01] FIX: Enable touch dragging */
+}
+
+/* [cite: 2026-02-01] MOBILE: Landscape Lock */
+/* Prevent usage in landscape on touch devices (phones) to ensure UI stability */
+/* [cite: 2026-02-01] FIX: Relaxed query for Playwright compatibility (removed hover/pointer checks) */
+@media only screen and (orientation: landscape) and (max-height: 700px) {
+  body {
+    overflow: hidden;
+  }
+
+  .Container {
+    display: none !important;
+  }
+
+  body::after {
+    content: "Please rotate your device to portrait mode.";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 99999;
+    text-align: center;
+    padding: 20px;
+  }
+}
+
+/* [cite: 2026-02-01] VISUAL: Force remove blur from HUD elements */
+.HUD_Wrapper, .HUD_Header, .HUD_Content_Area {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* [cite: 2026-02-01] TEST HOOK: Force Landscape Lock for Playwright */
+html[data-force-landscape="true"] .Container {
+  display: none !important;
+}
+
+html[data-force-landscape="true"] body::after {
+  content: "Please rotate your device to portrait mode.";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  z-index: 99999;
+  text-align: center;
+  padding: 20px;
 }

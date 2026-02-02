@@ -569,9 +569,12 @@ const Parametric = () => {
         // [cite: 2026-01-17] MVA: Only flush if breaking a manual lock
         if (isEditingHUD) {
             Debug.log("PIPELINE", "Switching Authority: HUD -> Slider. Flushing.");
-            if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
-            setIsEditingHUD(false); 
-            handleHUDChange(null, { forceSync: true }); 
+            // [cite: 2026-02-01] FIX: Defer blur/state update to prevent "flushDiscreteUpdates" warning during slider interaction
+            setTimeout(() => {
+              if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+              setIsEditingHUD(false); 
+              handleHUDChange(null, { forceSync: true }); 
+            }, 0);
         }
     }
 

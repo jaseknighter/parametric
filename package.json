@@ -63,6 +63,8 @@
     "test:complete": "npm run clean && npm run test && npm run test:baseline && node scripts/merge-coverage.cjs && node scripts/generate-coverage-table.cjs",
     "/* 5. GOVERNANCE & DOCS [DEV + PROD] - Meta-Audit heuristics and Readme Sync. */": "",
     "test:audit": "node scripts/analyze-tests.cjs",
+    "test:readme": "jest tests/readme.test.js --testPathIgnorePatterns=\"node_modules\" --env=node",
+    "test:readme:prod": "gh workflow run readme-check.yml --ref main",
     "docs:sync": "node scripts/sync-readme.js",
     "coverage:merge": "node scripts/merge-coverage.cjs",
     "coverage-table": "node scripts/generate-coverage-table.cjs",

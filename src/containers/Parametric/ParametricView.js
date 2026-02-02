@@ -400,11 +400,15 @@ const ParametricView = forwardRef((props, ref) => {
         ${isMobileHardening ? `
           /* [cite: 2026-01-31] MOBILE HARDENING (v0.5.4.2) */
           
-          /* 1. Tooltip Suppression: Kill native callouts */
-          .Container.layout-mobile * {
+          /* 1. Tooltip Suppression: Kill native callouts globally, restore for Textarea */
+          .Container.layout-mobile {
             -webkit-touch-callout: none !important;
-            justify-content: space-evenly;
-            
+          }
+
+          .Container.layout-mobile .HUD_Textarea {
+            -webkit-touch-callout: default !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
           }
 
           /* 2. Gap Fix & Shift Stability: Anchor Parent */

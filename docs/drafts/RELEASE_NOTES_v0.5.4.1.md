@@ -20,13 +20,16 @@ This maintenance release focuses on **"Governance over Guesswork."** Following t
 
 ## 2. Mobile UX & iOS Safari Hardening
 
+* **Landscape Lock:** Implemented a "Please rotate device" overlay for mobile landscape orientation to ensure UI stability on small screens.
 * **Safari UI Alignment:** Resolved a critical occlusion bug where the Micro-Nav toggle was hidden by the dynamic iOS Safari URL bar. The UI now respects `env(safe-area-inset-bottom)` to ensure visibility across all mobile browsers.
+* **HUD Ergonomics:**
+  * **iOS Zoom Prevention:** Enforced 16px font size on inputs and implemented a scroll-nudge workaround to reliably reset the viewport after text editing.
+  * **Visuals:** Removed backdrop blur filters and the Info Icon in mobile layout for cleaner rendering and reduced clutter.
+  * **Sizing:** Reduced default HUD height on mobile to better accommodate on-screen keyboards.
 * **Gesture Conflict Resolution:** Hardened the 3D canvas against browser-level interference.
-* Native pinch-to-zoom is now disabled on the canvas via `touch-action: none`.
-* **Remapped Zoom:** 3D zoom is now mapped to **two-finger vertical swipes**, providing a stable and predictable interaction model for mobile users.
-* **HUD Drag Stability:** Applied `touch-action: none` to the HUD header to prevent the browser from reclaiming drag gestures as scrolls, ensuring smooth dragging on mobile devices.
-
-
+  * **Multi-Touch Gating:** Aggressively tracks multi-touch start events to strictly separate rotation (one finger) from zoom (two fingers), preventing accidental camera jumps.
+  * **HUD Drag Stability:** Applied `touch-action: none` to the HUD header and resize handles to prevent browser scrolling during interaction.
+* **Stability:** Resolved `unstable_flushDiscreteUpdates` React warning by deferring state updates during slider-to-manual mode transitions.
 * **Tooltip Suppression:** Finalized the block on `MathTooltip` for mobile layouts to prevent "sticky" hover artifacts typical of touch interfaces.
 
 ---

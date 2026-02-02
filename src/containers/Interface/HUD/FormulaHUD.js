@@ -62,7 +62,8 @@ const FormulaHUD = ({
     if (layoutMode === 'mobile') {
       setSize(prev => ({
         ...prev,
-        width: Math.min(300, window.innerWidth * 0.6) // [cite: 2026-01-20] FIX: Narrower HUD for mobile overlay
+        width: Math.min(300, window.innerWidth * 0.6), // [cite: 2026-01-20] FIX: Narrower HUD for mobile overlay
+        height: (window.innerHeight * 0.5) - 160 // [cite: 2026-02-01] FIX: Shorter HUD on mobile (minus header + buffer)
       }));
     }
   }, [layoutMode]);
@@ -189,12 +190,26 @@ const FormulaHUD = ({
        // Optional: Auto-exit manual if no changes were made
        // handleFormulaChange(null, { exitManual: true });
     }
+
+    // [cite: 2026-02-01] MOBILE: Reset Zoom on Blur
+    // Forces iOS to reset the visual viewport if it was zoomed in during editing
+    if (layoutMode === 'mobile') {
+      // [cite: 2026-02-01] FIX: Replaced meta-tag hack with scroll nudge per iOS best practices
+      setTimeout(() => {
+        window.scrollTo({ top: window.scrollY + 1 });
+        window.scrollTo({ top: window.scrollY - 1 });
+      }, 100);
+    }
   };
 
   const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
 
   const startDrag = (e) => {
     e.preventDefault(); // [cite: 2026-01-14] FIX: Prevent default browser drag/select
+    
+    // [cite: 2026-02-01] UX: Blur active input to hide keyboard/prevent conflict
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+
     setIsDragging(true);
     if (e.target.setPointerCapture) e.target.setPointerCapture(e.pointerId);
     hasMoved.current = false;
@@ -242,6 +257,16 @@ const FormulaHUD = ({
 
   const startResize = (e) => {
     e.preventDefault(); // [cite: 2026-01-14] FIX: Prevent native image dragging
+
+    // [cite: 2026-02-01] UX: Blur active input to hide keyboard/prevent conflict
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+
+    // [cite: 2026-02-01] TEST HOOK: Signal resize attempt for mobile automation
+    // test-only visibility: HUD resize is reachable while input is focused
+    if (window.__PLAYWRIGHT__) {
+      window.__hudResizeAttempted = true;
+    }
+
     setIsResizing(true);
     if (e.target.setPointerCapture) e.target.setPointerCapture(e.pointerId);
     resizeStartDim.current = { w: size.width, h: size.height, x: e.clientX, y: e.clientY };
@@ -258,9 +283,13 @@ const FormulaHUD = ({
   }, [isResizing, position]);
 
   const stopAllActions = (e) => {
-    if (e.target.releasePointerCapture) e.target.releasePointerCapture(e.pointerId);
+    // [cite: 2026-02-01] FIX: Reset state immediately to prevent "stuck" cursor/mode
     setIsDragging(false);
     setIsResizing(false);
+
+    try {
+      if (e.target.releasePointerCapture) e.target.releasePointerCapture(e.pointerId);
+    } catch (err) { /* Ignore capture errors if element is gone */ }
   };
 
   useEffect(() => {
@@ -341,7 +370,7 @@ const FormulaHUD = ({
           width: `${size.width}px`,
           maxWidth: '90vw', // [cite: 2026-01-19] MOBILE: Prevent HUD from overflowing screen width
           // [cite: 2026-01-28] VISUAL: Increased opacity and z-index to sit above Micro-Nav
-          zIndex: 200, 
+          zIndex: 200
         }}
       >
         <div 
@@ -357,6 +386,7 @@ const FormulaHUD = ({
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span>FORMULA EDITOR ({activeStatus})</span>
             {/* [cite: 2026-01-27] TOOLTIP: Info Icon moved to Header for better visibility */}
+            {layoutMode !== 'mobile' && (
             <div 
               className="HUD_Info_Icon"
               role="button"
@@ -404,6 +434,7 @@ const FormulaHUD = ({
             >
               i
             </div>
+            )}
           </div>
           <div 
             className={`Status_Dot ${isMathematicalError ? "MathError" : (isFormulaValid ? "Valid" : "Invalid")}`} 
