@@ -4,6 +4,9 @@ test.describe('Mobile UX Hardening', () => {
   // [cite: 2026-02-01] FIX: Skip Firefox as it lacks mobile emulation support
   test.skip(({ browserName }) => browserName === 'firefox', 'Firefox does not support isMobile emulation');
 
+  // [cite: 2026-02-01] UPDATE: HUD is disabled on mobile viewports
+  test.skip(true, 'HUD is disabled on mobile viewports');
+
   // Emulate iPhone SE (small screen)
   test.use({ 
     viewport: { width: 375, height: 667 }, 
