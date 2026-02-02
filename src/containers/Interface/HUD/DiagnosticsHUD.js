@@ -113,7 +113,7 @@ const DiagnosticsHUD = ({ logs = [] }) => {
           padding: '12px',
           border: '1px solid #333',
           zIndex: 2000,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+          // boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
         }}>
           <h2 style={{ color: activeColor, fontSize: '9px', margin: '0 0 8px 0', letterSpacing: '0.1rem' }}>
             {smokeResults.success ? 'INTEGRITY: NOMINAL' : 'INTEGRITY: BREACH'}

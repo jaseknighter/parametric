@@ -70,7 +70,7 @@ const MathTooltip = ({ intent, text, visible, x, y, isA11yEnabled, placement, ..
         borderRadius: '4px',
         fontSize: '14px',
         maxWidth: '300px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+        // boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
         whiteSpace: 'pre-wrap'
       }}
     >

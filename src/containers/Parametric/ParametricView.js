@@ -569,7 +569,7 @@ const ParametricView = forwardRef((props, ref) => {
       </div>
 
       {/* [cite: 2026-01-28] LAYOUT: HUD moved to root to ensure z-index layering above Interface in mobile */}
-      {memoizedHUD}
+      {layoutMode !== 'mobile' && memoizedHUD}
 
       {/* [cite: 2026-01-28] MICRO-NAV: Toggle Button (Direct child of Container) */}
       {layoutMode === 'mobile' && isMobileHud && (
