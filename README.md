@@ -5,7 +5,7 @@ A browser-based environment for exploring complex mathematical surfaces and para
 
 **View the app:** [https://jaseknighter.github.io/parametric](https://jaseknighter.github.io/parametric)
 
-[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg?style=for-the-badge)](https://jaseknighter.github.io/parametric)
+[![Live App](https://img.shields.io/badge/app-live-brightgreen.svg?style=for-the-badge)](https://jaseknighter.github.io/parametric)
 [![Version](https://img.shields.io/badge/version-v0.5.4.1-blue.svg?style=for-the-badge)](https://github.com/jaseknighter/parametric)
 
 ---
